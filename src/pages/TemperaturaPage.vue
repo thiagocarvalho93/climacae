@@ -6,17 +6,25 @@
         <q-card>
           <q-card-section class="fade">
             <div class="q-pa-md row q-col-gutter-md">
-              <div class="col-3">
+              <div class="col-3 col-md-2">
                 <q-select
-                  dense
-                  outlined
+                  filled
+                  color="light-blue-7"
+                  label-color="light-blue-7"
                   v-model="estacaoSelecionada"
                   :options="estacoes.map((estacao) => estacao.ID)"
                   @update:model-value="obterDados"
                   label="Estação"
-                />
+                >
+                  <template v-slot:prepend>
+                    <q-icon name="search" />
+                  </template>
+                </q-select>
               </div>
             </div>
+          </q-card-section>
+          <q-separator class="q-mb-sm"></q-separator>
+          <q-card-section class="fade">
             <apexchart
               height="350"
               :options="chartOptions"
