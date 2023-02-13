@@ -108,7 +108,7 @@ export default defineComponent({
           tickAmount: 8,
         },
         yaxis: {
-          min: 7,
+          min: 5,
           max: 40,
         },
       },

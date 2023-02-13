@@ -8,24 +8,28 @@ const routes = [
         path: "/",
         title: "Home",
         icon: "bar_chart",
+        showMenu: true,
         component: () => import("pages/IndexPage.vue"),
       },
       {
         path: "temperatura",
         title: "Temperatura",
         icon: "thermostat",
+        showMenu: true,
         component: () => import("pages/TemperaturaPage.vue"),
       },
       {
         path: "precipitacao",
         title: "Precipitação",
         icon: "water_drop",
+        showMenu: true,
         component: () => import("pages/PrecipitacaoPage.vue"),
       },
       {
         path: "vento",
         title: "Vento",
         icon: "wind_power",
+        showMenu: true,
         component: () => import("pages/VentoPage.vue"),
       },
       {

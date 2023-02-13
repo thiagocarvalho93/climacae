@@ -1,34 +1,18 @@
 <template>
   <q-layout view="hHh LpR fFf">
-    <q-header>
-      <q-toolbar class="bg-light-blue-7 text-white shadow-2">
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
-
-        <q-toolbar-title> Climacaé </q-toolbar-title>
-      </q-toolbar>
-    </q-header>
-
     <q-drawer
       v-model="leftDrawerOpen"
       :width="200"
       :breakpoint="700"
       show-if-above
-      class="bg-light-blue-9"
+      class="bg-blue-9"
+      :mini="true"
     >
-      <q-list padding>
-        <EssentialLink
-          v-for="link in routes[0].children"
-          :key="link.title"
-          v-bind="link"
-        />
-      </q-list>
+      <EssentialLink
+        v-for="link in routes[0].children.filter((route) => !!route.showMenu)"
+        :key="link.title"
+        v-bind="link"
+      />
     </q-drawer>
 
     <q-page-container>

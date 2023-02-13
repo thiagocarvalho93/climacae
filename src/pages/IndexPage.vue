@@ -1,6 +1,6 @@
 <template>
   <q-page class="q-pa-md bg-blue-grey-1">
-    <div class="row q-col-gutter-md">
+    <div class="row q-col-gutter-md fade">
       <div class="col-3">
         <q-card flat bordered>
           <q-card-section>

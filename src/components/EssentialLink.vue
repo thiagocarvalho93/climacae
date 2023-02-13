@@ -3,12 +3,10 @@
     <q-item-section v-if="icon" avatar>
       <q-icon color="white" :name="icon" />
     </q-item-section>
-
-    <q-item-section>
-      <q-item-label class="text-white">{{ title }}</q-item-label>
-    </q-item-section>
+    <q-tooltip anchor="center right" self="center left" :offset="[5, 20]">
+      {{ title }}
+    </q-tooltip>
   </q-item>
-  <q-separator />
 </template>
 
 <script>
@@ -35,6 +33,12 @@ export default defineComponent({
     icon: {
       type: String,
       default: "",
+    },
+  },
+
+  methods: {
+    selecionar() {
+      this.$router.push(path);
     },
   },
 });
