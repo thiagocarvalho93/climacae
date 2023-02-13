@@ -6,7 +6,7 @@
         <q-card>
           <q-card-section class="fade">
             <div class="q-pa-md row q-col-gutter-md">
-              <div class="col-3 col-md-2">
+              <div class="col-12 col-xs-6 col-sm-5 col-md-3">
                 <q-select
                   filled
                   color="light-blue-7"
@@ -32,6 +32,13 @@
               ref="graficoTemperatura"
             ></apexchart>
           </q-card-section>
+
+          <q-inner-loading
+            :showing="carregando"
+            label="Aguarde..."
+            label-class="text-teal"
+            label-style="font-size: 1.1em"
+          />
         </q-card>
       </div>
     </div>
@@ -49,6 +56,7 @@ export default defineComponent({
 
   data() {
     return {
+      carregando: true,
       estacoes: [],
       estacaoSelecionada: "",
       apiKey: API_KEY,
@@ -127,16 +135,17 @@ export default defineComponent({
     },
 
     async obterDados() {
+      this.carregando = true;
       try {
         const response = await this.obterObservacoesDiaAnteriorEstacao(
           this.estacaoSelecionada
         );
-        console.log(response);
         this.dados = response;
       } catch (error) {
         console.log("Erro: ", error);
       }
       this.atualizarGrafico();
+      this.carregando = false;
     },
 
     atualizarGrafico() {
