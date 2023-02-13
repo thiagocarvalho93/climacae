@@ -3,29 +3,21 @@
   <q-page class="q-pa-md bg-blue-grey-1">
     <div class="q-pa-md row q-col-gutter-md">
       <div class="col-12">
-        <q-card flat bordered>
-          <div class="q-pa-md row q-col-gutter-md">
-            <div class="col-3">
-              <q-select
-                dense
-                outlined
-                v-model="estacaoSelecionada"
-                :options="estacoes.map((estacao) => estacao.ID)"
-                label="Estação"
-              />
+        <q-card>
+          <q-card-section class="fade">
+            <div class="q-pa-md row q-col-gutter-md">
+              <div class="col-3">
+                <q-select
+                  dense
+                  outlined
+                  v-model="estacaoSelecionada"
+                  :options="estacoes.map((estacao) => estacao.ID)"
+                  @update:model-value="obterDados"
+                  label="Estação"
+                />
+              </div>
             </div>
-            <div class="col-5">
-              <q-btn @click="obterDados">Pesquisar</q-btn>
-            </div>
-          </div>
-        </q-card>
-      </div>
-
-      <div class="col-12">
-        <q-card flat bordered>
-          <q-card-section>
             <apexchart
-              type="area"
               height="350"
               :options="chartOptions"
               :series="series"
@@ -55,28 +47,35 @@ export default defineComponent({
       series: [
         {
           name: "Temperaturas",
-          data: [
-            [new Date(1676126700 * 1000), 10],
-            [new Date(1676126701 * 1000), 35],
-            [new Date(1676126702 * 1000), 49],
-            [new Date(1676126703 * 1000), 69],
-            [new Date(1676126704 * 1000), 148],
-          ],
+          data: [[new Date(1676126700 * 1000), 10]],
         },
       ],
       chartOptions: {
         chart: {
-          height: 350,
           type: "line",
           zoom: {
             enabled: false,
+          },
+          animations: {
+            enabled: true,
+            easing: "easeinout",
+            speed: 800,
+            animateGradually: {
+              enabled: true,
+              delay: 150,
+            },
+            dynamicAnimation: {
+              enabled: true,
+              speed: 350,
+            },
           },
         },
         dataLabels: {
           enabled: false,
         },
         stroke: {
-          curve: "straight",
+          width: 3,
+          curve: "smooth",
         },
         title: {
           text: "Temperatura",
@@ -133,23 +132,22 @@ export default defineComponent({
     },
 
     atualizarGrafico() {
-      this.$refs.graficoTemperatura.updateSeries(
-        [
-          {
-            name: "temperatura",
-            data:
-              this.dados &&
-              this.dados.data &&
-              this.dados.data.observations.map((ob) => [
-                ob.epoch * 1000,
-                ob.metric.tempAvg,
-              ]),
-          },
-        ],
-        false,
-        true
-      );
+      this.$refs.graficoTemperatura.updateSeries([
+        {
+          name: "temperatura",
+          data:
+            this.dados &&
+            this.dados.data &&
+            this.dados.data.observations.map((ob) => [
+              ob.epoch * 1000,
+              ob.metric.tempAvg,
+            ]),
+        },
+      ]);
     },
   },
 });
 </script>
+
+<style scoped>
+</style>
