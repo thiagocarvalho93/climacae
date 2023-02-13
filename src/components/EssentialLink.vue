@@ -1,5 +1,5 @@
 <template>
-  <q-item clickable tag="a" @click="$router.push(path)">
+  <q-item class="fade" clickable tag="a" @click="$router.push(path)">
     <q-item-section v-if="icon" avatar>
       <q-icon color="white" :name="icon" />
     </q-item-section>
