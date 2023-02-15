@@ -127,27 +127,44 @@ export default defineComponent({
     return {
       apiKey: API_KEY,
       estacoes: STATIONS,
+      observacoes: [],
     };
   },
 
   async mounted() {
-    const response = await this.obterObservacoesDiaAnteriorEstacao(
-      STATIONS.IMACA7.ID
-    );
-    console.log(response.data.observations.map((ob) => ob.metric.tempAvg));
+    // const response = await this.obterObservacoesDiaAnteriorEstacao(
+    //   STATIONS.IMACA7.ID
+    // );
+    // console.log(response.data.observations.map((ob) => ob.metric.tempAvg));
+
+    await this.obterObservacoesTodasEstacoes();
+    console.log(this.observacoes);
   },
 
   methods: {
-    obterObservacoesDiaAnteriorEstacao(codigoEstacao) {
+    async obterObservacoesDiaAnteriorEstacao(codigoEstacao) {
       // https://api.weather.com/v1/location/SBME:9:BR/observations/historical.json?apiKey=e1f10a1e78da46f5b10a1e78da96f525&units=m&startDate=20230122&endDate=20230122
       return new Promise((resolve, reject) => {
         return this.$api
           .get(
             `/pws/observations/all/1day?apiKey=${this.apiKey}&stationId=${codigoEstacao}&numericPrecision=decimal&format=json&units=m`
           )
-          .then((response) => resolve(response))
+          .then((response) => resolve(response.data))
           .catch((error) => reject(error));
       });
+    },
+
+    async obterObservacoesTodasEstacoes() {
+      console.log(Object.keys(STATIONS));
+      const stations = Object.keys(STATIONS);
+
+      const dados = await Promise.all(
+        stations.map((station) =>
+          this.obterObservacoesDiaAnteriorEstacao(station)
+        )
+      );
+
+      dados.forEach((x) => this.observacoes.push(...x.observations));
     },
 
     obterDadosEstacao(codigoEstacao) {},
