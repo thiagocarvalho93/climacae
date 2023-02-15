@@ -8,11 +8,15 @@
       class="bg-blue-9"
       :mini="true"
     >
-      <EssentialLink
+      <q-item
         v-for="link in routes[0].children.filter((route) => !!route.showMenu)"
         :key="link.title"
-        v-bind="link"
-      />
+        class="fade item"
+        clickable
+        @click="$router.push(link.path)"
+      >
+        <EssentialLink v-bind="link" />
+      </q-item>
     </q-drawer>
 
     <q-page-container>
@@ -42,7 +46,13 @@ export default defineComponent({
       toggleLeftDrawer() {
         leftDrawerOpen.value = !leftDrawerOpen.value;
       },
+
+      clickItem() {
+        this.$router.push(path);
+      },
     };
   },
 });
 </script>
+<style scoped>
+</style>

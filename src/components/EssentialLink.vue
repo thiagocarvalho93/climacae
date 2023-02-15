@@ -1,12 +1,10 @@
 <template>
-  <q-item class="fade" clickable tag="a" @click="$router.push(path)">
-    <q-item-section v-if="icon" avatar>
-      <q-icon color="white" :name="icon" />
-    </q-item-section>
-    <q-tooltip anchor="center right" self="center left" :offset="[5, 20]">
-      {{ title }}
-    </q-tooltip>
-  </q-item>
+  <q-item-section v-if="icon" avatar>
+    <q-icon class="icon" color="white" :name="icon" />
+  </q-item-section>
+  <q-tooltip anchor="center right" self="center left" :offset="[5, 20]">
+    {{ title }}
+  </q-tooltip>
 </template>
 
 <script>
@@ -43,3 +41,9 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+.item:hover {
+  animation: fadeIn 1s infinite alternate;
+}
+</style>
