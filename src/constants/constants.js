@@ -1,5 +1,3 @@
-const API_KEY = "e1f10a1e78da46f5b10a1e78da96f525";
-
 const STATIONS = {
   IRIODA1: { ID: "IRIODA1", NOME: "Rio das Ostras" },
   IMACA6: { ID: "IMACA6", NOME: "" },
@@ -16,6 +14,7 @@ const STATIONS = {
 const CORES = {
   AZUL: "#1565c0",
   VERMELHO: "#f44336",
+  INDIGO: "#3f51b5",
 };
 
-export { API_KEY, STATIONS, CORES };
+export { STATIONS, CORES };

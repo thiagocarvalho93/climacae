@@ -20,6 +20,18 @@ export default defineComponent({
   }
 }
 
+@keyframes zoomInOut {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 .fade {
   animation-name: fadeIn;
   animation-duration: 1s;

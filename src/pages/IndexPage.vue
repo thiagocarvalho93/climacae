@@ -2,12 +2,12 @@
   <q-page class="q-pa-md bg-blue-grey-1">
     <div class="row q-col-gutter-md fade">
       <div class="col-3">
-        <q-card flat bordered dark class="bg-red">
+        <q-card flat dark class="bg-red maxima">
           <q-card-section>
             <q-item>
               <q-item-section>
                 <q-item-label> MÁXIMA </q-item-label>
-                <q-item-label class="text-bold">
+                <q-item-label class="text-bold text-h6">
                   {{ maxima && maxima.metric && maxima.metric.tempHigh }}°C
                 </q-item-label>
               </q-item-section>
@@ -19,19 +19,19 @@
           <q-inner-loading
             :showing="carregando"
             label="Aguarde..."
-            label-class="text-teal"
+            label-class="text-red"
             label-style="font-size: 1.1em"
           />
         </q-card>
       </div>
 
       <div class="col-3">
-        <q-card flat bordered dark class="bg-blue">
+        <q-card flat dark class="bg-primary minima">
           <q-card-section>
             <q-item>
               <q-item-section>
                 <q-item-label> MÍNIMA </q-item-label>
-                <q-item-label class="text-bold">
+                <q-item-label class="text-bold text-h6">
                   {{ minima && minima.metric && minima.metric.tempHigh }}°C
                 </q-item-label>
               </q-item-section>
@@ -44,19 +44,19 @@
           <q-inner-loading
             :showing="carregando"
             label="Aguarde..."
-            label-class="text-teal"
+            label-class="text-primary"
             label-style="font-size: 1.1em"
           />
         </q-card>
       </div>
 
       <div class="col-3">
-        <q-card flat bordered dark class="bg-teal">
+        <q-card flat dark class="bg-teal vento">
           <q-card-section>
             <q-item>
               <q-item-section>
                 <q-item-label> VENTO MÁXIMO </q-item-label>
-                <q-item-label class="text-bold">
+                <q-item-label class="text-bold text-h6">
                   {{
                     ventoMaximo &&
                     ventoMaximo.metric &&
@@ -79,13 +79,15 @@
         </q-card>
       </div>
 
-      <div class="col-3">
-        <q-card flat bordered dark class="bg-indigo">
+      <div class="col-3 precipitacao">
+        <q-card flat dark class="bg-indigo">
           <q-card-section>
             <q-item>
               <q-item-section>
                 <q-item-label> PRECIPITAÇÃO MÁXIMA </q-item-label>
-                <q-item-label class="text-bold"> mm </q-item-label>
+                <q-item-label class="text-bold text-h6">
+                  {{ precipitacaoMaxima }}mm
+                </q-item-label>
               </q-item-section>
               <q-item-section avatar>
                 <q-icon class="icon" size="lg" name="water_drop" />
@@ -95,7 +97,7 @@
           <q-inner-loading
             :showing="carregando"
             label="Aguarde..."
-            label-class="text-teal"
+            label-class="text-indigo"
             label-style="font-size: 1.1em"
           />
         </q-card>
@@ -119,15 +121,41 @@
         </q-card>
       </div> -->
 
-      <div class="col-12">
-        <q-card flat bordered>
+      <div class="col-8">
+        <q-card flat>
+          <q-card-section class="text-bold text-h6">
+            Temperatura
+          </q-card-section>
           <q-card-section>
             <apexchart
               type="bar"
-              height="350"
-              :options="chartOptions"
-              :series="series"
+              height="250"
+              :options="chartTemperaturaOptions"
+              :series="seriesTemperatura"
               ref="graficoColunaTemperatura"
+            ></apexchart>
+          </q-card-section>
+          <q-inner-loading
+            :showing="carregando"
+            label="Aguarde..."
+            label-class="text-teal"
+            label-style="font-size: 1.1em"
+          />
+        </q-card>
+      </div>
+
+      <div class="col-4">
+        <q-card flat>
+          <q-card-section class="text-bold text-h6">
+            Precipitação
+          </q-card-section>
+          <q-card-section>
+            <apexchart
+              type="bar"
+              height="250"
+              :options="chartPrecipitacaoOptions"
+              :series="seriesPrecipitacao"
+              ref="graficoPrecipitacao"
             ></apexchart>
           </q-card-section>
           <q-inner-loading
@@ -144,7 +172,8 @@
 
 <script>
 import { defineComponent, defineAsyncComponent } from "vue";
-import { API_KEY, STATIONS, CORES } from "../constants/constants";
+import { STATIONS, CORES } from "../constants/constants";
+import { API_KEY } from "src/constants/secrets";
 
 export default defineComponent({
   name: "IndexPage",
@@ -161,8 +190,9 @@ export default defineComponent({
       minima: 0,
       maxima: 0,
       ventoMaximo: 0,
+      precipitacaoMaxima: 0,
 
-      series: [
+      seriesTemperatura: [
         {
           name: "Máxima",
           color: CORES.VERMELHO,
@@ -175,7 +205,7 @@ export default defineComponent({
         },
       ],
 
-      chartOptions: {
+      chartTemperaturaOptions: {
         chart: {
           type: "bar",
           height: 350,
@@ -184,7 +214,7 @@ export default defineComponent({
           bar: {
             horizontal: false,
             columnWidth: "45%",
-            borderRadius: 1,
+            borderRadius: 2,
             endingShape: "rounded",
           },
         },
@@ -195,7 +225,7 @@ export default defineComponent({
             },
           },
           row: {
-            colors: ["#fff", "#f2f2f2"],
+            // colors: ["#fff", "#f2f2f2"],
           },
 
           strokeDashArray: 7,
@@ -206,17 +236,50 @@ export default defineComponent({
         xaxis: {
           categories: Object.keys(STATIONS),
         },
-        yaxis: {
-          title: {
-            text: "Temperatura (°C)",
-          },
-        },
+        yaxis: {},
         tooltip: {
           y: {
             formatter: function (val) {
               return val.toFixed(1) + "°C";
             },
           },
+        },
+      },
+      seriesPrecipitacao: [
+        {
+          data: [400, 430, 448, 470, 540, 580, 690, 1100],
+          color: CORES.INDIGO,
+        },
+      ],
+      chartPrecipitacaoOptions: {
+        chart: {
+          type: "bar",
+          height: 350,
+        },
+        plotOptions: {
+          bar: {
+            borderRadius: 2,
+            horizontal: true,
+          },
+        },
+        grid: {
+          yaxis: {
+            lines: {
+              show: false,
+            },
+          },
+          strokeDashArray: 7,
+          column: {
+            // colors: ["#fff", "#f2f2f2"],
+          },
+
+          // strokeDashArray: 7,
+        },
+        dataLabels: {
+          enabled: false,
+        },
+        xaxis: {
+          categories: Object.keys(STATIONS),
         },
       },
     };
@@ -231,7 +294,8 @@ export default defineComponent({
       this.carregando = true;
       await this.obterObservacoesTodasEstacoes();
       this.calcularMetadados();
-      this.atualizarGraficoColuna();
+      this.atualizarGraficoTemperatura();
+      this.atualizarGraficoPrecipitacao();
       this.carregando = false;
     },
 
@@ -287,7 +351,7 @@ export default defineComponent({
       console.log(this.minima);
     },
 
-    atualizarGraficoColuna() {
+    atualizarGraficoTemperatura() {
       let minimas = [];
       let maximas = [];
       Object.keys(STATIONS).forEach((station) => {
@@ -334,7 +398,60 @@ export default defineComponent({
       ]);
     },
 
-    obterDadosEstacao(codigoEstacao) {},
+    atualizarGraficoPrecipitacao() {
+      let precipitacoes = [];
+
+      Object.keys(STATIONS).forEach((station) => {
+        precipitacoes.push(
+          this.observacoes
+            .filter((x) => x.stationID == station)
+            .reduce((acc, valor) => {
+              return (
+                acc?.metric?.precipTotal ?? 0 + valor?.metric?.precipTotal ?? 0
+              );
+            })
+        );
+      });
+
+      console.log(precipitacoes);
+      this.precipitacaoMaxima = Math.max(precipitacoes);
+
+      this.$refs.graficoPrecipitacao.updateSeries([
+        {
+          data: precipitacoes,
+        },
+      ]);
+    },
   },
 });
 </script>
+
+<style scoped>
+.maxima {
+  animation-name: zoomInOut;
+  animation-duration: 0.4s;
+  animation-timing-function: ease;
+  animation-delay: 0s;
+}
+
+.minima {
+  animation-name: zoomInOut;
+  animation-duration: 0.4s;
+  animation-timing-function: ease;
+  animation-delay: 0.2s;
+}
+
+.vento {
+  animation-name: zoomInOut;
+  animation-duration: 0.4s;
+  animation-timing-function: ease;
+  animation-delay: 0.4s;
+}
+
+.precipitacao {
+  animation-name: zoomInOut;
+  animation-duration: 0.4s;
+  animation-timing-function: ease;
+  animation-delay: 0.6s;
+}
+</style>

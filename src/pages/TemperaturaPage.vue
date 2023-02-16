@@ -47,7 +47,8 @@
 
 <script>
 import { defineComponent } from "vue";
-import { API_KEY, STATIONS } from "../constants/constants";
+import { STATIONS } from "../constants/constants";
+import { API_KEY } from "src/constants/secrets";
 
 export default defineComponent({
   name: "TemperaturaPage",
