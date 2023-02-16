@@ -1,7 +1,7 @@
 <template>
   <q-page class="q-pa-md bg-blue-grey-1">
     <div class="row q-col-gutter-md fade">
-      <div class="col-3">
+      <div class="col-12 col-sm-6 col-md-3">
         <q-card flat dark class="bg-red maxima">
           <q-card-section>
             <q-item>
@@ -25,7 +25,7 @@
         </q-card>
       </div>
 
-      <div class="col-3">
+      <div class="col-12 col-sm-6 col-md-3">
         <q-card flat dark class="bg-primary minima">
           <q-card-section>
             <q-item>
@@ -50,7 +50,7 @@
         </q-card>
       </div>
 
-      <div class="col-3">
+      <div class="col-12 col-sm-6 col-md-3">
         <q-card flat dark class="bg-teal vento">
           <q-card-section>
             <q-item>
@@ -79,7 +79,7 @@
         </q-card>
       </div>
 
-      <div class="col-3 precipitacao">
+      <div class="col-12 col-sm-6 col-md-3 precipitacao">
         <q-card flat dark class="bg-indigo">
           <q-card-section>
             <q-item>
@@ -121,7 +121,7 @@
         </q-card>
       </div> -->
 
-      <div class="col-8">
+      <div class="col-12 col-sm-8">
         <q-card flat>
           <q-card-section class="text-bold text-h6">
             Temperatura
@@ -144,7 +144,7 @@
         </q-card>
       </div>
 
-      <div class="col-4">
+      <div class="col-12 col-sm-4">
         <q-card flat>
           <q-card-section class="text-bold text-h6">
             Precipitação
