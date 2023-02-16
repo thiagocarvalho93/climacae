@@ -13,4 +13,9 @@ const STATIONS = {
   IMACA32: { ID: "IMACA32", NOME: "" },
 };
 
-export { API_KEY, STATIONS };
+const CORES = {
+  AZUL: "#1565c0",
+  VERMELHO: "#f44336",
+};
+
+export { API_KEY, STATIONS, CORES };
