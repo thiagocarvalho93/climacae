@@ -149,7 +149,7 @@
 </template>
 
 <script>
-import { defineComponent, defineAsyncComponent } from "vue";
+import { defineComponent } from "vue";
 import { STATIONS, CORES } from "../constants/constants";
 import { API_KEY } from "src/constants/secrets";
 
@@ -164,12 +164,12 @@ export default defineComponent({
       cores: CORES,
       apiKey: API_KEY,
       estacoes: STATIONS,
+      metadadosEstacoes: [],
       observacoes: [],
       minima: 0,
       maxima: 0,
       ventoMaximo: 0,
       precipitacaoMaxima: 0,
-
       seriesTemperatura: [
         {
           name: "Máxima",
@@ -279,7 +279,7 @@ export default defineComponent({
       this.carregando = false;
     },
 
-    async obterObservacoesDiaAnteriorEstacao(codigoEstacao) {
+    async obterObservacoesDiaAtualEstacao(codigoEstacao) {
       return new Promise((resolve, reject) => {
         return this.$api
           .get(
@@ -296,7 +296,7 @@ export default defineComponent({
       try {
         const dados = await Promise.all(
           stations.map((station) =>
-            this.obterObservacoesDiaAnteriorEstacao(station)
+            this.obterObservacoesDiaAtualEstacao(station)
           )
         );
         console.log(dados);
@@ -309,22 +309,10 @@ export default defineComponent({
     },
 
     calcularMetadados() {
-      this.maxima = Math.max(
-        ...this.observacoes.map((ob) => ob.metric.tempHigh)
-      );
-      this.minima = Math.min(
-        ...this.observacoes.map((ob) => ob.metric.tempLow)
-      );
-      this.ventoMaximo = Math.max(
-        ...this.observacoes.map((ob) => ob.metric.windgustHigh)
-      );
-    },
-
-    atualizarGraficoTemperatura() {
-      let dadosEstacao = [];
+      this.metadadosEstacoes = [];
 
       Object.keys(STATIONS).forEach((station) => {
-        dadosEstacao.push({
+        this.metadadosEstacoes.push({
           id: station,
           minima: Math.min(
             ...this.observacoes
@@ -336,28 +324,56 @@ export default defineComponent({
               .filter((x) => x.stationID == station)
               .map((x) => x.metric.tempHigh)
           ),
+          ventoMaximo: Math.max(
+            ...this.observacoes
+              .filter((x) => x.stationID == station)
+              .map((x) => x.metric.windgustHigh)
+          ),
+          precipitacao: this.observacoes
+            .filter((x) => x.stationID == station)
+            .reduce((acc, valor) => {
+              return (
+                acc?.metric?.precipTotal ?? 0 + valor?.metric?.precipTotal ?? 0
+              );
+            }, 0),
         });
       });
 
+      this.maxima = Math.max(
+        ...this.metadadosEstacoes.map((dado) => dado.maxima)
+      );
+      this.minima = Math.min(
+        ...this.metadadosEstacoes.map((dado) => dado.minima)
+      );
+      this.ventoMaximo = Math.max(
+        ...this.metadadosEstacoes.map((dado) => dado.ventoMaximo)
+      );
+      this.precipitacaoMaxima = Math.max(
+        ...this.metadadosEstacoes.map((dado) => dado.precipitacao)
+      );
+    },
+
+    atualizarGraficoTemperatura() {
       this.$refs.graficoColunaTemperatura.updateSeries([
         {
           name: "Máxima",
           color: CORES.VERMELHO,
-          data: dadosEstacao.map((x) => x.maxima).filter((x) => x != -Infinity),
+          data: this.metadadosEstacoes
+            .map((x) => x.maxima)
+            .filter((x) => x != -Infinity),
         },
         {
           name: "Mínima",
           color: CORES.AZUL,
-          data: dadosEstacao.map((x) => x.minima).filter((x) => x != Infinity),
+          data: this.metadadosEstacoes
+            .map((x) => x.minima)
+            .filter((x) => x != Infinity),
         },
       ]);
 
       this.$refs.graficoColunaTemperatura.updateOptions({
-        title: {
-          text: "new title",
-        },
         xaxis: {
-          categories: dadosEstacao
+          categories: this.metadadosEstacoes
             .filter((x) => x.maxima != -Infinity && x.minima != Infinity)
             .map((x) => x.id),
         },
@@ -365,25 +381,9 @@ export default defineComponent({
     },
 
     atualizarGraficoPrecipitacao() {
-      let precipitacoes = [];
-
-      Object.keys(STATIONS).forEach((station) => {
-        precipitacoes.push(
-          this.observacoes
-            .filter((x) => x.stationID == station)
-            .reduce((acc, valor) => {
-              return (
-                acc?.metric?.precipTotal ?? 0 + valor?.metric?.precipTotal ?? 0
-              );
-            }, 0)
-        );
-      });
-
-      this.precipitacaoMaxima = Math.max(...precipitacoes);
-
       this.$refs.graficoPrecipitacao.updateSeries([
         {
-          data: precipitacoes,
+          data: this.metadadosEstacoes.map((x) => x.precipitacao),
         },
       ]);
     },

@@ -2,7 +2,7 @@
   "name": "frontend",
   "version": "0.0.1",
   "description": "A weather dashboard project",
-  "productName": "WeatherDashboard",
+  "productName": "CliMacaé",
   "author": "thiagocarvalho93",
   "private": true,
   "scripts": {
