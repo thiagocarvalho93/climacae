@@ -1,5 +1,9 @@
 <template>
   <q-page class="q-pa-md bg-blue-grey-1">
+    <span class="text-h6 fade"
+      >Macaé, {{ new Date().toLocaleDateString("pt-br") }}</span
+    >
+    <q-separator class="q-my-sm"></q-separator>
     <div class="row q-col-gutter-md fade">
       <div class="col-12 col-sm-6 col-md-3">
         <q-card flat dark class="bg-red maxima">
@@ -101,9 +105,7 @@
 
       <div class="col-12 col-sm-8">
         <q-card flat>
-          <q-card-section class="text-bold text-h6">
-            Temperatura
-          </q-card-section>
+          <q-card-section class="text-h6"> Temperatura </q-card-section>
           <q-card-section>
             <apexchart
               type="bar"
@@ -124,9 +126,7 @@
 
       <div class="col-12 col-sm-4">
         <q-card flat>
-          <q-card-section class="text-bold text-h6">
-            Precipitação
-          </q-card-section>
+          <q-card-section class="text-h6"> Precipitação </q-card-section>
           <q-card-section>
             <apexchart
               type="bar"
@@ -143,6 +143,21 @@
             label-style="font-size: 1.1em"
           />
         </q-card>
+      </div>
+
+      <div class="col-12">
+        <q-table
+          title="Dados das estações"
+          :rows="observacoes"
+          :columns="columns"
+          row-key="name"
+        />
+        <q-inner-loading
+          :showing="carregando"
+          label="Aguarde..."
+          label-class="text-teal"
+          label-style="font-size: 1.1em"
+        />
       </div>
     </div>
   </q-page>
@@ -170,6 +185,43 @@ export default defineComponent({
       maxima: 0,
       ventoMaximo: 0,
       precipitacaoMaxima: 0,
+      columns: [
+        {
+          name: "horário",
+          required: true,
+          label: "Horário",
+          align: "left",
+          field: (row) => row.obsTimeLocal,
+          format: (val) => `${new Date(val).toLocaleTimeString()}`,
+          sortable: true,
+        },
+        {
+          name: "Estação",
+          align: "center",
+          label: "Estação",
+          field: (row) => row.stationID,
+          sortable: true,
+        },
+        {
+          name: "temp",
+          label: "Temperatura (°C)",
+          field: (row) => row.metric.tempAvg,
+          sortable: true,
+        },
+        {
+          name: "precipitacao",
+          label: "Precipitação (mm)",
+          field: (row) => row.metric.precipTotal,
+          sortable: true,
+        },
+        {
+          name: "gustHigh",
+          label: "Vento máximo (km/h)",
+          field: (row) => row.metric.windgustHigh,
+          sortable: true,
+        },
+      ],
+
       seriesTemperatura: [
         {
           name: "Máxima",
@@ -214,7 +266,9 @@ export default defineComponent({
         xaxis: {
           categories: Object.keys(STATIONS),
         },
-        yaxis: {},
+        yaxis: {
+          max: 40,
+        },
         tooltip: {
           y: {
             formatter: function (val) {
