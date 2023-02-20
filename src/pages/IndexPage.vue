@@ -8,7 +8,7 @@
               <q-item-section>
                 <q-item-label> MÁXIMA </q-item-label>
                 <q-item-label class="text-bold text-h6">
-                  {{ maxima && maxima.metric && maxima.metric.tempHigh }}°C
+                  {{ maxima }}°C
                 </q-item-label>
               </q-item-section>
               <q-item-section avatar>
@@ -32,7 +32,7 @@
               <q-item-section>
                 <q-item-label> MÍNIMA </q-item-label>
                 <q-item-label class="text-bold text-h6">
-                  {{ minima && minima.metric && minima.metric.tempHigh }}°C
+                  {{ minima }}°C
                 </q-item-label>
               </q-item-section>
 
@@ -57,11 +57,7 @@
               <q-item-section>
                 <q-item-label> VENTO MÁXIMO </q-item-label>
                 <q-item-label class="text-bold text-h6">
-                  {{
-                    ventoMaximo &&
-                    ventoMaximo.metric &&
-                    ventoMaximo.metric.tempHigh
-                  }}
+                  {{ ventoMaximo }}
                   km/h
                 </q-item-label>
               </q-item-section>
@@ -102,24 +98,6 @@
           />
         </q-card>
       </div>
-
-      <!-- <div class="col-6">
-        <q-card flat bordered>
-          <q-card-section>
-            <q-skeleton type="text" />
-          </q-card-section>
-          <q-skeleton height="200px" square />
-        </q-card>
-      </div>
-
-      <div class="col-6">
-        <q-card flat bordered>
-          <q-card-section>
-            <q-skeleton type="text" />
-          </q-card-section>
-          <q-skeleton height="200px" square />
-        </q-card>
-      </div> -->
 
       <div class="col-12 col-sm-8">
         <q-card flat>
@@ -286,7 +264,9 @@ export default defineComponent({
   },
 
   async mounted() {
-    this.obterCalcularEAtualizar();
+    const inicio = new Date();
+    await this.obterCalcularEAtualizar();
+    console.log(`Tempo de execução: ${new Date() - inicio}ms`);
   },
 
   methods: {
@@ -319,81 +299,55 @@ export default defineComponent({
             this.obterObservacoesDiaAnteriorEstacao(station)
           )
         );
-
-        dados.forEach((x) => this.observacoes.push(...x.observations));
-        console.log(dados);
+        dados.forEach(
+          (x) => x.observations && this.observacoes.push(...x.observations)
+        );
       } catch (error) {
         console.log(error);
       }
     },
 
     calcularMetadados() {
-      this.maxima = this.observacoes.reduce((acc, valor) => {
-        return valor.metric.tempLow > acc.metric.tempLow &&
-          !!valor.metric.tempLow
-          ? valor
-          : acc;
-      });
-
-      this.minima = this.observacoes.reduce((acc, valor) => {
-        return valor.metric.tempLow < acc.metric.tempLow &&
-          !!valor.metric.tempLow
-          ? valor
-          : acc;
-      });
-
-      this.ventoMaximo = this.observacoes.reduce((acc, valor) => {
-        return valor.metric.windgustHigh > acc.metric.windgustHigh &&
-          !!valor.metric.windgustHigh
-          ? valor
-          : acc;
-      });
-      console.log(this.minima);
+      this.maxima = Math.max(
+        ...this.observacoes.map((ob) => ob.metric.tempHigh)
+      );
+      this.minima = Math.min(
+        ...this.observacoes.map((ob) => ob.metric.tempLow)
+      );
+      this.ventoMaximo = Math.max(
+        ...this.observacoes.map((ob) => ob.metric.windgustHigh)
+      );
     },
 
     atualizarGraficoTemperatura() {
-      let minimas = [];
-      let maximas = [];
-      Object.keys(STATIONS).forEach((station) => {
-        minimas.push(
-          this.observacoes
-            .filter((x) => x.stationID == station)
-            .reduce((acc, valor) => {
-              return valor.metric.tempLow < acc.metric.tempLow &&
-                !!valor.metric.tempLow
-                ? valor
-                : acc;
-            })
-        );
-      });
+      let dadosEstacao = [];
 
       Object.keys(STATIONS).forEach((station) => {
-        maximas.push(
-          this.observacoes
-            .filter((x) => x.stationID == station)
-            .reduce((acc, valor) => {
-              return valor.metric.tempHigh > acc.metric.tempHigh &&
-                !!valor.metric.tempHigh
-                ? valor
-                : acc;
-            })
-        );
+        dadosEstacao.push({
+          id: station,
+          minima: Math.min(
+            ...this.observacoes
+              .filter((x) => x.stationID == station)
+              .map((x) => x.metric.tempLow)
+          ),
+          maxima: Math.max(
+            ...this.observacoes
+              .filter((x) => x.stationID == station)
+              .map((x) => x.metric.tempHigh)
+          ),
+        });
       });
-
-      minimas = minimas.map((x) => x.metric.tempLow);
-      maximas = maximas.map((x) => x.metric.tempHigh);
-      console.log(minimas, maximas);
 
       this.$refs.graficoColunaTemperatura.updateSeries([
         {
           name: "Máxima",
           color: CORES.VERMELHO,
-          data: maximas,
+          data: dadosEstacao.map((x) => x.maxima).filter((x) => x != -Infinity),
         },
         {
           name: "Mínima",
           color: CORES.AZUL,
-          data: minimas,
+          data: dadosEstacao.map((x) => x.minima).filter((x) => x != Infinity),
         },
       ]);
     },
@@ -409,12 +363,11 @@ export default defineComponent({
               return (
                 acc?.metric?.precipTotal ?? 0 + valor?.metric?.precipTotal ?? 0
               );
-            })
+            }, 0)
         );
       });
 
-      console.log(precipitacoes);
-      this.precipitacaoMaxima = Math.max(precipitacoes);
+      this.precipitacaoMaxima = Math.max(...precipitacoes);
 
       this.$refs.graficoPrecipitacao.updateSeries([
         {
