@@ -299,6 +299,7 @@ export default defineComponent({
             this.obterObservacoesDiaAnteriorEstacao(station)
           )
         );
+        console.log(dados);
         dados.forEach(
           (x) => x.observations && this.observacoes.push(...x.observations)
         );
@@ -350,6 +351,17 @@ export default defineComponent({
           data: dadosEstacao.map((x) => x.minima).filter((x) => x != Infinity),
         },
       ]);
+
+      this.$refs.graficoColunaTemperatura.updateOptions({
+        title: {
+          text: "new title",
+        },
+        xaxis: {
+          categories: dadosEstacao
+            .filter((x) => x.maxima != -Infinity && x.minima != Infinity)
+            .map((x) => x.id),
+        },
+      });
     },
 
     atualizarGraficoPrecipitacao() {
