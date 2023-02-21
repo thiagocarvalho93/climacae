@@ -1,8 +1,6 @@
 <template>
   <q-page class="q-pa-md bg-blue-grey-1">
-    <span class="text-h6 fade"
-      >Macaé, {{ new Date().toLocaleDateString("pt-br") }}</span
-    >
+    <span class="text-h6 fade">Macaé, {{ new Date().toLocaleDateString("pt-br") }}</span>
     <q-separator class="q-my-sm"></q-separator>
     <div class="row q-col-gutter-md fade">
       <div class="col-12 col-sm-6 col-md-3">
@@ -20,12 +18,8 @@
               </q-item-section>
             </q-item>
           </q-card-section>
-          <q-inner-loading
-            :showing="carregando"
-            label="Aguarde..."
-            label-class="text-red"
-            label-style="font-size: 1.1em"
-          />
+          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-red"
+            label-style="font-size: 1.1em" />
         </q-card>
       </div>
 
@@ -45,12 +39,8 @@
               </q-item-section>
             </q-item>
           </q-card-section>
-          <q-inner-loading
-            :showing="carregando"
-            label="Aguarde..."
-            label-class="text-primary"
-            label-style="font-size: 1.1em"
-          />
+          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-primary"
+            label-style="font-size: 1.1em" />
         </q-card>
       </div>
 
@@ -70,12 +60,8 @@
               </q-item-section>
             </q-item>
           </q-card-section>
-          <q-inner-loading
-            :showing="carregando"
-            label="Aguarde..."
-            label-class="text-teal"
-            label-style="font-size: 1.1em"
-          />
+          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
+            label-style="font-size: 1.1em" />
         </q-card>
       </div>
 
@@ -94,12 +80,8 @@
               </q-item-section>
             </q-item>
           </q-card-section>
-          <q-inner-loading
-            :showing="carregando"
-            label="Aguarde..."
-            label-class="text-indigo"
-            label-style="font-size: 1.1em"
-          />
+          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-indigo"
+            label-style="font-size: 1.1em" />
         </q-card>
       </div>
 
@@ -107,20 +89,11 @@
         <q-card flat>
           <q-card-section class="text-h6"> Temperatura </q-card-section>
           <q-card-section>
-            <apexchart
-              type="bar"
-              height="250"
-              :options="chartTemperaturaOptions"
-              :series="seriesTemperatura"
-              ref="graficoColunaTemperatura"
-            ></apexchart>
+            <apexchart type="bar" height="250" :options="chartTemperaturaOptions" :series="seriesTemperatura"
+              ref="graficoColunaTemperatura"></apexchart>
           </q-card-section>
-          <q-inner-loading
-            :showing="carregando"
-            label="Aguarde..."
-            label-class="text-teal"
-            label-style="font-size: 1.1em"
-          />
+          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
+            label-style="font-size: 1.1em" />
         </q-card>
       </div>
 
@@ -128,36 +101,18 @@
         <q-card flat>
           <q-card-section class="text-h6"> Precipitação </q-card-section>
           <q-card-section>
-            <apexchart
-              type="bar"
-              height="250"
-              :options="chartPrecipitacaoOptions"
-              :series="seriesPrecipitacao"
-              ref="graficoPrecipitacao"
-            ></apexchart>
+            <apexchart type="bar" height="250" :options="chartPrecipitacaoOptions" :series="seriesPrecipitacao"
+              ref="graficoPrecipitacao"></apexchart>
           </q-card-section>
-          <q-inner-loading
-            :showing="carregando"
-            label="Aguarde..."
-            label-class="text-teal"
-            label-style="font-size: 1.1em"
-          />
+          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
+            label-style="font-size: 1.1em" />
         </q-card>
       </div>
 
       <div class="col-12">
-        <q-table
-          title="Dados das estações"
-          :rows="observacoes"
-          :columns="columns"
-          row-key="name"
-        />
-        <q-inner-loading
-          :showing="carregando"
-          label="Aguarde..."
-          label-class="text-teal"
-          label-style="font-size: 1.1em"
-        />
+        <q-table class="my-sticky-header-table" flat title="Dados das estações" :rows="observacoes" :columns="columns"
+          :pagination="pagination" :rows-per-page-options="[6, 12, 24, 48, 96]" row-key="name" :loading="carregando
+          " />
       </div>
     </div>
   </q-page>
@@ -185,6 +140,9 @@ export default defineComponent({
       maxima: 0,
       ventoMaximo: 0,
       precipitacaoMaxima: 0,
+      pagination: {
+        rowsPerPage: 12
+      },
       columns: [
         {
           name: "horário",
@@ -194,6 +152,8 @@ export default defineComponent({
           field: (row) => row.obsTimeLocal,
           format: (val) => `${new Date(val).toLocaleTimeString()}`,
           sortable: true,
+          style: 'width: 50px',
+          align: "left",
         },
         {
           name: "Estação",
@@ -201,24 +161,29 @@ export default defineComponent({
           label: "Estação",
           field: (row) => row.stationID,
           sortable: true,
+          style: 'width: 50px',
+          align: "left",
         },
         {
           name: "temp",
           label: "Temperatura (°C)",
           field: (row) => row.metric.tempAvg,
           sortable: true,
+          align: "left",
         },
         {
           name: "precipitacao",
           label: "Precipitação (mm)",
           field: (row) => row.metric.precipTotal,
           sortable: true,
+          align: "left",
         },
         {
           name: "gustHigh",
           label: "Vento máximo (km/h)",
           field: (row) => row.metric.windgustHigh,
           sortable: true,
+          align: "left",
         },
       ],
 
@@ -473,4 +438,62 @@ export default defineComponent({
   animation-timing-function: ease;
   animation-delay: 0.6s;
 }
+
+.sticky-header-table {
+  height: 310px;
+}
 </style>
+
+<style lang="sass">
+\:root
+  --scrollbar-width-height        : 10px
+  --scrollbar-track               : #eeeeee
+  --scrollbar-thumb               : rgb(204,231,255)
+  --scrollbar-thumb-hover         : rgb(33,118,210)
+  --scrollbar-track-dark          : #eeeeee
+  --scrollbar-thumb-dark          : rgb(204,231,255)
+  --scrollbar-thumb-hover-dark    : rgb(33,118,210)
+
+::-webkit-scrollbar
+  width: var(--scrollbar-width-height)
+  height: var(--scrollbar-width-height)
+
+// the track (progress bar) of the scrollbar
+::-webkit-scrollbar-track
+  // border-top: var(--markdown-border)
+  background: var(--scrollbar-track-dark)
+  box-shadow: inset 0 0 4px var(--scrollbar-track-dark)
+
+// the bottom corner of the scrollbar, where both horizontal and vertical scrollbars meet
+::-webkit-scrollbar-corner
+  background: var(--scrollbar-track-dark)
+
+// the draggable scrolling handle
+::-webkit-scrollbar-thumb
+  background: var(--scrollbar-thumb-dark)
+  border-radius: 5px
+
+  &:hover
+    background: var(--scrollbar-thumb-hover-dark)
+
+.my-sticky-header-table
+  /* height or max-height is important */
+  height: 310px
+
+  .q-table__top,
+  .q-table__bottom,
+  thead tr:first-child th
+    /* bg color is important for th; just specify one */
+    background-color: #FFF
+
+  thead tr th
+    position: sticky
+    z-index: 1
+  thead tr:first-child th
+    top: 0
+
+  /* this is when the loading indicator appears */
+  &.q-table--loading thead tr:last-child th
+    /* height of all previous header rows */
+    top: 48px
+  </style>
