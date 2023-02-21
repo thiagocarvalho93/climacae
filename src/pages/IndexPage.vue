@@ -1,6 +1,6 @@
 <template>
   <q-page class="q-pa-md bg-blue-grey-1">
-    <span class="text-h6 fade">Macaé, {{ new Date().toLocaleDateString("pt-br") }}</span>
+    <span class="text-h6 fade">Macaé - {{ new Date().toLocaleDateString("pt-br") }}</span>
     <q-separator class="q-my-sm"></q-separator>
     <div class="row q-col-gutter-md fade">
       <div class="col-12 col-sm-6 col-md-3">
@@ -111,8 +111,16 @@
 
       <div class="col-12">
         <q-table class="my-sticky-header-table" flat title="Dados das estações" :rows="observacoes" :columns="columns"
-          :pagination="pagination" :rows-per-page-options="[6, 12, 24, 48, 96]" row-key="name" :loading="carregando
-          " />
+          :pagination="pagination" :filter="filter" :rows-per-page-options="[6, 12, 24, 48, 96]" row-key="name" :loading="carregando
+          ">
+          <template v-slot:top-right>
+            <q-input borderless dense debounce="300" v-model="filter" placeholder="Pesquisar">
+              <template v-slot:append>
+                <q-icon name="search" />
+              </template>
+            </q-input>
+          </template>
+        </q-table>
       </div>
     </div>
   </q-page>
@@ -143,6 +151,7 @@ export default defineComponent({
       pagination: {
         rowsPerPage: 12
       },
+      filter: "",
       columns: [
         {
           name: "horário",
@@ -156,12 +165,20 @@ export default defineComponent({
           align: "left",
         },
         {
-          name: "Estação",
+          name: "idEstacao",
           align: "center",
-          label: "Estação",
+          label: "ID estação",
           field: (row) => row.stationID,
           sortable: true,
           style: 'width: 50px',
+          align: "left",
+        },
+        {
+          name: "estacao",
+          align: "center",
+          label: "Local",
+          field: (row) => STATIONS[row.stationID].NOME,
+          sortable: true,
           align: "left",
         },
         {
@@ -283,18 +300,20 @@ export default defineComponent({
   },
 
   async mounted() {
-    const inicio = new Date();
     await this.obterCalcularEAtualizar();
-    console.log(`Tempo de execução: ${new Date() - inicio}ms`);
   },
 
   methods: {
     async obterCalcularEAtualizar() {
+      const inicioObtencao = new Date();
       this.carregando = true;
       await this.obterObservacoesTodasEstacoes();
+      console.log(`Tempo de execução para obter dados: ${new Date() - inicioObtencao}ms`);
+      const inicioCalculo = new Date();
       this.calcularMetadados();
       this.atualizarGraficoTemperatura();
       this.atualizarGraficoPrecipitacao();
+      console.log(`Tempo de execução para manipular dados: ${new Date() - inicioCalculo}ms`);
       this.carregando = false;
     },
 
@@ -318,7 +337,6 @@ export default defineComponent({
             this.obterObservacoesDiaAtualEstacao(station)
           )
         );
-        console.log(dados);
         dados.forEach(
           (x) => x.observations && this.observacoes.push(...x.observations)
         );
@@ -332,7 +350,7 @@ export default defineComponent({
 
       Object.keys(STATIONS).forEach((station) => {
         this.metadadosEstacoes.push({
-          id: station,
+          id: STATIONS[station].NOME,
           minima: Math.min(
             ...this.observacoes
               .filter((x) => x.stationID == station)
@@ -406,6 +424,7 @@ export default defineComponent({
         },
       ]);
     },
+
   },
 });
 </script>
@@ -478,7 +497,7 @@ export default defineComponent({
 
 .my-sticky-header-table
   /* height or max-height is important */
-  height: 310px
+  height: 400px
 
   .q-table__top,
   .q-table__bottom,
@@ -496,4 +515,4 @@ export default defineComponent({
   &.q-table--loading thead tr:last-child th
     /* height of all previous header rows */
     top: 48px
-  </style>
+</style>
