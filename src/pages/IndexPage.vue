@@ -1,129 +1,132 @@
 <template>
-  <q-page class="q-pa-md bg-blue-grey-1">
-    <span class="text-h6 fade">Macaé - {{ new Date().toLocaleDateString("pt-br") }}</span>
-    <q-separator class="q-my-sm"></q-separator>
-    <div class="row q-col-gutter-md fade">
-      <div class="col-12 col-sm-6 col-md-3">
-        <q-card flat dark class="bg-red maxima">
-          <q-card-section>
-            <q-item>
-              <q-item-section>
-                <q-item-label> MÁXIMA </q-item-label>
-                <q-item-label class="text-bold text-h6">
-                  {{ maxima }}°C
-                </q-item-label>
-              </q-item-section>
-              <q-item-section avatar>
-                <q-icon class="icon" size="lg" name="thermostat" />
-              </q-item-section>
-            </q-item>
-          </q-card-section>
-          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-red"
-            label-style="font-size: 1.1em" />
-        </q-card>
-      </div>
+  <q-pull-to-refresh @refresh="refresh">
+    <q-page class="q-pa-md bg-blue-grey-1">
+      <span class="text-h6 fade">Macaé - {{ new Date().toLocaleDateString("pt-br") }}</span>
+      <q-separator class="q-my-sm"></q-separator>
+      <div class="row q-col-gutter-md fade">
+        <div class="col-12 col-sm-6 col-md-3">
+          <q-card flat dark class="bg-red maxima">
+            <q-card-section>
+              <q-item>
+                <q-item-section>
+                  <q-item-label> MÁXIMA </q-item-label>
+                  <q-item-label class="text-bold text-h6">
+                    {{ maxima }}°C
+                  </q-item-label>
+                </q-item-section>
+                <q-item-section avatar>
+                  <q-icon class="icon" size="lg" name="thermostat" />
+                </q-item-section>
+              </q-item>
+            </q-card-section>
+            <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-red"
+              label-style="font-size: 1.1em" />
+          </q-card>
+        </div>
 
-      <div class="col-12 col-sm-6 col-md-3">
-        <q-card flat dark class="bg-primary minima">
-          <q-card-section>
-            <q-item>
-              <q-item-section>
-                <q-item-label> MÍNIMA </q-item-label>
-                <q-item-label class="text-bold text-h6">
-                  {{ minima }}°C
-                </q-item-label>
-              </q-item-section>
+        <div class="col-12 col-sm-6 col-md-3">
+          <q-card flat dark class="bg-primary minima">
+            <q-card-section>
+              <q-item>
+                <q-item-section>
+                  <q-item-label> MÍNIMA </q-item-label>
+                  <q-item-label class="text-bold text-h6">
+                    {{ minima }}°C
+                  </q-item-label>
+                </q-item-section>
 
-              <q-item-section avatar>
-                <q-icon class="icon" size="lg" name="thermostat" />
-              </q-item-section>
-            </q-item>
-          </q-card-section>
-          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-primary"
-            label-style="font-size: 1.1em" />
-        </q-card>
-      </div>
+                <q-item-section avatar>
+                  <q-icon class="icon" size="lg" name="thermostat" />
+                </q-item-section>
+              </q-item>
+            </q-card-section>
+            <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-primary"
+              label-style="font-size: 1.1em" />
+          </q-card>
+        </div>
 
-      <div class="col-12 col-sm-6 col-md-3">
-        <q-card flat dark class="bg-teal vento">
-          <q-card-section>
-            <q-item>
-              <q-item-section>
-                <q-item-label> VENTO MÁXIMO </q-item-label>
-                <q-item-label class="text-bold text-h6">
-                  {{ ventoMaximo }}
-                  km/h
-                </q-item-label>
-              </q-item-section>
-              <q-item-section avatar>
-                <q-icon class="icon" size="lg" name="wind_power" />
-              </q-item-section>
-            </q-item>
-          </q-card-section>
-          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
-            label-style="font-size: 1.1em" />
-        </q-card>
-      </div>
+        <div class="col-12 col-sm-6 col-md-3">
+          <q-card flat dark class="bg-teal vento">
+            <q-card-section>
+              <q-item>
+                <q-item-section>
+                  <q-item-label> VENTO MÁXIMO </q-item-label>
+                  <q-item-label class="text-bold text-h6">
+                    {{ ventoMaximo }}
+                    km/h
+                  </q-item-label>
+                </q-item-section>
+                <q-item-section avatar>
+                  <q-icon class="icon" size="lg" name="wind_power" />
+                </q-item-section>
+              </q-item>
+            </q-card-section>
+            <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
+              label-style="font-size: 1.1em" />
+          </q-card>
+        </div>
 
-      <div class="col-12 col-sm-6 col-md-3 precipitacao">
-        <q-card flat dark class="bg-indigo">
-          <q-card-section>
-            <q-item>
-              <q-item-section>
-                <q-item-label> PRECIPITAÇÃO MÁXIMA </q-item-label>
-                <q-item-label class="text-bold text-h6">
-                  {{ precipitacaoMaxima }}mm
-                </q-item-label>
-              </q-item-section>
-              <q-item-section avatar>
-                <q-icon class="icon" size="lg" name="water_drop" />
-              </q-item-section>
-            </q-item>
-          </q-card-section>
-          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-indigo"
-            label-style="font-size: 1.1em" />
-        </q-card>
-      </div>
+        <div class="col-12 col-sm-6 col-md-3 precipitacao">
+          <q-card flat dark class="bg-indigo">
+            <q-card-section>
+              <q-item>
+                <q-item-section>
+                  <q-item-label> PRECIPITAÇÃO MÁXIMA </q-item-label>
+                  <q-item-label class="text-bold text-h6">
+                    {{ precipitacaoMaxima }}mm
+                  </q-item-label>
+                </q-item-section>
+                <q-item-section avatar>
+                  <q-icon class="icon" size="lg" name="water_drop" />
+                </q-item-section>
+              </q-item>
+            </q-card-section>
+            <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-indigo"
+              label-style="font-size: 1.1em" />
+          </q-card>
+        </div>
 
-      <div class="col-12 col-sm-8">
-        <q-card flat>
-          <q-card-section class="text-h6"> Temperatura </q-card-section>
-          <q-card-section>
-            <apexchart type="bar" height="250" :options="chartTemperaturaOptions" :series="seriesTemperatura"
-              ref="graficoColunaTemperatura"></apexchart>
-          </q-card-section>
-          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
-            label-style="font-size: 1.1em" />
-        </q-card>
-      </div>
+        <div class="col-12 col-sm-8">
+          <q-card flat>
+            <q-card-section class="text-h6"> Temperatura </q-card-section>
+            <q-card-section>
+              <apexchart type="bar" height="250" :options="chartTemperaturaOptions" :series="seriesTemperatura"
+                ref="graficoColunaTemperatura"></apexchart>
+            </q-card-section>
+            <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
+              label-style="font-size: 1.1em" />
+          </q-card>
+        </div>
 
-      <div class="col-12 col-sm-4">
-        <q-card flat>
-          <q-card-section class="text-h6"> Precipitação </q-card-section>
-          <q-card-section>
-            <apexchart type="bar" height="250" :options="chartPrecipitacaoOptions" :series="seriesPrecipitacao"
-              ref="graficoPrecipitacao"></apexchart>
-          </q-card-section>
-          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
-            label-style="font-size: 1.1em" />
-        </q-card>
-      </div>
+        <div class="col-12 col-sm-4">
+          <q-card flat>
+            <q-card-section class="text-h6"> Precipitação </q-card-section>
+            <q-card-section>
+              <apexchart type="bar" height="250" :options="chartPrecipitacaoOptions" :series="seriesPrecipitacao"
+                ref="graficoPrecipitacao"></apexchart>
+            </q-card-section>
+            <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
+              label-style="font-size: 1.1em" />
+          </q-card>
+        </div>
 
-      <div class="col-12">
-        <q-table class="my-sticky-header-table" flat title="Dados das estações" :rows="observacoes" :columns="columns"
-          :pagination="pagination" :filter="filter" :rows-per-page-options="[6, 12, 24, 48, 96]" row-key="name" :loading="carregando
-          ">
-          <template v-slot:top-right>
-            <q-input borderless dense debounce="300" v-model="filter" placeholder="Pesquisar">
-              <template v-slot:append>
-                <q-icon name="search" />
-              </template>
-            </q-input>
-          </template>
-        </q-table>
+        <div class="col-12">
+          <q-table class="my-sticky-header-table" flat title="Dados das estações" :rows="observacoes" :columns="columns"
+            :pagination="pagination" :filter="filter" :rows-per-page-options="[6, 12, 24, 48, 96]" row-key="name"
+            :loading="carregando
+            ">
+            <template v-slot:top-right>
+              <q-input borderless dense debounce="300" v-model="filter" placeholder="Pesquisar">
+                <template v-slot:append>
+                  <q-icon name="search" />
+                </template>
+              </q-input>
+            </template>
+          </q-table>
+        </div>
       </div>
-    </div>
-  </q-page>
+    </q-page>
+  </q-pull-to-refresh>
 </template>
 
 <script>
@@ -336,6 +339,11 @@ export default defineComponent({
       this.atualizarGraficoPrecipitacao();
       console.log(`Tempo de execução para manipular dados: ${new Date() - inicioCalculo}ms`);
       this.carregando = false;
+    },
+
+    async refresh(done) {
+      await this.obterCalcularEAtualizar();
+      done();
     },
 
     async obterObservacoesDiaAtualEstacao(codigoEstacao) {
