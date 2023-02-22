@@ -189,6 +189,20 @@ export default defineComponent({
           align: "left",
         },
         {
+          name: "dewPoint",
+          label: "Ponto de orvalho (°C)",
+          field: (row) => row.metric.dewptAvg,
+          sortable: true,
+          align: "left",
+        },
+        {
+          name: "humid",
+          label: "Umidade (%)",
+          field: (row) => row.humidityAvg,
+          sortable: true,
+          align: "left",
+        },
+        {
           name: "precipitacao",
           label: "Precipitação (mm)",
           field: (row) => row.metric.precipTotal,
@@ -199,6 +213,13 @@ export default defineComponent({
           name: "gustHigh",
           label: "Vento máximo (km/h)",
           field: (row) => row.metric.windgustHigh,
+          sortable: true,
+          align: "left",
+        },
+        {
+          name: "radiation",
+          label: "Radiação solar máxima (W/m²)",
+          field: (row) => row.solarRadiationHigh,
           sortable: true,
           align: "left",
         },
@@ -423,6 +444,12 @@ export default defineComponent({
           data: this.metadadosEstacoes.map((x) => x.precipitacao),
         },
       ]);
+      this.$refs.graficoPrecipitacao.updateOptions({
+        xaxis: {
+          categories: this.metadadosEstacoes
+            .map((x) => x.id),
+        },
+      });
     },
 
   },
@@ -466,10 +493,10 @@ export default defineComponent({
 <style lang="sass">
 \:root
   --scrollbar-width-height        : 10px
-  --scrollbar-track               : #eeeeee
+  --scrollbar-track               : #FFF
   --scrollbar-thumb               : rgb(204,231,255)
   --scrollbar-thumb-hover         : rgb(33,118,210)
-  --scrollbar-track-dark          : #eeeeee
+  --scrollbar-track-dark          : #FFF
   --scrollbar-thumb-dark          : rgb(204,231,255)
   --scrollbar-thumb-hover-dark    : rgb(33,118,210)
 
