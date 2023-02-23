@@ -86,9 +86,38 @@
           </q-card>
         </div>
 
+        <div class="col-12 col-sm-4">
+          <q-card flat>
+            <q-card-section class="text-h6"> Agora </q-card-section>
+            <q-card-section>
+              <q-carousel v-model="slide" transition-prev="scale" transition-next="scale" swipeable animated
+                :control-color="darkMode ? 'white' : 'primary'" padding navigation arrows infinite height="265px"
+                :autoplay="autoplayCarousel" class="bg-transparent" @mouseenter="autoplay = false"
+                @mouseleave="autoplay = true">
+                <q-carousel-slide v-for="dados in metadadosEstacoes" :key="dados.id" :name="dados.id"
+                  class="column no-wrap flex-center">
+                  <div class="q-mt-md text-center text-h6">
+                    {{ dados.id }}
+                  </div>
+                  <div class="q-mt-md text-h5 text-center">
+                    <q-icon class="icon" :color="darkMode ? 'white' : 'primary'" size="lg" name="thermostat" />
+                    {{ dados.temperaturaAtual }}°C
+                  </div>
+                  <div class="q-mt-md text-h5 text-center">
+                    <q-icon class="icon" :color="darkMode ? 'white' : 'primary'" size="lg" name="water_drop" />
+                    {{ dados.precipitacao }}mm
+                  </div>
+                </q-carousel-slide>
+              </q-carousel>
+            </q-card-section>
+            <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
+              label-style="font-size: 1.1em" />
+          </q-card>
+        </div>
+
         <div class="col-12 col-sm-8">
           <q-card flat>
-            <q-card-section class="text-h6"> Temperatura </q-card-section>
+            <q-card-section class="text-h6"> Máximas e mínimas </q-card-section>
             <q-card-section>
               <apexchart type="bar" height="250" :options="chartTemperaturaOptions" :series="seriesTemperatura"
                 ref="graficoColunaTemperatura"></apexchart>
@@ -98,7 +127,7 @@
           </q-card>
         </div>
 
-        <div class="col-12 col-sm-4">
+        <div class="col-12 col-sm-12">
           <q-card flat>
             <q-card-section class="text-h6"> Precipitação </q-card-section>
             <q-card-section>
@@ -164,6 +193,8 @@ export default defineComponent({
   data() {
     return {
       carregando: true,
+      slide: STATIONS[Object.keys(STATIONS)[0]].NOME,
+      autoplayCarousel: true,
       cores: CORES,
       apiKey: API_KEY,
       estacoes: STATIONS,
@@ -243,7 +274,7 @@ export default defineComponent({
         },
         {
           name: "radiation",
-          label: "Radiação solar máxima (W/m²)",
+          label: "Irradiação solar (W/m²)",
           field: (row) => row.solarRadiationHigh,
           sortable: true,
           align: "left",
@@ -412,19 +443,18 @@ export default defineComponent({
               .filter((x) => x.stationID == station)
               .map((x) => x.metric.tempHigh)
           ),
+          temperaturaAtual: this.observacoes
+            .filter((x) => x.stationID == station).at(-1).metric.tempAvg,
           ventoMaximo: Math.max(
             ...this.observacoes
               .filter((x) => x.stationID == station)
               .map((x) => x.metric.windgustHigh)
           ),
           precipitacao: this.observacoes
-            .filter((x) => x.stationID == station)
-            .reduce((acc, valor) => {
-              return (
-                acc?.metric?.precipTotal ?? 0 + valor?.metric?.precipTotal ?? 0
-              );
-            }, 0),
+            .filter((x) => x.stationID == station).at(-1).metric.precipTotal,
         });
+        console.log(this.observacoes
+          .filter((x) => x.stationID == station).slice(-1))
       });
 
       this.maxima = Math.max(
