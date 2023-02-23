@@ -47,7 +47,7 @@ import { ref } from "vue"
 export default {
   setup() {
     return {
-      isDarkMode: ref(true)
+      isDarkMode: ref(false)
     }
   },
 

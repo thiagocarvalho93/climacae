@@ -1,6 +1,6 @@
 <template>
   <q-pull-to-refresh @refresh="refresh">
-    <q-page :class="`q-pa-md ${darkMode ? 'bg-black' : 'bg-blue-grey-1'}`">
+    <q-page :class="`q-pa-md ${darkMode ? 'bg-dark-page' : 'bg-blue-grey-1'}`">
       <span class="text-h6 fade">Macaé - {{ new Date().toLocaleDateString("pt-br") }}</span>
       <q-separator class="q-my-sm"></q-separator>
       <div class="row q-col-gutter-md fade">
@@ -142,6 +142,22 @@ export default defineComponent({
   computed: {
     darkMode() {
       return this.$q.dark.isActive;
+    }
+  },
+
+  watch: {
+    darkMode(newThemeDark, oldThemeDark) {
+      this.$refs.graficoColunaTemperatura.updateOptions({
+        theme: {
+          mode: newThemeDark ? "dark" : "light"
+        }
+      })
+
+      this.$refs.graficoPrecipitacao.updateOptions({
+        theme: {
+          mode: newThemeDark ? "dark" : "light"
+        }
+      })
     }
   },
 
