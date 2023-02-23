@@ -1,7 +1,7 @@
 <template>
   <q-layout view="hHh lpR fff">
 
-    <q-header class="bg-primary text-white">
+    <q-header class="navbar text-white">
       <q-toolbar>
         <q-toolbar-title class="fade">
           <q-avatar>
@@ -17,15 +17,15 @@
       <router-view />
     </q-page-container>
 
-    <q-footer class="bg-grey-8 text-white">
+    <q-footer bordered :class="`text-white ${isDarkMode ? 'bg-dark' : 'bg-white'}`">
       <q-toolbar class="row justify-center">
         <div class="col-3 col-md-1 fade">
           <q-toolbar-title>
             <a target="_blank" href="https://www.linkedin.com/in/thiago-paes-de-carvalho/">
-              <q-btn unelevated round icon="ion-logo-linkedin" />
+              <q-btn round unelevated :text-color="isDarkMode ? 'white' : 'dark'" icon="ion-logo-linkedin" />
             </a>
             <a target="_blank" href="https://github.com/thiagocarvalho93">
-              <q-btn unelevated round icon="ion-logo-github" />
+              <q-btn round unelevated :text-color="isDarkMode ? 'white' : 'dark'" icon="ion-logo-github" />
             </a>
           </q-toolbar-title>
         </div>
@@ -58,3 +58,7 @@ export default {
   }
 }
 </script>
+<style lang="sass">
+.navbar
+  background-image: linear-gradient(180deg,$blue-9, $blue-10)
+</style>

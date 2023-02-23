@@ -1,7 +1,7 @@
 <template>
   <q-pull-to-refresh @refresh="refresh">
     <q-page :class="`q-pa-md ${darkMode ? 'bg-dark-page' : 'bg-blue-grey-1'}`">
-      <span class="text-h6 fade">Macaé - {{ new Date().toLocaleDateString("pt-br") }}</span>
+      <span class="text-h6 text-bold fade">Macaé - {{ new Date().toLocaleDateString("pt-br") }}</span>
       <q-separator class="q-my-sm"></q-separator>
       <div class="row q-col-gutter-md fade">
         <div class="col-12 col-sm-6 col-md-3">
@@ -504,14 +504,12 @@ export default defineComponent({
   animation-delay: 0s
   background-image: linear-gradient(to right,$red-6, $red-8)
 
-
 .minima
   animation-name: zoomInOut
   animation-duration: 0.4s
   animation-timing-function: ease
   animation-delay: 0.2s
   background-image: linear-gradient(to right,$blue-6, $blue-8)
-
 
 .vento
   animation-name: zoomInOut
