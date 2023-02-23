@@ -8,6 +8,8 @@
           </q-avatar>
           CliMacaé
         </q-toolbar-title>
+        <q-toggle v-model="isDarkMode" color="dark" @update:model-value="toggleDarkMode(isDarkMode)" icon="nightlight"
+          unchecked-icon="light_mode" />
       </q-toolbar>
     </q-header>
 
@@ -38,3 +40,21 @@ a {
   color: white;
 }
 </style>
+
+<script>
+import { ref } from "vue"
+
+export default {
+  setup() {
+    return {
+      isDarkMode: ref(true)
+    }
+  },
+
+  methods: {
+    toggleDarkMode(val) {
+      this.$q.dark.set(val);
+    }
+  }
+}
+</script>

@@ -1,6 +1,6 @@
 <template>
   <q-pull-to-refresh @refresh="refresh">
-    <q-page class="q-pa-md bg-blue-grey-1">
+    <q-page :class="`q-pa-md ${darkMode ? 'bg-black' : 'bg-blue-grey-1'}`">
       <span class="text-h6 fade">Macaé - {{ new Date().toLocaleDateString("pt-br") }}</span>
       <q-separator class="q-my-sm"></q-separator>
       <div class="row q-col-gutter-md fade">
@@ -111,9 +111,9 @@
         </div>
 
         <div class="col-12">
-          <q-table class="my-sticky-header-table" flat title="Dados das estações" :rows="observacoes" :columns="columns"
-            :pagination="pagination" :filter="filter" :rows-per-page-options="[6, 12, 24, 48, 96]" row-key="name"
-            :loading="carregando
+          <q-table :class="darkMode ? 'my-sticky-header-table-dark' : 'my-sticky-header-table'" flat
+            title="Dados das estações" :rows="observacoes" :columns="columns" :pagination="pagination" :filter="filter"
+            :rows-per-page-options="[6, 12, 24, 48, 96]" row-key="name" :loading="carregando
             ">
             <template v-slot:top-right>
               <q-input borderless dense debounce="300" v-model="filter" placeholder="Pesquisar">
@@ -138,6 +138,12 @@ export default defineComponent({
   name: "IndexPage",
 
   components: {},
+
+  computed: {
+    darkMode() {
+      return this.$q.dark.isActive;
+    }
+  },
 
   data() {
     return {
@@ -504,8 +510,8 @@ export default defineComponent({
   --scrollbar-track               : #FFF
   --scrollbar-thumb               : rgb(204,231,255)
   --scrollbar-thumb-hover         : rgb(33,118,210)
-  --scrollbar-track-dark          : #FFF
-  --scrollbar-thumb-dark          : rgb(204,231,255)
+  --scrollbar-track-dark          : $dark
+  --scrollbar-thumb-dark          : #CCC
   --scrollbar-thumb-hover-dark    : rgb(33,118,210)
 
 ::-webkit-scrollbar
@@ -550,4 +556,14 @@ export default defineComponent({
   &.q-table--loading thead tr:last-child th
     /* height of all previous header rows */
     top: 48px
+
+.my-sticky-header-table-dark
+  @extend .my-sticky-header-table
+
+  .q-table__top,
+  .q-table__bottom,
+  thead tr:first-child th
+    /* bg color is important for th; just specify one */
+    background-color: $dark
+
 </style>
