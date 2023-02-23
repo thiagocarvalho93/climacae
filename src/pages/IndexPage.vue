@@ -5,7 +5,7 @@
       <q-separator class="q-my-sm"></q-separator>
       <div class="row q-col-gutter-md fade">
         <div class="col-12 col-sm-6 col-md-3">
-          <q-card flat dark class="bg-red maxima">
+          <q-card flat dark class="maxima">
             <q-card-section>
               <q-item>
                 <q-item-section>
@@ -25,7 +25,7 @@
         </div>
 
         <div class="col-12 col-sm-6 col-md-3">
-          <q-card flat dark class="bg-primary minima">
+          <q-card flat dark class="minima">
             <q-card-section>
               <q-item>
                 <q-item-section>
@@ -46,7 +46,7 @@
         </div>
 
         <div class="col-12 col-sm-6 col-md-3">
-          <q-card flat dark class="bg-teal vento">
+          <q-card flat dark class="vento">
             <q-card-section>
               <q-item>
                 <q-item-section>
@@ -66,8 +66,8 @@
           </q-card>
         </div>
 
-        <div class="col-12 col-sm-6 col-md-3 precipitacao">
-          <q-card flat dark class="bg-indigo">
+        <div class="col-12 col-sm-6 col-md-3">
+          <q-card flat dark class="precipitacao">
             <q-card-section>
               <q-item>
                 <q-item-section>
@@ -486,39 +486,6 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-.maxima {
-  animation-name: zoomInOut;
-  animation-duration: 0.4s;
-  animation-timing-function: ease;
-  animation-delay: 0s;
-}
-
-.minima {
-  animation-name: zoomInOut;
-  animation-duration: 0.4s;
-  animation-timing-function: ease;
-  animation-delay: 0.2s;
-}
-
-.vento {
-  animation-name: zoomInOut;
-  animation-duration: 0.4s;
-  animation-timing-function: ease;
-  animation-delay: 0.4s;
-}
-
-.precipitacao {
-  animation-name: zoomInOut;
-  animation-duration: 0.4s;
-  animation-timing-function: ease;
-  animation-delay: 0.6s;
-}
-
-.sticky-header-table {
-  height: 310px;
-}
-</style>
 
 <style lang="sass">
 \:root
@@ -529,6 +496,36 @@ export default defineComponent({
   --scrollbar-track-dark          : $dark
   --scrollbar-thumb-dark          : #CCC
   --scrollbar-thumb-hover-dark    : rgb(33,118,210)
+
+.maxima
+  animation-name: zoomInOut
+  animation-duration: 0.4s
+  animation-timing-function: ease
+  animation-delay: 0s
+  background-image: linear-gradient(to right,$red-6, $red-8)
+
+
+.minima
+  animation-name: zoomInOut
+  animation-duration: 0.4s
+  animation-timing-function: ease
+  animation-delay: 0.2s
+  background-image: linear-gradient(to right,$blue-6, $blue-8)
+
+
+.vento
+  animation-name: zoomInOut
+  animation-duration: 0.4s
+  animation-timing-function: ease
+  animation-delay: 0.4s
+  background-image: linear-gradient(to right,$teal-6, $teal-8)
+
+.precipitacao
+  animation-name: zoomInOut
+  animation-duration: 0.4s
+  animation-timing-function: ease
+  animation-delay: 0.6s
+  background-image: linear-gradient(to right,$indigo-6, $indigo-8)
 
 ::-webkit-scrollbar
   width: var(--scrollbar-width-height)
