@@ -522,6 +522,7 @@ export default defineComponent({
 
     async obterDadosAtuaisTodasEstacoes() {
       const stations = Object.keys(STATIONS);
+      this.dadosAgora = [];
 
       try {
         const dados = await Promise.all(
@@ -583,7 +584,7 @@ export default defineComponent({
     atualizarDadosAtuais() {
       this.carregando = true;
       setInterval(async () => {
-        await this.obterDadosTempoReal();
+        await this.obterDadosAtuaisTodasEstacoes();
         this.atualizacao = new Date().toLocaleTimeString();
       }, 30000)
       this.carregando = false;
