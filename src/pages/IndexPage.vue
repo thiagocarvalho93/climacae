@@ -1,178 +1,191 @@
 <template>
-  <q-pull-to-refresh @refresh="refresh">
-    <q-page :class="`q-pa-md ${darkMode ? 'bg-dark-page' : 'bg-blue-grey-1'}`">
-      <div class="row ">
+  <q-page :class="`q-pa-md ${darkMode ? 'bg-dark-page' : 'bg-blue-grey-1'}`">
+    <q-card flat class="q-pa-md q-mb-md fade">
+      <div class="row q-col-gutter-md">
         <div class="col-12 col-sm-4 col-md-2 fade">
-          <q-select @update:model-value="atualizarPeriodo" dense outlined v-model="periodoSelecionado"
-            :options="['Hoje', 'Últimos 7 dias', 'Últimos 30 dias']" label="Período" />
+          <q-select dense outlined v-model="periodoSelecionado" :options="opcoesPeriodos" label="Período" />
+        </div>
+        <div v-if="periodoSelecionado == periodos.MES_ESPECIFICO" class="col-6 col-sm-2 col-md-1 fade">
+          <q-select dense outlined v-model="mesSelecionado" :options="opcoosMeses" label="Mês" />
+        </div>
+        <div v-if="periodoSelecionado == periodos.MES_ESPECIFICO" class="col-6 col-sm-2 col-md-1 fade">
+          <q-select dense outlined v-model="anoSelecionado" :options="opcoesAnos" label="Mês" />
+        </div>
+        <div class="col-12 col-sm-4 col-md-2 col-lg-1 fade">
+          <q-btn push @click="obterCalcularEAtualizar" style="width: 100%" :loading="carregando" color="primary">Filtrar
+            <template v-slot:loading>
+              <q-spinner-hourglass class="on-left" />
+              Loading
+            </template>
+          </q-btn>
         </div>
       </div>
-      <q-separator class="q-my-sm"></q-separator>
-      <div class="row q-col-gutter-md fade">
-        <div class="col-12 col-sm-6 col-md-3">
-          <q-card flat dark class="maxima">
-            <q-card-section>
-              <q-item>
-                <q-item-section>
-                  <q-item-label> MÁXIMA </q-item-label>
-                  <q-item-label class="text-bold text-h6">
-                    {{ maxima }}°C
-                  </q-item-label>
-                </q-item-section>
-                <q-item-section avatar>
-                  <q-icon class="icon" size="lg" name="thermostat" />
-                </q-item-section>
-              </q-item>
-            </q-card-section>
-            <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-red"
-              label-style="font-size: 1.1em" />
-          </q-card>
-        </div>
+    </q-card>
+    <div class="row q-col-gutter-md fade">
+      <div class="col-12 col-sm-6 col-md-3">
+        <q-card flat dark class="maxima">
+          <q-card-section>
+            <q-item>
+              <q-item-section>
+                <q-item-label> MÁXIMA </q-item-label>
+                <q-item-label class="text-bold text-h6">
+                  {{ maxima }}°C
+                </q-item-label>
+              </q-item-section>
+              <q-item-section avatar>
+                <q-icon class="icon" size="lg" name="thermostat" />
+              </q-item-section>
+            </q-item>
+          </q-card-section>
+          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-red"
+            label-style="font-size: 1.1em" />
+        </q-card>
+      </div>
 
-        <div class="col-12 col-sm-6 col-md-3">
-          <q-card flat dark class="minima">
-            <q-card-section>
-              <q-item>
-                <q-item-section>
-                  <q-item-label> MÍNIMA </q-item-label>
-                  <q-item-label class="text-bold text-h6">
-                    {{ minima }}°C
-                  </q-item-label>
-                </q-item-section>
+      <div class="col-12 col-sm-6 col-md-3">
+        <q-card flat dark class="minima">
+          <q-card-section>
+            <q-item>
+              <q-item-section>
+                <q-item-label> MÍNIMA </q-item-label>
+                <q-item-label class="text-bold text-h6">
+                  {{ minima }}°C
+                </q-item-label>
+              </q-item-section>
 
-                <q-item-section avatar>
-                  <q-icon class="icon" size="lg" name="thermostat" />
-                </q-item-section>
-              </q-item>
-            </q-card-section>
-            <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-primary"
-              label-style="font-size: 1.1em" />
-          </q-card>
-        </div>
+              <q-item-section avatar>
+                <q-icon class="icon" size="lg" name="thermostat" />
+              </q-item-section>
+            </q-item>
+          </q-card-section>
+          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-primary"
+            label-style="font-size: 1.1em" />
+        </q-card>
+      </div>
 
-        <div class="col-12 col-sm-6 col-md-3">
-          <q-card flat dark class="vento">
-            <q-card-section>
-              <q-item>
-                <q-item-section>
-                  <q-item-label> VENTO MÁXIMO </q-item-label>
-                  <q-item-label class="text-bold text-h6">
-                    {{ ventoMaximo }}
-                    km/h
-                  </q-item-label>
-                </q-item-section>
-                <q-item-section avatar>
-                  <q-icon class="icon" size="lg" name="wind_power" />
-                </q-item-section>
-              </q-item>
-            </q-card-section>
-            <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
-              label-style="font-size: 1.1em" />
-          </q-card>
-        </div>
+      <div class="col-12 col-sm-6 col-md-3">
+        <q-card flat dark class="vento">
+          <q-card-section>
+            <q-item>
+              <q-item-section>
+                <q-item-label> VENTO MÁXIMO </q-item-label>
+                <q-item-label class="text-bold text-h6">
+                  {{ ventoMaximo }}
+                  km/h
+                </q-item-label>
+              </q-item-section>
+              <q-item-section avatar>
+                <q-icon class="icon" size="lg" name="wind_power" />
+              </q-item-section>
+            </q-item>
+          </q-card-section>
+          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
+            label-style="font-size: 1.1em" />
+        </q-card>
+      </div>
 
-        <div class="col-12 col-sm-6 col-md-3">
-          <q-card flat dark class="precipitacao">
-            <q-card-section>
-              <q-item>
-                <q-item-section>
-                  <q-item-label> PRECIPITAÇÃO MÁXIMA </q-item-label>
-                  <q-item-label class="text-bold text-h6">
-                    {{ precipitacaoMaxima }}mm
-                  </q-item-label>
-                </q-item-section>
-                <q-item-section avatar>
-                  <q-icon class="icon" size="lg" name="ion-rainy" />
-                </q-item-section>
-              </q-item>
-            </q-card-section>
-            <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-indigo"
-              label-style="font-size: 1.1em" />
-          </q-card>
-        </div>
+      <div class="col-12 col-sm-6 col-md-3">
+        <q-card flat dark class="precipitacao">
+          <q-card-section>
+            <q-item>
+              <q-item-section>
+                <q-item-label> PRECIPITAÇÃO MÁXIMA </q-item-label>
+                <q-item-label class="text-bold text-h6">
+                  {{ precipitacaoMaxima }}mm
+                </q-item-label>
+              </q-item-section>
+              <q-item-section avatar>
+                <q-icon class="icon" size="lg" name="ion-rainy" />
+              </q-item-section>
+            </q-item>
+          </q-card-section>
+          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-indigo"
+            label-style="font-size: 1.1em" />
+        </q-card>
+      </div>
 
-        <div class="col-12 col-md-4">
-          <q-card flat>
-            <q-card-section class="text-h6"> Agora ({{ atualizacao }}) </q-card-section>
-            <q-card-section>
-              <q-carousel v-model="slide" transition-duration="600" transition-prev="slide-right"
-                transition-next="slide-left" swipeable animated :control-color="darkMode ? 'white' : 'primary'" padding
-                navigation arrows infinite height="265px" :autoplay="autoplayCarousel" class="bg-transparent"
-                @mouseenter="autoplay = false" @mouseleave="autoplay = true">
-                <q-carousel-slide v-for="dados in dadosAgora" :key="dados.stationID"
-                  :name="estacoes[dados.stationID].NOME" class="column no-wrap flex-center">
-                  <div class="q-mt-md text-center text-h6">
-                    {{ estacoes[dados.stationID].NOME }}
-                  </div>
-                  <div class="justify-start">
-                    <div class="q-mt-md text-h6 text-start">
-                      <q-icon class="icon" :color="darkMode ? 'white' : 'primary'" size="lg" name="ion-thermometer" />
-                      {{ dados.metric.temp }}°C
-                    </div>
-                    <div class="q-mt-md text-h6 text-start">
-                      <q-icon class="icon" :color="darkMode ? 'white' : 'primary'" size="lg" name="ion-rainy" />
-                      {{ dados.metric.precipRate }}mm/h
-                    </div>
+      <div class="col-12 col-md-4">
+        <q-card flat>
+          <q-card-section class="text-h6"> Agora ({{ atualizacao }}) </q-card-section>
+          <q-card-section>
+            <q-carousel v-model="slide" transition-duration="600" transition-prev="slide-right"
+              transition-next="slide-left" swipeable animated :control-color="darkMode ? 'white' : 'primary'" padding
+              navigation arrows infinite height="265px" :autoplay="autoplayCarousel" class="bg-transparent"
+              @mouseenter="autoplay = false" @mouseleave="autoplay = true">
+              <q-carousel-slide v-for="dados in dadosAgora" :key="dados.stationID" :name="estacoes[dados.stationID].NOME"
+                class="column no-wrap flex-center">
+                <div class="q-mt-md text-center text-h6">
+                  {{ estacoes[dados.stationID].NOME }}
+                </div>
+                <div class="justify-start">
+                  <div class="q-mt-md text-h6 text-start">
+                    <q-icon class="icon" :color="darkMode ? 'white' : 'primary'" size="lg" name="ion-thermometer" />
+                    {{ dados.metric.temp }}°C
                   </div>
                   <div class="q-mt-md text-h6 text-start">
-                    <q-icon class="icon" :color="darkMode ? 'white' : 'primary'" size="lg" name="water_drop" />
-                    {{ dados.humidity }}%
+                    <q-icon class="icon" :color="darkMode ? 'white' : 'primary'" size="lg" name="ion-rainy" />
+                    {{ dados.metric.precipRate }}mm/h
                   </div>
-                </q-carousel-slide>
-              </q-carousel>
-            </q-card-section>
-            <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
-              label-style="font-size: 1.1em" />
-          </q-card>
-        </div>
-
-        <div class="col-12 col-md-8">
-          <q-card flat>
-            <q-card-section class="text-h6"> Máximas e mínimas </q-card-section>
-            <q-card-section>
-              <apexchart type="bar" height="250" :options="chartTemperaturaOptions" :series="seriesTemperatura"
-                ref="graficoColunaTemperatura"></apexchart>
-            </q-card-section>
-            <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
-              label-style="font-size: 1.1em" />
-          </q-card>
-        </div>
-
-        <div class="col-12 col-sm-12">
-          <q-card flat>
-            <q-card-section class="text-h6"> Precipitação </q-card-section>
-            <q-card-section>
-              <apexchart type="bar" height="250" :options="chartPrecipitacaoOptions" :series="seriesPrecipitacao"
-                ref="graficoPrecipitacao"></apexchart>
-            </q-card-section>
-            <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
-              label-style="font-size: 1.1em" />
-          </q-card>
-        </div>
-
-        <div class="col-12">
-          <q-table :class="darkMode ? 'my-sticky-header-table-dark' : 'my-sticky-header-table'" flat
-            title="Dados das estações" :rows="observacoes" :columns="columns" :pagination="pagination" :filter="filter"
-            :rows-per-page-options="[6, 12, 24, 48, 96]" row-key="name" :loading="carregando
-            ">
-            <template v-slot:top-right>
-              <q-input borderless dense debounce="300" v-model="filter" placeholder="Pesquisar">
-                <template v-slot:append>
-                  <q-icon name="search" />
-                </template>
-              </q-input>
-            </template>
-          </q-table>
-        </div>
+                </div>
+                <div class="q-mt-md text-h6 text-start">
+                  <q-icon class="icon" :color="darkMode ? 'white' : 'primary'" size="lg" name="water_drop" />
+                  {{ dados.humidity }}%
+                </div>
+              </q-carousel-slide>
+            </q-carousel>
+          </q-card-section>
+          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
+            label-style="font-size: 1.1em" />
+        </q-card>
       </div>
-    </q-page>
-  </q-pull-to-refresh>
+
+      <div class="col-12 col-md-8">
+        <q-card flat>
+          <q-card-section class="text-h6"> Máximas e mínimas </q-card-section>
+          <q-card-section>
+            <apexchart type="bar" height="250" :options="chartTemperaturaOptions" :series="seriesTemperatura"
+              ref="graficoColunaTemperatura"></apexchart>
+          </q-card-section>
+          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
+            label-style="font-size: 1.1em" />
+        </q-card>
+      </div>
+
+      <div class="col-12 col-sm-12">
+        <q-card flat>
+          <q-card-section class="text-h6"> Precipitação </q-card-section>
+          <q-card-section>
+            <apexchart type="bar" height="250" :options="chartPrecipitacaoOptions" :series="seriesPrecipitacao"
+              ref="graficoPrecipitacao"></apexchart>
+          </q-card-section>
+          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
+            label-style="font-size: 1.1em" />
+        </q-card>
+      </div>
+
+      <div class="col-12">
+        <q-table :class="darkMode ? 'my-sticky-header-table-dark' : 'my-sticky-header-table'" flat
+          title="Dados das estações" :rows="observacoes" :columns="columns" :pagination="pagination" :filter="filter"
+          :rows-per-page-options="[6, 12, 24, 48, 96]" row-key="name" :loading="carregando
+          ">
+          <template v-slot:top-right>
+            <q-input borderless dense debounce="300" v-model="filter" placeholder="Pesquisar">
+              <template v-slot:append>
+                <q-icon name="search" />
+              </template>
+            </q-input>
+          </template>
+        </q-table>
+      </div>
+    </div>
+  </q-page>
 </template>
 
 <script>
 import { defineComponent } from "vue";
-import { STATIONS, CORES } from "../constants/constants";
+import { STATIONS, CORES, PERIODOS } from "../constants/constants";
 import { API_KEY } from "src/constants/secrets";
+import arrayUtils from "src/utils/array-utils"
 
 export default defineComponent({
   name: "IndexPage",
@@ -213,7 +226,13 @@ export default defineComponent({
       dadosAgora: [],
       dataInicial: new Date(),
       dataFinal: new Date(),
-      periodoSelecionado: "Hoje",
+      periodos: PERIODOS,
+      periodoSelecionado: PERIODOS.HOJE,
+      opcoesPeriodos: Object.values(PERIODOS),
+      mesSelecionado: new Date().getMonth() + 1,
+      opcoosMeses: Array.from({ length: 12 }, (_, i) => i + 1),
+      opcoesAnos: arrayUtils.arrayRange(new Date().getFullYear() - 20, new Date().getFullYear(), 1),
+      anoSelecionado: new Date().getFullYear(),
       atualizacao: new Date().toLocaleTimeString(),
       observacoes: [],
       minima: 0,
@@ -344,6 +363,7 @@ export default defineComponent({
         yaxis: {
           max: 40,
         },
+
         tooltip: {
           y: {
             formatter: function (val) {
@@ -388,11 +408,32 @@ export default defineComponent({
         xaxis: {
           categories: Object.keys(STATIONS),
         },
+        fill: {
+          type: "gradient",
+          gradient: {
+            type: 'vertical',
+            shadeIntensity: 1,
+            opacityFrom: 1,
+            opacityTo: 1,
+            colorStops: [
+              {
+                offset: 10,
+                color: "#3F51B5",
+                opacity: 1
+              },
+              {
+                offset: 90,
+                color: "#283593",
+                opacity: 1
+              }
+            ]
+          }
+        },
       },
     };
   },
 
-  async mounted() {
+  async created() {
     await this.obterCalcularEAtualizar();
     await this.obterDadosAtuaisTodasEstacoes();
     this.atualizarDadosAtuais();
@@ -408,40 +449,41 @@ export default defineComponent({
       this.carregando = true;
       this.observacoes = [];
       this.metadadosEstacoes = [];
-      await this.obterObservacoesDiariasPeriodoTodasEstacoes(this.dataInicial, this.dataFinal);
+
+      await this.obterDadosPeriodo();
       console.log(`Tempo de execução para obter dados: ${new Date() - inicioObtencao}ms`);
+
       const inicioCalculo = new Date();
       this.calcularMetadados();
       this.atualizarGraficoTemperatura();
       this.atualizarGraficoPrecipitacao();
       console.log(`Tempo de execução para manipular dados: ${new Date() - inicioCalculo}ms`);
+
       this.carregando = false;
     },
 
-    async atualizarPeriodo(valor) {
-      switch (valor) {
-        case "Hoje":
+    async obterDadosPeriodo() {
+      switch (this.periodoSelecionado) {
+        case PERIODOS.HOJE:
           this.dataInicial = new Date(Date.now());
           this.dataFinal = new Date(Date.now());
+          await this.obterObservacoesDiaAtualTodasEstacoes();
           break;
-        case "Últimos 7 dias":
+        case PERIODOS.ULTIMOS_SETE_DIAS:
           this.dataInicial = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
           this.dataFinal = new Date(Date.now())
+          await this.obterObservacoesDiariasPeriodoTodasEstacoes(this.dataInicial, this.dataFinal);
           break;
-        case "Últimos 30 dias":
+        case PERIODOS.ULTIMOS_TRINTA_DIAS:
           this.dataInicial = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
           this.dataFinal = new Date(Date.now())
+          await this.obterObservacoesDiariasPeriodoTodasEstacoes(this.dataInicial, this.dataFinal);
           break;
         default:
           this.dataInicial = new Date();
           this.dataFinal = new Date();
+          await this.obterObservacoesDiaAtualTodasEstacoes();
       }
-      await this.obterCalcularEAtualizar();
-    },
-
-    async refresh(done) {
-      await this.obterCalcularEAtualizar();
-      done();
     },
 
     async obterObservacoesDiaAtualEstacao(codigoEstacao) {

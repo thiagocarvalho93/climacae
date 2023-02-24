@@ -16,4 +16,11 @@ const CORES = {
   INDIGO: "#3f51b5",
 };
 
-export { STATIONS, CORES };
+const PERIODOS = {
+  HOJE: "Hoje",
+  ULTIMOS_SETE_DIAS: "Últimos 7 dias",
+  ULTIMOS_TRINTA_DIAS: "Últimos 30 dias",
+  MES_ESPECIFICO: "Mês específico",
+};
+
+export { STATIONS, CORES, PERIODOS };
