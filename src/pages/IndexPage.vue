@@ -111,7 +111,7 @@
             <q-carousel v-model="slide" transition-duration="600" transition-prev="slide-right"
               transition-next="slide-left" swipeable animated :control-color="darkMode ? 'white' : 'primary'" padding
               navigation arrows infinite height="265px" :autoplay="autoplayCarousel" class="bg-transparent"
-              @mouseenter="autoplay = false" @mouseleave="autoplay = true">
+              @mouseenter="autoplay = false" navigation-icon="radio_button_unchecked" @mouseleave="autoplay = true">
               <q-carousel-slide v-for="dados in dadosAgora" :key="dados.stationID" :name="estacoes[dados.stationID].NOME"
                 class="column no-wrap flex-center">
                 <div class="q-mt-md text-center text-h6">
@@ -134,7 +134,7 @@
               </q-carousel-slide>
             </q-carousel>
           </q-card-section>
-          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
+          <q-inner-loading :showing="carregandoTempoReal" label="Aguarde..." label-class="text-teal"
             label-style="font-size: 1.1em" />
         </q-card>
       </div>
@@ -217,6 +217,7 @@ export default defineComponent({
   data() {
     return {
       carregando: true,
+      carregandoTempoReal: false,
       slide: STATIONS[Object.keys(STATIONS)[0]].NOME,
       autoplayCarousel: true,
       cores: CORES,
@@ -443,8 +444,6 @@ export default defineComponent({
       try {
         const inicioObtencao = new Date();
 
-        this.observacoes = [];
-        this.metadadosEstacoes = [];
         await this.filtrarDadosPeriodo();
         console.log(`Tempo de execução para obter dados: ${new Date() - inicioObtencao}ms`);
 
@@ -545,6 +544,10 @@ export default defineComponent({
       });
     },
 
+    formatarDataParaQuery(data) {
+      return `${data.getFullYear()}${data.getMonth() + 1 < 10 ? '0' : ''}${data.getMonth() + 1}${data.getDate() < 10 ? '0' : ''}${data.getDate()}`;
+    },
+
     async obterObservacoesDiaAtualTodasEstacoes() {
       const stations = Object.keys(STATIONS);
 
@@ -554,16 +557,14 @@ export default defineComponent({
             this.obterObservacoesDiaAtualEstacao(station)
           )
         );
+
+        this.observacoes = [];
         dados.forEach(
           (x) => x.observations && this.observacoes.push(...x.observations)
         );
       } catch (error) {
         console.log(error);
       }
-    },
-
-    formatarDataParaQuery(data) {
-      return `${data.getFullYear()}${data.getMonth() + 1 < 10 ? '0' : ''}${data.getMonth() + 1}${data.getDate() < 10 ? '0' : ''}${data.getDate()}`;
     },
 
     async obterObservacoesDiariasPeriodoTodasEstacoes(dataInicial, dataFinal) {
@@ -578,6 +579,8 @@ export default defineComponent({
             this.obterObservacoesDiariasPeriodo(station, dataInicialFormatada, dataFinalFormatada)
           )
         );
+
+        this.observacoes = [];
         dados.forEach(
           (x) => x.observations && this.observacoes.push(...x.observations)
         );
@@ -588,7 +591,6 @@ export default defineComponent({
 
     async obterDadosAtuaisTodasEstacoes() {
       const stations = Object.keys(STATIONS);
-      this.dadosAgora = [];
 
       try {
         const dados = await Promise.all(
@@ -596,6 +598,8 @@ export default defineComponent({
             this.obterDadosTempoReal(station)
           )
         );
+
+        this.dadosAgora = [];
         dados.forEach(
           (x) => x.observations && this.dadosAgora.push(...x.observations)
         );
@@ -648,12 +652,12 @@ export default defineComponent({
     },
 
     atualizarDadosAtuais() {
-      this.carregando = true;
       setInterval(async () => {
+        this.carregandoTempoReal = true;
         await this.obterDadosAtuaisTodasEstacoes();
         this.atualizacao = new Date().toLocaleTimeString();
+        this.carregandoTempoReal = false;
       }, 30000)
-      this.carregando = false;
     },
 
     atualizarGraficoTemperatura() {
