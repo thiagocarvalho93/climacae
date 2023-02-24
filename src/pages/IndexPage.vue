@@ -9,7 +9,7 @@
           <q-select dense outlined v-model="mesSelecionado" :options="opcoosMeses" label="Mês" />
         </div>
         <div v-if="periodoSelecionado == periodos.MES_ESPECIFICO" class="col-6 col-sm-2 col-md-1 fade">
-          <q-select dense outlined v-model="anoSelecionado" :options="opcoesAnos" label="Mês" />
+          <q-select dense outlined v-model="anoSelecionado" :options="opcoesAnos" label="Ano" />
         </div>
         <div class="col-12 col-sm-4 col-md-2 col-lg-1 fade">
           <q-btn push @click="obterCalcularEAtualizar" style="width: 100%" :loading="carregando" color="primary">Filtrar
@@ -185,7 +185,7 @@
 import { defineComponent } from "vue";
 import { STATIONS, CORES, PERIODOS } from "../constants/constants";
 import { API_KEY } from "src/constants/secrets";
-import arrayUtils from "src/utils/array-utils"
+import arrayUtils from "src/utils/array-utils";
 
 export default defineComponent({
   name: "IndexPage",
@@ -231,7 +231,7 @@ export default defineComponent({
       opcoesPeriodos: Object.values(PERIODOS),
       mesSelecionado: new Date().getMonth() + 1,
       opcoosMeses: Array.from({ length: 12 }, (_, i) => i + 1),
-      opcoesAnos: arrayUtils.arrayRange(new Date().getFullYear() - 20, new Date().getFullYear(), 1),
+      opcoesAnos: arrayUtils.arrayRange(2020, new Date().getFullYear(), 1),
       anoSelecionado: new Date().getFullYear(),
       atualizacao: new Date().toLocaleTimeString(),
       observacoes: [],
@@ -455,7 +455,15 @@ export default defineComponent({
         this.atualizarGraficoPrecipitacao();
         console.log(`Tempo de execução para manipular dados: ${new Date() - inicioCalculo}ms`);
       } catch (error) {
-        console.log("Erro ao obter: ", error)
+        this.$q.notify({
+          message: error && error.message || "Erro ao obter os dados.",
+          type: 'negative',
+          progress: true,
+          position: 'top',
+          actions: [
+            { label: 'Fechar', color: 'white', handler: () => { /* ... */ } }
+          ]
+        })
       }
       this.carregando = false;
     },
@@ -488,10 +496,7 @@ export default defineComponent({
     async filtrarMesEspecifico() {
       const hoje = new Date();
 
-      console.log(hoje.getMonth())
-
       if (this.mesSelecionado > hoje.getMonth() + 1 && this.anoSelecionado >= hoje.getFullYear()) {
-        console.log("Erro")
         throw new Error("Não é possivel obter dados do futuro!");
       }
 
@@ -505,8 +510,6 @@ export default defineComponent({
 
       await this.obterObservacoesDiariasPeriodoTodasEstacoes(this.dataInicial, this.dataFinal);
     },
-
-
 
     async obterObservacoesDiaAtualEstacao(codigoEstacao) {
       return new Promise((resolve, reject) => {
