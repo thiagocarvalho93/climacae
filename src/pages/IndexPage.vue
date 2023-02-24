@@ -1,7 +1,12 @@
 <template>
   <q-pull-to-refresh @refresh="refresh">
     <q-page :class="`q-pa-md ${darkMode ? 'bg-dark-page' : 'bg-blue-grey-1'}`">
-      <span class="text-h6 text-bold fade">Macaé - {{ new Date().toLocaleDateString("pt-br") }}</span>
+      <div class="row ">
+        <div class="col-12 col-sm-4 col-md-2 fade">
+          <q-select @update:model-value="atualizarPeriodo" dense outlined v-model="periodoSelecionado"
+            :options="['Hoje', '7 dias', '30 dias']" label="Período" />
+        </div>
+      </div>
       <q-separator class="q-my-sm"></q-separator>
       <div class="row q-col-gutter-md fade">
         <div class="col-12 col-sm-6 col-md-3">
@@ -135,7 +140,7 @@
 
         <div class="col-12 col-sm-12">
           <q-card flat>
-            <q-card-section class="text-h6"> Precipitação </q-card-section>
+            <q-card-section class="text-h6"> Precipitação máxima </q-card-section>
             <q-card-section>
               <apexchart type="bar" height="250" :options="chartPrecipitacaoOptions" :series="seriesPrecipitacao"
                 ref="graficoPrecipitacao"></apexchart>
@@ -206,6 +211,9 @@ export default defineComponent({
       estacoes: STATIONS,
       metadadosEstacoes: [],
       dadosAgora: [],
+      dataInicial: new Date(),
+      dataFinal: new Date(),
+      periodoSelecionado: "Hoje",
       atualizacao: new Date().toLocaleTimeString(),
       observacoes: [],
       minima: 0,
@@ -386,6 +394,7 @@ export default defineComponent({
 
   async mounted() {
     await this.obterCalcularEAtualizar();
+    await this.obterDadosAtuaisTodasEstacoes();
     this.atualizarDadosAtuais();
   },
 
@@ -397,8 +406,9 @@ export default defineComponent({
     async obterCalcularEAtualizar() {
       const inicioObtencao = new Date();
       this.carregando = true;
-      await this.obterObservacoesTodasEstacoes();
-      await this.obterDadosAtuaisTodasEstacoes();
+      this.observacoes = [];
+      this.metadadosEstacoes = [];
+      await this.obterObservacoesDiariasPeriodoTodasEstacoes(this.dataInicial, this.dataFinal);
       console.log(`Tempo de execução para obter dados: ${new Date() - inicioObtencao}ms`);
       const inicioCalculo = new Date();
       this.calcularMetadados();
@@ -406,6 +416,32 @@ export default defineComponent({
       this.atualizarGraficoPrecipitacao();
       console.log(`Tempo de execução para manipular dados: ${new Date() - inicioCalculo}ms`);
       this.carregando = false;
+    },
+
+    async atualizarPeriodo(valor) {
+      console.log(valor)
+      switch (valor) {
+        case "Hoje":
+          console.log("hoje")
+          this.dataInicial = new Date(Date.now());
+          this.dataFinal = new Date(Date.now());
+          break;
+        case "7 dias":
+          console.log("semana")
+          this.dataInicial = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+          this.dataFinal = new Date(Date.now())
+          break;
+        case "30 dias":
+          console.log("mês")
+          this.dataInicial = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+          this.dataFinal = new Date(Date.now())
+          break;
+        default:
+          this.dataInicial = new Date();
+          this.dataFinal = new Date();
+      }
+      console.log("atualizei")
+      await this.obterCalcularEAtualizar();
     },
 
     async refresh(done) {
@@ -424,6 +460,18 @@ export default defineComponent({
       });
     },
 
+    async obterObservacoesDiariasPeriodo(codigoEstacao, dataInicial, dataFinal) {
+      //Formato das datas YYYYMMDD
+      return new Promise((resolve, reject) => {
+        return this.$api
+          .get(
+            `/pws/history/daily?stationId=${codigoEstacao}&format=json&units=m&startDate=${dataInicial}&endDate=${dataFinal}&numericPrecision=decimal&apiKey=${this.apiKey}`
+          )
+          .then((response) => resolve(response.data))
+          .catch((error) => reject(error));
+      });
+    },
+
     async obterDadosTempoReal(codigoEstacao) {
       return new Promise((resolve, reject) => {
         return this.$api
@@ -435,13 +483,33 @@ export default defineComponent({
       });
     },
 
-    async obterObservacoesTodasEstacoes() {
+    async obterObservacoesDiaAtualTodasEstacoes() {
       const stations = Object.keys(STATIONS);
 
       try {
         const dados = await Promise.all(
           stations.map((station) =>
             this.obterObservacoesDiaAtualEstacao(station)
+          )
+        );
+        dados.forEach(
+          (x) => x.observations && this.observacoes.push(...x.observations)
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    async obterObservacoesDiariasPeriodoTodasEstacoes(dataInicial, dataFinal) {
+      const stations = Object.keys(STATIONS);
+
+      const dataInicialFormatada = `${dataInicial.getFullYear()}${dataInicial.getMonth() + 1 < 10 ? '0' : ''}${dataInicial.getMonth() + 1}${dataInicial.getDate()}`
+      const dataFinalFormatada = `${dataFinal.getFullYear()}${dataInicial.getMonth() + 1 < 10 ? '0' : ''}${dataFinal.getMonth() + 1}${dataFinal.getDate()}`
+
+      try {
+        const dados = await Promise.all(
+          stations.map((station) =>
+            this.obterObservacoesDiariasPeriodo(station, dataInicialFormatada, dataFinalFormatada)
           )
         );
         dados.forEach(
@@ -490,8 +558,11 @@ export default defineComponent({
               .filter((x) => x.stationID == station)
               .map((x) => x.metric.windgustHigh)
           ),
-          precipitacao: this.observacoes
-            .filter((x) => x.stationID == station).slice(-1)[0].metric.precipTotal,
+          precipitacao: Math.max(
+            ...this.observacoes
+              .filter((x) => x.stationID == station)
+              .map((x) => x.metric.precipTotal)
+          ),
         });
       });
 
@@ -548,6 +619,7 @@ export default defineComponent({
     atualizarGraficoPrecipitacao() {
       this.$refs.graficoPrecipitacao.updateSeries([
         {
+          name: "Precipitação",
           data: this.metadadosEstacoes.map((x) => x.precipitacao),
         },
       ]);
