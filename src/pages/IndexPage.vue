@@ -450,7 +450,7 @@ export default defineComponent({
       this.observacoes = [];
       this.metadadosEstacoes = [];
 
-      await this.obterDadosPeriodo();
+      await this.filtrarDadosPeriodo();
       console.log(`Tempo de execução para obter dados: ${new Date() - inicioObtencao}ms`);
 
       const inicioCalculo = new Date();
@@ -462,7 +462,7 @@ export default defineComponent({
       this.carregando = false;
     },
 
-    async obterDadosPeriodo() {
+    async filtrarDadosPeriodo() {
       switch (this.periodoSelecionado) {
         case PERIODOS.HOJE:
           this.dataInicial = new Date(Date.now());
@@ -479,12 +479,19 @@ export default defineComponent({
           this.dataFinal = new Date(Date.now())
           await this.obterObservacoesDiariasPeriodoTodasEstacoes(this.dataInicial, this.dataFinal);
           break;
+        case PERIODOS.MES_ESPECIFICO:
+          this.dataInicial = new Date(this.anoSelecionado, this.mesSelecionado, 1)
+          this.dataFinal = new Date(this.anoSelecionado, this.mesSelecionado + 1, 0)
+          await this.obterObservacoesDiariasPeriodoTodasEstacoes(this.dataInicial, this.dataFinal);
+          break;
         default:
           this.dataInicial = new Date();
           this.dataFinal = new Date();
           await this.obterObservacoesDiaAtualTodasEstacoes();
       }
     },
+
+
 
     async obterObservacoesDiaAtualEstacao(codigoEstacao) {
       return new Promise((resolve, reject) => {
@@ -537,11 +544,15 @@ export default defineComponent({
       }
     },
 
+    formatarDataParaQuery(data) {
+      return `${data.getFullYear()}${data.getMonth() + 1 < 10 ? '0' : ''}${data.getMonth() + 1}${data.getDate() < 10 ? '0' : ''}${data.getDate()}`;
+    },
+
     async obterObservacoesDiariasPeriodoTodasEstacoes(dataInicial, dataFinal) {
       const stations = Object.keys(STATIONS);
 
-      const dataInicialFormatada = `${dataInicial.getFullYear()}${dataInicial.getMonth() + 1 < 10 ? '0' : ''}${dataInicial.getMonth() + 1}${dataInicial.getDate()}`
-      const dataFinalFormatada = `${dataFinal.getFullYear()}${dataInicial.getMonth() + 1 < 10 ? '0' : ''}${dataFinal.getMonth() + 1}${dataFinal.getDate()}`
+      const dataInicialFormatada = this.formatarDataParaQuery(dataInicial)
+      const dataFinalFormatada = this.formatarDataParaQuery(dataFinal)
 
       try {
         const dados = await Promise.all(
@@ -648,7 +659,7 @@ export default defineComponent({
       this.$refs.graficoColunaTemperatura.updateOptions({
         xaxis: {
           categories: this.metadadosEstacoes
-            .filter((x) => x.maxima != -Infinity && x.minima != Infinity)
+            .filter((x) => x.maxima != -Infinity || x.minima != Infinity)
             .map((x) => x.id),
         },
       });
@@ -658,12 +669,15 @@ export default defineComponent({
       this.$refs.graficoPrecipitacao.updateSeries([
         {
           name: "Precipitação",
-          data: this.metadadosEstacoes.map((x) => x.precipitacao),
+          data: this.metadadosEstacoes
+            .filter((x) => x.precipitacao != (-Infinity || Infinity))
+            .map((x) => x.precipitacao),
         },
       ]);
       this.$refs.graficoPrecipitacao.updateOptions({
         xaxis: {
           categories: this.metadadosEstacoes
+            .filter((x) => x.precipitacao != (-Infinity || Infinity))
             .map((x) => x.id),
         },
       });
