@@ -4,7 +4,7 @@
       <div class="row ">
         <div class="col-12 col-sm-4 col-md-2 fade">
           <q-select @update:model-value="atualizarPeriodo" dense outlined v-model="periodoSelecionado"
-            :options="['Hoje', '7 dias', '30 dias']" label="Período" />
+            :options="['Hoje', 'Últimos 7 dias', 'Últimos 30 dias']" label="Período" />
         </div>
       </div>
       <q-separator class="q-my-sm"></q-separator>
@@ -95,10 +95,10 @@
           <q-card flat>
             <q-card-section class="text-h6"> Agora ({{ atualizacao }}) </q-card-section>
             <q-card-section>
-              <q-carousel v-model="slide" transition-prev="scale" transition-next="scale" swipeable animated
-                :control-color="darkMode ? 'white' : 'primary'" padding navigation arrows infinite height="265px"
-                :autoplay="autoplayCarousel" class="bg-transparent" @mouseenter="autoplay = false"
-                @mouseleave="autoplay = true">
+              <q-carousel v-model="slide" transition-duration="600" transition-prev="slide-right"
+                transition-next="slide-left" swipeable animated :control-color="darkMode ? 'white' : 'primary'" padding
+                navigation arrows infinite height="265px" :autoplay="autoplayCarousel" class="bg-transparent"
+                @mouseenter="autoplay = false" @mouseleave="autoplay = true">
                 <q-carousel-slide v-for="dados in dadosAgora" :key="dados.stationID"
                   :name="estacoes[dados.stationID].NOME" class="column no-wrap flex-center">
                   <div class="q-mt-md text-center text-h6">
@@ -140,7 +140,7 @@
 
         <div class="col-12 col-sm-12">
           <q-card flat>
-            <q-card-section class="text-h6"> Precipitação máxima </q-card-section>
+            <q-card-section class="text-h6"> Precipitação </q-card-section>
             <q-card-section>
               <apexchart type="bar" height="250" :options="chartPrecipitacaoOptions" :series="seriesPrecipitacao"
                 ref="graficoPrecipitacao"></apexchart>
@@ -419,20 +419,16 @@ export default defineComponent({
     },
 
     async atualizarPeriodo(valor) {
-      console.log(valor)
       switch (valor) {
         case "Hoje":
-          console.log("hoje")
           this.dataInicial = new Date(Date.now());
           this.dataFinal = new Date(Date.now());
           break;
-        case "7 dias":
-          console.log("semana")
+        case "Últimos 7 dias":
           this.dataInicial = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
           this.dataFinal = new Date(Date.now())
           break;
-        case "30 dias":
-          console.log("mês")
+        case "Últimos 30 dias":
           this.dataInicial = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
           this.dataFinal = new Date(Date.now())
           break;
@@ -440,7 +436,6 @@ export default defineComponent({
           this.dataInicial = new Date();
           this.dataFinal = new Date();
       }
-      console.log("atualizei")
       await this.obterCalcularEAtualizar();
     },
 
