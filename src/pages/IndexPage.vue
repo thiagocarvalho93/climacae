@@ -91,7 +91,7 @@
           </q-card>
         </div>
 
-        <div class="col-12 col-sm-4">
+        <div class="col-12 col-md-4">
           <q-card flat>
             <q-card-section class="text-h6"> Agora ({{ atualizacao }}) </q-card-section>
             <q-card-section>
@@ -126,7 +126,7 @@
           </q-card>
         </div>
 
-        <div class="col-12 col-sm-8">
+        <div class="col-12 col-md-8">
           <q-card flat>
             <q-card-section class="text-h6"> Máximas e mínimas </q-card-section>
             <q-card-section>
