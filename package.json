@@ -1,8 +1,8 @@
 {
   "name": "frontend",
   "version": "0.0.1",
-  "description": "A weather dashboard project",
-  "productName": "CliMacaé",
+  "description": "Painel climático das estações de Macaé",
+  "productName": "Observadores do Tempo e Clima",
   "author": "thiagocarvalho93",
   "private": true,
   "scripts": {

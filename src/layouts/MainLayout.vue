@@ -5,8 +5,8 @@
       <q-toolbar>
         <q-toolbar-title class="fade">
           <q-avatar>
+            <q-img src="../assets/logo-192x192.png" spinner-color="white" style="height: 30px;" fit="scale-down" />
           </q-avatar>
-          CliMacaé
         </q-toolbar-title>
         <q-toggle v-model="isDarkMode" color="dark" @update:model-value="toggleDarkMode(isDarkMode)" icon="nightlight"
           unchecked-icon="light_mode" />

@@ -7,15 +7,8 @@
           <q-card-section class="fade">
             <div class="q-pa-md row q-col-gutter-md">
               <div class="col-12 col-xs-6 col-sm-5 col-md-3">
-                <q-select
-                  filled
-                  color="light-blue-7"
-                  label-color="light-blue-7"
-                  v-model="estacaoSelecionada"
-                  :options="estacoes.map((estacao) => estacao.ID)"
-                  @update:model-value="obterDados"
-                  label="Estação"
-                >
+                <q-select filled color="light-blue-7" label-color="light-blue-7" v-model="estacaoSelecionada"
+                  :options="estacoes.map((estacao) => estacao.ID)" @update:model-value="obterDados" label="Estação">
                   <template v-slot:prepend>
                     <q-icon name="search" />
                   </template>
@@ -25,20 +18,11 @@
           </q-card-section>
           <q-separator class="q-mb-sm"></q-separator>
           <q-card-section class="fade">
-            <apexchart
-              height="350"
-              :options="chartOptions"
-              :series="series"
-              ref="graficoTemperatura"
-            ></apexchart>
+            <apexchart height="350" :options="chartOptions" :series="series" ref="graficoTemperatura"></apexchart>
           </q-card-section>
 
-          <q-inner-loading
-            :showing="carregando"
-            label="Aguarde..."
-            label-class="text-teal"
-            label-style="font-size: 1.1em"
-          />
+          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
+            label-style="font-size: 1.1em" />
         </q-card>
       </div>
     </div>
@@ -124,7 +108,6 @@ export default defineComponent({
 
   methods: {
     obterObservacoesDiaAnteriorEstacao(codigoEstacao) {
-      // https://api.weather.com/v1/location/SBME:9:BR/observations/historical.json?apiKey=e1f10a1e78da46f5b10a1e78da96f525&units=m&startDate=20230122&endDate=20230122
       return new Promise((resolve, reject) => {
         return this.$api
           .get(
@@ -167,5 +150,4 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
