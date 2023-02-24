@@ -77,7 +77,7 @@
                   </q-item-label>
                 </q-item-section>
                 <q-item-section avatar>
-                  <q-icon class="icon" size="lg" name="water_drop" />
+                  <q-icon class="icon" size="lg" name="ion-rainy" />
                 </q-item-section>
               </q-item>
             </q-card-section>
@@ -88,24 +88,30 @@
 
         <div class="col-12 col-sm-4">
           <q-card flat>
-            <q-card-section class="text-h6"> Agora </q-card-section>
+            <q-card-section class="text-h6"> Agora ({{ atualizacao }}) </q-card-section>
             <q-card-section>
               <q-carousel v-model="slide" transition-prev="scale" transition-next="scale" swipeable animated
                 :control-color="darkMode ? 'white' : 'primary'" padding navigation arrows infinite height="265px"
                 :autoplay="autoplayCarousel" class="bg-transparent" @mouseenter="autoplay = false"
                 @mouseleave="autoplay = true">
-                <q-carousel-slide v-for="dados in metadadosEstacoes" :key="dados.id" :name="dados.id"
-                  class="column no-wrap flex-center">
+                <q-carousel-slide v-for="dados in dadosAgora" :key="dados.stationID"
+                  :name="estacoes[dados.stationID].NOME" class="column no-wrap flex-center">
                   <div class="q-mt-md text-center text-h6">
-                    {{ dados.id }}
+                    {{ estacoes[dados.stationID].NOME }}
                   </div>
-                  <div class="q-mt-md text-h5 text-center">
-                    <q-icon class="icon" :color="darkMode ? 'white' : 'primary'" size="lg" name="thermostat" />
-                    {{ dados.temperaturaAtual }}°C
+                  <div class="justify-start">
+                    <div class="q-mt-md text-h6 text-start">
+                      <q-icon class="icon" :color="darkMode ? 'white' : 'primary'" size="lg" name="ion-thermometer" />
+                      {{ dados.metric.temp }}°C
+                    </div>
+                    <div class="q-mt-md text-h6 text-start">
+                      <q-icon class="icon" :color="darkMode ? 'white' : 'primary'" size="lg" name="ion-rainy" />
+                      {{ dados.metric.precipRate }}mm/h
+                    </div>
                   </div>
-                  <div class="q-mt-md text-h5 text-center">
+                  <div class="q-mt-md text-h6 text-start">
                     <q-icon class="icon" :color="darkMode ? 'white' : 'primary'" size="lg" name="water_drop" />
-                    {{ dados.precipitacao }}mm
+                    {{ dados.humidity }}%
                   </div>
                 </q-carousel-slide>
               </q-carousel>
@@ -199,6 +205,8 @@ export default defineComponent({
       apiKey: API_KEY,
       estacoes: STATIONS,
       metadadosEstacoes: [],
+      dadosAgora: [],
+      atualizacao: new Date().toLocaleTimeString(),
       observacoes: [],
       minima: 0,
       maxima: 0,
@@ -378,6 +386,11 @@ export default defineComponent({
 
   async mounted() {
     await this.obterCalcularEAtualizar();
+    this.atualizarDadosAtuais();
+  },
+
+  beforeUnmount() {
+    clearInterval(this.atualizarDadosAtuais)
   },
 
   methods: {
@@ -385,6 +398,7 @@ export default defineComponent({
       const inicioObtencao = new Date();
       this.carregando = true;
       await this.obterObservacoesTodasEstacoes();
+      await this.obterDadosAtuaisTodasEstacoes();
       console.log(`Tempo de execução para obter dados: ${new Date() - inicioObtencao}ms`);
       const inicioCalculo = new Date();
       this.calcularMetadados();
@@ -410,6 +424,17 @@ export default defineComponent({
       });
     },
 
+    async obterDadosTempoReal(codigoEstacao) {
+      return new Promise((resolve, reject) => {
+        return this.$api
+          .get(
+            `/pws/observations/current?apiKey=${this.apiKey}&stationId=${codigoEstacao}&numericPrecision=decimal&format=json&units=m`
+          )
+          .then((response) => resolve(response.data))
+          .catch((error) => reject(error));
+      });
+    },
+
     async obterObservacoesTodasEstacoes() {
       const stations = Object.keys(STATIONS);
 
@@ -421,6 +446,23 @@ export default defineComponent({
         );
         dados.forEach(
           (x) => x.observations && this.observacoes.push(...x.observations)
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    async obterDadosAtuaisTodasEstacoes() {
+      const stations = Object.keys(STATIONS);
+
+      try {
+        const dados = await Promise.all(
+          stations.map((station) =>
+            this.obterDadosTempoReal(station)
+          )
+        );
+        dados.forEach(
+          (x) => x.observations && this.dadosAgora.push(...x.observations)
         );
       } catch (error) {
         console.log(error);
@@ -443,18 +485,14 @@ export default defineComponent({
               .filter((x) => x.stationID == station)
               .map((x) => x.metric.tempHigh)
           ),
-          temperaturaAtual: this.observacoes
-            .filter((x) => x.stationID == station).at(-1).metric.tempAvg,
           ventoMaximo: Math.max(
             ...this.observacoes
               .filter((x) => x.stationID == station)
               .map((x) => x.metric.windgustHigh)
           ),
           precipitacao: this.observacoes
-            .filter((x) => x.stationID == station).at(-1).metric.precipTotal,
+            .filter((x) => x.stationID == station).slice(-1)[0].metric.precipTotal,
         });
-        console.log(this.observacoes
-          .filter((x) => x.stationID == station).slice(-1))
       });
 
       this.maxima = Math.max(
@@ -469,6 +507,15 @@ export default defineComponent({
       this.precipitacaoMaxima = Math.max(
         ...this.metadadosEstacoes.map((dado) => dado.precipitacao)
       );
+    },
+
+    atualizarDadosAtuais() {
+      this.carregando = true;
+      setInterval(async () => {
+        await this.obterDadosTempoReal();
+        this.atualizacao = new Date().toLocaleTimeString();
+      }, 30000)
+      this.carregando = false;
     },
 
     atualizarGraficoTemperatura() {
