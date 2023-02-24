@@ -287,13 +287,6 @@ export default defineComponent({
           align: "left",
         },
         {
-          name: "dewPoint",
-          label: "Ponto de orvalho (°C)",
-          field: (row) => row.metric.dewptAvg,
-          sortable: true,
-          align: "left",
-        },
-        {
           name: "humid",
           label: "Umidade (%)",
           field: (row) => row.humidityAvg,
@@ -445,20 +438,25 @@ export default defineComponent({
 
   methods: {
     async obterCalcularEAtualizar() {
-      const inicioObtencao = new Date();
       this.carregando = true;
-      this.observacoes = [];
-      this.metadadosEstacoes = [];
 
-      await this.filtrarDadosPeriodo();
-      console.log(`Tempo de execução para obter dados: ${new Date() - inicioObtencao}ms`);
+      try {
+        const inicioObtencao = new Date();
 
-      const inicioCalculo = new Date();
-      this.calcularMetadados();
-      this.atualizarGraficoTemperatura();
-      this.atualizarGraficoPrecipitacao();
-      console.log(`Tempo de execução para manipular dados: ${new Date() - inicioCalculo}ms`);
+        this.observacoes = [];
+        this.metadadosEstacoes = [];
+        await this.filtrarDadosPeriodo();
+        console.log(`Tempo de execução para obter dados: ${new Date() - inicioObtencao}ms`);
 
+        const inicioCalculo = new Date();
+
+        this.calcularMetadados();
+        this.atualizarGraficoTemperatura();
+        this.atualizarGraficoPrecipitacao();
+        console.log(`Tempo de execução para manipular dados: ${new Date() - inicioCalculo}ms`);
+      } catch (error) {
+        console.log("Erro ao obter: ", error)
+      }
       this.carregando = false;
     },
 
@@ -470,25 +468,42 @@ export default defineComponent({
           await this.obterObservacoesDiaAtualTodasEstacoes();
           break;
         case PERIODOS.ULTIMOS_SETE_DIAS:
-          this.dataInicial = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-          this.dataFinal = new Date(Date.now())
+          this.dataInicial = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+          this.dataFinal = new Date(Date.now());
           await this.obterObservacoesDiariasPeriodoTodasEstacoes(this.dataInicial, this.dataFinal);
           break;
         case PERIODOS.ULTIMOS_TRINTA_DIAS:
-          this.dataInicial = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-          this.dataFinal = new Date(Date.now())
+          this.dataInicial = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+          this.dataFinal = new Date(Date.now());
           await this.obterObservacoesDiariasPeriodoTodasEstacoes(this.dataInicial, this.dataFinal);
           break;
         case PERIODOS.MES_ESPECIFICO:
-          this.dataInicial = new Date(this.anoSelecionado, this.mesSelecionado, 1)
-          this.dataFinal = new Date(this.anoSelecionado, this.mesSelecionado + 1, 0)
-          await this.obterObservacoesDiariasPeriodoTodasEstacoes(this.dataInicial, this.dataFinal);
+          await this.filtrarMesEspecifico();
           break;
         default:
-          this.dataInicial = new Date();
-          this.dataFinal = new Date();
-          await this.obterObservacoesDiaAtualTodasEstacoes();
+          throw new Error("Período inválido!");
       }
+    },
+
+    async filtrarMesEspecifico() {
+      const hoje = new Date();
+
+      console.log(hoje.getMonth())
+
+      if (this.mesSelecionado > hoje.getMonth() + 1 && this.anoSelecionado >= hoje.getFullYear()) {
+        console.log("Erro")
+        throw new Error("Não é possivel obter dados do futuro!");
+      }
+
+      this.dataInicial = new Date(this.anoSelecionado, this.mesSelecionado - 1, 1);
+
+      if (this.mesSelecionado == hoje.getMonth() + 1 && this.anoSelecionado == hoje.getFullYear()) {
+        this.dataFinal = hoje;
+      } else {
+        this.dataFinal = new Date(this.anoSelecionado, this.mesSelecionado, 0);
+      }
+
+      await this.obterObservacoesDiariasPeriodoTodasEstacoes(this.dataInicial, this.dataFinal);
     },
 
 
