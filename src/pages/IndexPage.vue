@@ -1,5 +1,5 @@
 <template>
-  <q-page :class="`q-pa-md ${darkMode ? 'bg-dark-page' : 'bg-blue-grey-1'}`">
+  <q-page style="padding-top: 66px" :class="`q-pa-md ${darkMode ? 'bg-dark-page' : 'bg-blue-grey-1'}`">
     <q-card flat class="q-pa-md q-mb-md fade">
       <div class="row q-col-gutter-md">
         <div class="col-12 col-sm-4 col-md-2 fade">
@@ -23,8 +23,9 @@
     </q-card>
     <div class="row q-col-gutter-md fade">
       <div class="col-12 col-sm-6 col-md-3">
-        <q-card flat dark class="maxima">
-          <q-card-section>
+        <q-card flat dark @mouseover="mostrarInformacoesCard[0] = false" @mouseleave="mostrarInformacoesCard[0] = true"
+          class="maxima">
+          <q-card-section class="fade" v-if="mostrarInformacoesCard[0]">
             <q-item>
               <q-item-section>
                 <q-item-label> MÁXIMA </q-item-label>
@@ -37,14 +38,28 @@
               </q-item-section>
             </q-item>
           </q-card-section>
+
+          <q-card-section class="fade" v-else>
+            <q-item>
+              <q-item-section>
+                <q-item-label> Em {{ estacoes[dadosMaxima.stationID].NOME }} ({{ dadosMaxima.stationID }})</q-item-label>
+                <q-item-label class="text-bold text-h6">
+                  {{ new Date(dadosMaxima.obsTimeLocal).toLocaleDateString() }}
+                </q-item-label>
+              </q-item-section>
+
+            </q-item>
+          </q-card-section>
+
           <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-red"
             label-style="font-size: 1.1em" />
         </q-card>
       </div>
 
       <div class="col-12 col-sm-6 col-md-3">
-        <q-card flat dark class="minima">
-          <q-card-section>
+        <q-card flat dark @mouseover="mostrarInformacoesCard[1] = false" @mouseleave="mostrarInformacoesCard[1] = true"
+          class="minima">
+          <q-card-section class="fade" v-if="mostrarInformacoesCard[1]">
             <q-item>
               <q-item-section>
                 <q-item-label> MÍNIMA </q-item-label>
@@ -58,14 +73,28 @@
               </q-item-section>
             </q-item>
           </q-card-section>
+
+          <q-card-section class="fade" v-else>
+            <q-item>
+              <q-item-section>
+                <q-item-label> Em {{ estacoes[dadosMinima.stationID].NOME }} ({{ dadosMinima.stationID }})</q-item-label>
+                <q-item-label class="text-bold text-h6">
+                  {{ new Date(dadosMinima.obsTimeLocal).toLocaleDateString() }}
+                </q-item-label>
+              </q-item-section>
+
+            </q-item>
+          </q-card-section>
+
           <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-primary"
             label-style="font-size: 1.1em" />
         </q-card>
       </div>
 
       <div class="col-12 col-sm-6 col-md-3">
-        <q-card flat dark class="vento">
-          <q-card-section>
+        <q-card flat dark @mouseover="mostrarInformacoesCard[2] = false" @mouseleave="mostrarInformacoesCard[2] = true"
+          class="vento">
+          <q-card-section class="fade" v-if="mostrarInformacoesCard[2]">
             <q-item>
               <q-item-section>
                 <q-item-label> VENTO MÁXIMO </q-item-label>
@@ -79,14 +108,29 @@
               </q-item-section>
             </q-item>
           </q-card-section>
+
+          <q-card-section class="fade" v-else>
+            <q-item>
+              <q-item-section>
+                <q-item-label> Em {{ estacoes[dadosVentoMaximo.stationID].NOME }} ({{ dadosVentoMaximo.stationID
+                }})</q-item-label>
+                <q-item-label class="text-bold text-h6">
+                  {{ new Date(dadosVentoMaximo.obsTimeLocal).toLocaleDateString() }}
+                </q-item-label>
+              </q-item-section>
+
+            </q-item>
+          </q-card-section>
+
           <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
             label-style="font-size: 1.1em" />
         </q-card>
       </div>
 
       <div class="col-12 col-sm-6 col-md-3">
-        <q-card flat dark class="precipitacao">
-          <q-card-section>
+        <q-card flat dark @mouseover="mostrarInformacoesCard[3] = false" @mouseleave="mostrarInformacoesCard[3] = true"
+          class="precipitacao">
+          <q-card-section class="fade" v-if="mostrarInformacoesCard[3]">
             <q-item>
               <q-item-section>
                 <q-item-label> PRECIPITAÇÃO MÁXIMA </q-item-label>
@@ -99,6 +143,20 @@
               </q-item-section>
             </q-item>
           </q-card-section>
+
+          <q-card-section class="fade" v-else>
+            <q-item>
+              <q-item-section>
+                <q-item-label> Em {{ estacoes[dadosPrecipitacaoMaxima.stationID].NOME }} ({{
+                  dadosPrecipitacaoMaxima.stationID }})</q-item-label>
+                <q-item-label class="text-bold text-h6">
+                  {{ new Date(dadosPrecipitacaoMaxima.obsTimeLocal).toLocaleDateString() }}
+                </q-item-label>
+              </q-item-section>
+
+            </q-item>
+          </q-card-section>
+
           <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-indigo"
             label-style="font-size: 1.1em" />
         </q-card>
@@ -178,6 +236,7 @@
         </q-table>
       </div>
     </div>
+
   </q-page>
 </template>
 
@@ -219,6 +278,7 @@ export default defineComponent({
       carregando: true,
       carregandoTempoReal: false,
       slide: STATIONS[Object.keys(STATIONS)[0]].NOME,
+      mostrarInformacoesCard: [true, true, true, true],
       autoplayCarousel: true,
       cores: CORES,
       apiKey: API_KEY,
@@ -237,9 +297,13 @@ export default defineComponent({
       atualizacao: new Date().toLocaleTimeString(),
       observacoes: [],
       minima: 0,
+      dadosMinima: [],
       maxima: 0,
+      dadosMaxima: [],
       ventoMaximo: 0,
+      dadosVentoMaximo: [],
       precipitacaoMaxima: 0,
+      dadosPrecipitacaoMaxima: [],
       pagination: {
         rowsPerPage: 12
       },
@@ -640,15 +704,24 @@ export default defineComponent({
       this.maxima = Math.max(
         ...this.metadadosEstacoes.map((dado) => dado.maxima)
       );
+      this.dadosMaxima = this.observacoes.find(obs => obs.metric.tempHigh == this.maxima);
+
       this.minima = Math.min(
         ...this.metadadosEstacoes.map((dado) => dado.minima)
       );
+      this.dadosMinima = this.observacoes.find(obs => obs.metric.tempLow == this.minima);
+
       this.ventoMaximo = Math.max(
         ...this.metadadosEstacoes.map((dado) => dado.ventoMaximo)
       );
+      this.dadosVentoMaximo = this.observacoes.find(obs => obs.metric.windgustHigh == this.ventoMaximo);
+
+
       this.precipitacaoMaxima = Math.max(
         ...this.metadadosEstacoes.map((dado) => dado.precipitacao)
       );
+      this.dadosPrecipitacaoMaxima = this.observacoes.find(obs => obs.metric.precipTotal == this.precipitacaoMaxima);
+
     },
 
     atualizarDadosAtuais() {
@@ -721,6 +794,7 @@ export default defineComponent({
   --scrollbar-thumb-hover-dark    : rgb(33,118,210)
 
 .maxima
+  height: 100px
   animation-name: zoomInOut
   animation-duration: 0.4s
   animation-timing-function: ease
@@ -728,6 +802,7 @@ export default defineComponent({
   background-image: linear-gradient(to right,$red-6, $red-8)
 
 .minima
+  height: 100px
   animation-name: zoomInOut
   animation-duration: 0.4s
   animation-timing-function: ease
@@ -735,6 +810,7 @@ export default defineComponent({
   background-image: linear-gradient(to right,$blue-6, $blue-8)
 
 .vento
+  height: 100px
   animation-name: zoomInOut
   animation-duration: 0.4s
   animation-timing-function: ease
@@ -742,6 +818,7 @@ export default defineComponent({
   background-image: linear-gradient(to right,$teal-6, $teal-8)
 
 .precipitacao
+  height: 100px
   animation-name: zoomInOut
   animation-duration: 0.4s
   animation-timing-function: ease
