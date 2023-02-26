@@ -15,6 +15,11 @@
 
     <q-page-container>
       <router-view />
+      <q-page-sticky expand position="top">
+        <q-toolbar :class="`${isDarkMode ? 'bg-dark' : 'bg-white'}`">
+          <q-toolbar-title class="text-h6"> {{ $route.name }}</q-toolbar-title>
+        </q-toolbar>
+      </q-page-sticky>
     </q-page-container>
 
     <q-footer bordered :class="`text-white ${isDarkMode ? 'bg-dark' : 'bg-white'}`">
@@ -49,6 +54,10 @@ export default {
     return {
       isDarkMode: ref(false)
     }
+  },
+
+  mounted() {
+    console.log(this.$route)
   },
 
   methods: {

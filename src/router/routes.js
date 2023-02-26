@@ -6,8 +6,9 @@ const routes = [
     children: [
       {
         path: "/",
-        title: "Home",
+        title: "Dashboard",
         icon: "bar_chart",
+        name: "Dashboard",
         showMenu: true,
         component: () => import("pages/IndexPage.vue"),
       },
