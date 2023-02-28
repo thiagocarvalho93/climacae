@@ -5,10 +5,15 @@
         <div class="col-12 col-sm-4 col-md-2 fade">
           <q-select dense outlined v-model="periodoSelecionado" :options="opcoesPeriodos" label="Período" />
         </div>
-        <div v-if="periodoSelecionado == periodos.MES_ESPECIFICO" class="col-6 col-sm-2 col-md-1 fade">
-          <q-select dense outlined v-model="mesSelecionado" :options="opcoosMeses" label="Mês" />
+        <div v-if="periodoSelecionado == periodos.DIA_ESPECIFICO" class="col-4 col-sm-2 col-md-1 fade">
+          <q-select dense outlined v-model="diaSelecionado" :options="opcoesDias" label="Dia" />
         </div>
-        <div v-if="periodoSelecionado == periodos.MES_ESPECIFICO" class="col-6 col-sm-2 col-md-1 fade">
+        <div v-if="periodoSelecionado == periodos.MES_ESPECIFICO || periodoSelecionado == periodos.DIA_ESPECIFICO"
+          :class="(periodoSelecionado == periodos.DIA_ESPECIFICO ? 'col-4 ' : 'col-6 ') + 'col-sm-2 col-md-1 fade'">
+          <q-select dense outlined v-model="mesSelecionado" :options="opcoesMeses" label="Mês" />
+        </div>
+        <div v-if="periodoSelecionado == periodos.MES_ESPECIFICO || periodoSelecionado == periodos.DIA_ESPECIFICO"
+          :class="(periodoSelecionado == periodos.DIA_ESPECIFICO ? 'col-4 ' : 'col-6 ') + 'col-sm-2 col-md-1 fade'">
           <q-select dense outlined v-model="anoSelecionado" :options="opcoesAnos" label="Ano" />
         </div>
         <div class="col-12 col-sm-4 col-md-2 col-lg-1 fade">
@@ -222,7 +227,7 @@
       </div>
 
       <div class="col-12">
-        <q-table :class="darkMode ? 'my-sticky-header-table-dark' : 'my-sticky-header-table'" flat
+        <q-table :class="darkMode ? 'my-sticky-header-table-dark' : 'my-sticky-header-table'" flat column-sort-order="ad"
           title="Dados das estações" :rows="observacoes" :columns="columns" :pagination="pagination" :filter="filter"
           :rows-per-page-options="[6, 12, 24, 48, 96]" row-key="name" :loading="carregando
           ">
@@ -245,6 +250,7 @@ import { defineComponent } from "vue";
 import { STATIONS, CORES, PERIODOS } from "../constants/constants";
 import { API_KEY } from "src/constants/secrets";
 import arrayUtils from "src/utils/array-utils";
+import dataUtils from "src/utils/data-utils";
 
 export default defineComponent({
   name: "IndexPage",
@@ -290,8 +296,10 @@ export default defineComponent({
       periodos: PERIODOS,
       periodoSelecionado: PERIODOS.HOJE,
       opcoesPeriodos: Object.values(PERIODOS),
+      diaSelecionado: new Date().getDate(),
+      opcoesDias: arrayUtils.arrayRange(1, dataUtils.calcularDiaMesAtual(), 1),
       mesSelecionado: new Date().getMonth() + 1,
-      opcoosMeses: Array.from({ length: 12 }, (_, i) => i + 1),
+      opcoesMeses: Array.from({ length: 12 }, (_, i) => i + 1),
       opcoesAnos: arrayUtils.arrayRange(2020, new Date().getFullYear(), 1),
       anoSelecionado: new Date().getFullYear(),
       atualizacao: new Date().toLocaleTimeString(),
@@ -316,6 +324,20 @@ export default defineComponent({
           align: "left",
           field: (row) => row.obsTimeLocal,
           format: (val) => `${new Date(val).toLocaleDateString()}`,
+          sortable: true,
+          style: 'width: 50px',
+          align: "left",
+        },
+        {
+          name: "hora",
+          required: true,
+          label: "Hora",
+          align: "left",
+          field: (row) => row.obsTimeLocal,
+          format: (val) => `${new Date(val).toLocaleTimeString(navigator.language, {
+            hour: '2-digit',
+            minute: '2-digit'
+          })}`,
           sortable: true,
           style: 'width: 50px',
           align: "left",
@@ -528,7 +550,9 @@ export default defineComponent({
           ]
         })
       }
+      this.observacoes = this.observacoes.reverse();
       this.carregando = false;
+
     },
 
     async filtrarDadosPeriodo() {
