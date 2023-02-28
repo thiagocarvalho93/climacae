@@ -467,6 +467,21 @@ export default defineComponent({
           bar: {
             borderRadius: 2,
             horizontal: true,
+            stacked: true,
+            dataLabels: {
+              total: {
+                enabled: true,
+                offsetX: 12,
+                offsetY: 6,
+                style: {
+                  fontSize: '12px',
+                  fontWeight: 800
+                },
+                formatter: function (val) {
+                  return val.toFixed(1) + " mm"
+                }
+              }
+            }
           },
         },
         grid: {
@@ -489,25 +504,25 @@ export default defineComponent({
           categories: Object.keys(STATIONS),
         },
         fill: {
-          type: "gradient",
-          gradient: {
-            type: 'vertical',
-            shadeIntensity: 1,
-            opacityFrom: 1,
-            opacityTo: 1,
-            colorStops: [
-              {
-                offset: 10,
-                color: "#3F51B5",
-                opacity: 1
-              },
-              {
-                offset: 90,
-                color: "#283593",
-                opacity: 1
-              }
-            ]
-          }
+          // type: "gradient",
+          // gradient: {
+          //   type: 'vertical',
+          //   shadeIntensity: 1,
+          //   opacityFrom: 1,
+          //   opacityTo: 1,
+          //   colorStops: [
+          //     {
+          //       offset: 10,
+          //       color: "#3F51B5",
+          //       opacity: 1
+          //     },
+          //     {
+          //       offset: 90,
+          //       color: "#283593",
+          //       opacity: 1
+          //     }
+          //   ]
+          // }
         },
       },
     };
@@ -717,11 +732,15 @@ export default defineComponent({
               .filter((x) => x.stationID == station)
               .map((x) => x.metric.windgustHigh)
           ),
-          precipitacao: Math.max(
+          precipitacaoMaxima: Math.max(
             ...this.observacoes
               .filter((x) => x.stationID == station)
               .map((x) => x.metric.precipTotal)
           ),
+          precipitacaoAcumulada: this.observacoes
+            .filter((x) => x.stationID == station)
+            .reduce((acc, valor) => acc + valor.metric.precipTotal, 0)
+            .toFixed(2)
         });
       });
 
@@ -742,10 +761,9 @@ export default defineComponent({
 
 
       this.precipitacaoMaxima = Math.max(
-        ...this.metadadosEstacoes.map((dado) => dado.precipitacao)
+        ...this.metadadosEstacoes.map((dado) => dado.precipitacaoMaxima)
       );
       this.dadosPrecipitacaoMaxima = this.observacoes.find(obs => obs.metric.precipTotal == this.precipitacaoMaxima);
-
     },
 
     atualizarDadosAtuais() {
@@ -785,20 +803,43 @@ export default defineComponent({
     },
 
     atualizarGraficoPrecipitacao() {
-      this.$refs.graficoPrecipitacao.updateSeries([
-        {
-          name: "Precipitação",
-          data: this.metadadosEstacoes
-            .filter((x) => x.precipitacao != (-Infinity || Infinity))
-            .map((x) => x.precipitacao),
-        },
-      ]);
+      if (this.periodoSelecionado == this.periodos.DIA_ESPECIFICO || this.periodoSelecionado == this.periodos.HOJE) {
+        this.$refs.graficoPrecipitacao.updateSeries([
+          {
+            name: "Precipitação",
+            data: this.metadadosEstacoes
+              .filter((x) => x.precipitacaoMaxima != (-Infinity || Infinity))
+              .map((x) => x.precipitacaoMaxima),
+          },
+        ]);
+      } else {
+        this.$refs.graficoPrecipitacao.updateSeries([
+          {
+            name: "Precipitação máxima",
+            data: this.metadadosEstacoes
+              .filter((x) => x.precipitacaoMaxima != (-Infinity || Infinity))
+              .map((x) => x.precipitacaoMaxima),
+          },
+          {
+            name: "Precipitação restante",
+            data: this.metadadosEstacoes
+              .filter((x) => x.precipitacaoAcumulada != (-Infinity || Infinity))
+              .map((x) => (x.precipitacaoAcumulada - x.precipitacaoMaxima).toFixed(2)),
+          },
+        ]);
+      }
+
       this.$refs.graficoPrecipitacao.updateOptions({
+        chart: {
+          type: 'bar',
+          stacked: true
+        },
         xaxis: {
           categories: this.metadadosEstacoes
             .filter((x) => x.precipitacao != (-Infinity || Infinity))
             .map((x) => x.id),
         },
+
       });
     },
 
