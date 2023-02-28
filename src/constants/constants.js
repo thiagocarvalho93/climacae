@@ -1,8 +1,7 @@
 const STATIONS = {
   IRIODA1: { ID: "IRIODA1", NOME: "Rio das Ostras" },
-  IMACA6: { ID: "IMACA6", NOME: "Mirante 1" },
-  IMACA7: { ID: "IMACA7", NOME: "Mirante 2" },
-  IMACA13: { ID: "IMACA13", NOME: "Glicério" },
+  IMACA6: { ID: "IMACA6", NOME: "Mirante" },
+  IMACA13: { ID: "IMACA13", NOME: "Trapiche" },
   IMACA15: { ID: "IMACA15", NOME: "Glória" },
   IMACA28: { ID: "IMACA28", NOME: "Aroeira" },
   IMACA30: { ID: "IMACA30", NOME: "Imboassica" },
@@ -20,6 +19,7 @@ const PERIODOS = {
   HOJE: "Hoje",
   ULTIMOS_SETE_DIAS: "Últimos 7 dias",
   ULTIMOS_TRINTA_DIAS: "Últimos 30 dias",
+  DIA_ESPECIFICO: "Dia específico",
   MES_ESPECIFICO: "Mês específico",
 };
 
