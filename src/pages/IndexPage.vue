@@ -419,6 +419,7 @@ export default defineComponent({
             horizontal: false,
             columnWidth: "45%",
             borderRadius: 2,
+            borderRadiusApplication: 'end',
             endingShape: "rounded",
           },
         },
@@ -455,7 +456,6 @@ export default defineComponent({
       seriesPrecipitacao: [
         {
           data: [400, 430, 448, 470, 540, 580, 690, 1100],
-          color: CORES.INDIGO,
         },
       ],
       chartPrecipitacaoOptions: {
@@ -465,7 +465,9 @@ export default defineComponent({
         },
         plotOptions: {
           bar: {
-            borderRadius: 2,
+            borderRadius: 3,
+            borderRadiusWhenStacked: 'last',
+            borderRadiusApplication: 'end',
             horizontal: true,
             stacked: true,
             dataLabels: {
@@ -494,8 +496,6 @@ export default defineComponent({
           column: {
             // colors: ["#fff", "#f2f2f2"],
           },
-
-          // strokeDashArray: 7,
         },
         dataLabels: {
           enabled: false,
@@ -819,12 +819,14 @@ export default defineComponent({
             data: this.metadadosEstacoes
               .filter((x) => x.precipitacaoMaxima != (-Infinity || Infinity))
               .map((x) => x.precipitacaoMaxima),
+            color: this.cores.INDIGO_ESCURO
           },
           {
             name: "Precipitação restante",
             data: this.metadadosEstacoes
               .filter((x) => x.precipitacaoAcumulada != (-Infinity || Infinity))
               .map((x) => (x.precipitacaoAcumulada - x.precipitacaoMaxima).toFixed(2)),
+            color: this.cores.INDIGO
           },
         ]);
       }
@@ -839,7 +841,6 @@ export default defineComponent({
             .filter((x) => x.precipitacao != (-Infinity || Infinity))
             .map((x) => x.id),
         },
-
       });
     },
 

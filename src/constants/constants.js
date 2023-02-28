@@ -13,6 +13,8 @@ const CORES = {
   AZUL: "#1565c0",
   VERMELHO: "#f44336",
   INDIGO: "#3f51b5",
+  INDIGO_CLARO: "#7986CB",
+  INDIGO_ESCURO: "#1a237e",
 };
 
 const PERIODOS = {
