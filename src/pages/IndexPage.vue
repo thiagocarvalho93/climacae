@@ -226,6 +226,17 @@
         </q-card>
       </div>
 
+      <div class="col-12 col-sm-12">
+        <q-card flat>
+          <q-card-section class="text-h6"> Séries temporais </q-card-section>
+          <q-card-section>
+            <apexchart height="350" :options="chartSerieTemporalOptions" :series="seriesTemporal" ref="graficoTemporal" />
+          </q-card-section>
+          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
+            label-style="font-size: 1.1em" />
+        </q-card>
+      </div>
+
       <div class="col-12">
         <q-table :class="darkMode ? 'my-sticky-header-table-dark' : 'my-sticky-header-table'" flat column-sort-order="ad"
           title="Dados das estações" :rows="observacoes" :columns="columns" :pagination="pagination" :filter="filter"
@@ -272,6 +283,12 @@ export default defineComponent({
       })
 
       this.$refs.graficoPrecipitacao.updateOptions({
+        theme: {
+          mode: newThemeDark ? "dark" : "light"
+        }
+      })
+
+      this.$refs.graficoTemporal.updateOptions({
         theme: {
           mode: newThemeDark ? "dark" : "light"
         }
@@ -398,20 +415,9 @@ export default defineComponent({
           align: "left",
         },
       ],
-
-      seriesTemperatura: [
-        {
-          name: "Máxima",
-          color: CORES.VERMELHO,
-          data: [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        },
-        {
-          name: "Mínima",
-          color: CORES.AZUL,
-          data: [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        },
-      ],
-
+      seriesTemperatura: [],
+      seriesPrecipitacao: [],
+      seriesTemporal: [],
       chartTemperaturaOptions: {
         chart: {
           type: "bar",
@@ -452,11 +458,6 @@ export default defineComponent({
           },
         },
       },
-      seriesPrecipitacao: [
-        {
-          data: [400, 430, 448, 470, 540, 580, 690, 1100],
-        },
-      ],
       chartPrecipitacaoOptions: {
         chart: {
           type: "bar",
@@ -492,9 +493,6 @@ export default defineComponent({
             },
           },
           strokeDashArray: 7,
-          column: {
-            // colors: ["#fff", "#f2f2f2"],
-          },
         },
         dataLabels: {
           enabled: false,
@@ -502,26 +500,46 @@ export default defineComponent({
         xaxis: {
           categories: Object.keys(STATIONS),
         },
-        fill: {
-          // type: "gradient",
-          // gradient: {
-          //   type: 'vertical',
-          //   shadeIntensity: 1,
-          //   opacityFrom: 1,
-          //   opacityTo: 1,
-          //   colorStops: [
-          //     {
-          //       offset: 10,
-          //       color: "#3F51B5",
-          //       opacity: 1
-          //     },
-          //     {
-          //       offset: 90,
-          //       color: "#283593",
-          //       opacity: 1
-          //     }
-          //   ]
-          // }
+      },
+      chartSerieTemporalOptions: {
+        chart: {
+          type: "line",
+          zoom: {
+            enabled: false,
+          },
+          animations: {
+            enabled: true,
+            easing: "easeinout",
+            speed: 800,
+            animateGradually: {
+              enabled: true,
+              delay: 150,
+            },
+            dynamicAnimation: {
+              enabled: true,
+              speed: 350,
+            },
+          },
+        },
+        dataLabels: {
+          enabled: false,
+        },
+        stroke: {
+          width: 3,
+          curve: "smooth",
+        },
+        grid: {
+          row: {
+            opacity: 0.5,
+          },
+        },
+        xaxis: {
+          type: "datetime",
+          tickAmount: 8,
+        },
+        yaxis: {
+          min: 5,
+          max: 40,
         },
       },
     };
@@ -552,6 +570,7 @@ export default defineComponent({
         this.calcularMetadados();
         this.atualizarGraficoTemperatura();
         this.atualizarGraficoPrecipitacao();
+        this.atualizarGraficoTemporal();
         console.log(`Tempo de execução para manipular dados: ${new Date() - inicioCalculo}ms`);
       } catch (error) {
         this.$q.notify({
@@ -846,6 +865,25 @@ export default defineComponent({
       });
     },
 
+    atualizarGraficoTemporal() {
+      let dados = []
+
+      Object.keys(this.estacoes).forEach(estacao => {
+        dados.push({
+          name: this.estacoes[estacao].NOME,
+          data:
+            this.observacoes &&
+            this.observacoes
+              .filter(ob => ob.stationID == estacao)
+              .map((ob) => [
+                dataUtils.subtrairHoras(new Date(ob.obsTimeLocal), 3),
+                ob.metric.tempAvg,
+              ]),
+        })
+      })
+
+      this.$refs.graficoTemporal.updateSeries(dados);
+    },
   },
 });
 </script>
@@ -862,7 +900,7 @@ export default defineComponent({
   --scrollbar-thumb-hover-dark    : rgb(33,118,210)
 
 .maxima
-  height: 100px
+  height: 90px
   animation-name: zoomInOut
   animation-duration: 0.4s
   animation-timing-function: ease
@@ -870,7 +908,7 @@ export default defineComponent({
   background-image: linear-gradient(to right,$red-6, $red-8)
 
 .minima
-  height: 100px
+  height: 90px
   animation-name: zoomInOut
   animation-duration: 0.4s
   animation-timing-function: ease
@@ -878,7 +916,7 @@ export default defineComponent({
   background-image: linear-gradient(to right,$blue-6, $blue-8)
 
 .vento
-  height: 100px
+  height: 90px
   animation-name: zoomInOut
   animation-duration: 0.4s
   animation-timing-function: ease
@@ -886,7 +924,7 @@ export default defineComponent({
   background-image: linear-gradient(to right,$teal-6, $teal-8)
 
 .precipitacao
-  height: 100px
+  height: 90px
   animation-name: zoomInOut
   animation-duration: 0.4s
   animation-timing-function: ease
