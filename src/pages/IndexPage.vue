@@ -173,8 +173,8 @@
           <q-card-section>
             <q-carousel v-model="slide" transition-duration="600" transition-prev="slide-right"
               transition-next="slide-left" swipeable animated :control-color="darkMode ? 'white' : 'primary'" padding
-              navigation arrows infinite height="265px" :autoplay="autoplayCarousel" class="bg-transparent"
-              @mouseenter="autoplay = false" navigation-icon="radio_button_unchecked" @mouseleave="autoplay = true">
+              arrows infinite height="265px" :autoplay="autoplayCarousel" class="bg-transparent"
+              @mouseenter="autoplay = false" @mouseleave="autoplay = true">
               <q-carousel-slide v-for="dados in dadosAgora" :key="dados.stationID" :name="estacoes[dados.stationID].NOME"
                 class="column no-wrap flex-center">
                 <div class="q-mt-md text-center text-h6">
@@ -182,16 +182,16 @@
                 </div>
                 <div class="justify-start">
                   <div class="q-mt-md text-h6 text-start">
-                    <q-icon class="icon" :color="darkMode ? 'white' : 'primary'" size="lg" name="ion-thermometer" />
+                    <q-icon class="icon" :color="darkMode ? 'white' : 'primary'" size="md" name="ion-thermometer" />
                     {{ dados.metric.temp }}°C
                   </div>
                   <div class="q-mt-md text-h6 text-start">
-                    <q-icon class="icon" :color="darkMode ? 'white' : 'primary'" size="lg" name="ion-rainy" />
+                    <q-icon class="icon" :color="darkMode ? 'white' : 'primary'" size="md" name="ion-rainy" />
                     {{ dados.metric.precipRate }}mm/h
                   </div>
                 </div>
                 <div class="q-mt-md text-h6 text-start">
-                  <q-icon class="icon" :color="darkMode ? 'white' : 'primary'" size="lg" name="water_drop" />
+                  <q-icon class="icon" :color="darkMode ? 'white' : 'primary'" size="md" name="water_drop" />
                   {{ dados.humidity }}%
                 </div>
               </q-carousel-slide>
@@ -302,7 +302,10 @@ export default defineComponent({
       opcoesMeses: Array.from({ length: 12 }, (_, i) => i + 1),
       opcoesAnos: arrayUtils.arrayRange(2020, new Date().getFullYear(), 1),
       anoSelecionado: new Date().getFullYear(),
-      atualizacao: new Date().toLocaleTimeString(),
+      atualizacao: new Date().toLocaleTimeString(navigator.language, {
+        hour: '2-digit',
+        minute: '2-digit'
+      }),
       observacoes: [],
       minima: 0,
       dadosMinima: [],
@@ -423,20 +426,16 @@ export default defineComponent({
             endingShape: "rounded",
           },
         },
+        dataLabels: {
+          enabled: false,
+        },
         grid: {
           xaxis: {
             lines: {
               show: false,
             },
           },
-          row: {
-            // colors: ["#fff", "#f2f2f2"],
-          },
-
           strokeDashArray: 7,
-        },
-        dataLabels: {
-          enabled: false,
         },
         xaxis: {
           categories: Object.keys(STATIONS),
@@ -770,7 +769,10 @@ export default defineComponent({
       setInterval(async () => {
         this.carregandoTempoReal = true;
         await this.obterDadosAtuaisTodasEstacoes();
-        this.atualizacao = new Date().toLocaleTimeString();
+        this.atualizacao = new Date().toLocaleTimeString(navigator.language, {
+          hour: '2-digit',
+          minute: '2-digit'
+        });
         this.carregandoTempoReal = false;
       }, 30000)
     },
