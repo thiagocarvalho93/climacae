@@ -752,11 +752,11 @@ export default defineComponent({
           ),
           precipitacaoMaxima: Math.max(
             ...this.observacoes
-              .filter((x) => x.stationID == station && !!x.metric.precipTotal)
+              .filter((x) => x.stationID == station)
               .map((x) => x.metric.precipTotal)
           ),
           precipitacaoAcumulada: this.observacoes
-            .filter((x) => x.stationID == station && !x.metric.precipTotal)
+            .filter((x) => x.stationID == station && !!x.metric.precipTotal)
             .reduce((acc, valor) => acc + valor.metric.precipTotal, 0)
             .toFixed(2)
         });
