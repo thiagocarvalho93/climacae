@@ -214,7 +214,7 @@
         </q-card>
       </div>
 
-      <div class="col-12 col-sm-12">
+      <div class="col-12 col-sm-5">
         <q-card flat>
           <q-card-section class="text-h6"> Precipitação </q-card-section>
           <q-card-section>
@@ -226,11 +226,11 @@
         </q-card>
       </div>
 
-      <div class="col-12 col-sm-12">
+      <div class="col-12 col-sm-7">
         <q-card flat>
           <q-card-section class="text-h6"> Séries temporais </q-card-section>
           <q-card-section>
-            <apexchart height="350" :options="chartSerieTemporalOptions" :series="seriesTemporal" ref="graficoTemporal" />
+            <apexchart height="250" :options="chartSerieTemporalOptions" :series="seriesTemporal" ref="graficoTemporal" />
           </q-card-section>
           <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
             label-style="font-size: 1.1em" />
@@ -737,26 +737,26 @@ export default defineComponent({
           id: STATIONS[station].NOME,
           minima: Math.min(
             ...this.observacoes
-              .filter((x) => x.stationID == station)
+              .filter((x) => x.stationID == station && !!x.metric.tempLow)
               .map((x) => x.metric.tempLow)
           ),
           maxima: Math.max(
             ...this.observacoes
-              .filter((x) => x.stationID == station)
+              .filter((x) => x.stationID == station && !!x.metric.tempHigh)
               .map((x) => x.metric.tempHigh)
           ),
           ventoMaximo: Math.max(
             ...this.observacoes
-              .filter((x) => x.stationID == station)
+              .filter((x) => x.stationID == station && !!x.metric.windgustHigh)
               .map((x) => x.metric.windgustHigh)
           ),
           precipitacaoMaxima: Math.max(
             ...this.observacoes
-              .filter((x) => x.stationID == station)
+              .filter((x) => x.stationID == station && !!x.metric.precipTotal)
               .map((x) => x.metric.precipTotal)
           ),
           precipitacaoAcumulada: this.observacoes
-            .filter((x) => x.stationID == station)
+            .filter((x) => x.stationID == station && !x.metric.precipTotal)
             .reduce((acc, valor) => acc + valor.metric.precipTotal, 0)
             .toFixed(2)
         });
@@ -883,6 +883,13 @@ export default defineComponent({
       })
 
       this.$refs.graficoTemporal.updateSeries(dados);
+
+      this.$refs.graficoTemporal.updateOptions({
+        xaxis: {
+          tickAmount: 8,
+        },
+      });
+
     },
   },
 });
