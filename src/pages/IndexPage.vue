@@ -1,23 +1,77 @@
 <template>
-  <q-page style="padding-top: 66px" :class="`q-pa-md ${darkMode ? 'bg-dark-page' : 'bg-blue-grey-1'}`">
+  <q-page
+    style="padding-top: 66px"
+    :class="`q-pa-md ${darkMode ? 'bg-dark-page' : 'bg-blue-grey-1'}`"
+  >
     <q-card flat class="q-pa-md q-mb-md fade">
       <div class="row q-col-gutter-md">
         <div class="col-12 col-sm-4 col-md-2 fade">
-          <q-select dense outlined v-model="periodoSelecionado" :options="opcoesPeriodos" label="Período" />
+          <q-select
+            dense
+            outlined
+            v-model="periodoSelecionado"
+            :options="opcoesPeriodos"
+            label="Período"
+          />
         </div>
-        <div v-if="periodoSelecionado == periodos.DIA_ESPECIFICO" class="col-4 col-sm-2 col-md-1 fade">
-          <q-select dense outlined v-model="diaSelecionado" :options="opcoesDias" label="Dia" />
+        <div
+          v-if="periodoSelecionado == periodos.DIA_ESPECIFICO"
+          class="col-4 col-sm-2 col-md-1 fade"
+        >
+          <q-select
+            dense
+            outlined
+            v-model="diaSelecionado"
+            :options="opcoesDias"
+            label="Dia"
+          />
         </div>
-        <div v-if="periodoSelecionado == periodos.MES_ESPECIFICO || periodoSelecionado == periodos.DIA_ESPECIFICO"
-          :class="(periodoSelecionado == periodos.DIA_ESPECIFICO ? 'col-4 ' : 'col-6 ') + 'col-sm-2 col-md-1 fade'">
-          <q-select dense outlined v-model="mesSelecionado" :options="opcoesMeses" label="Mês" />
+        <div
+          v-if="
+            periodoSelecionado == periodos.MES_ESPECIFICO ||
+            periodoSelecionado == periodos.DIA_ESPECIFICO
+          "
+          :class="
+            (periodoSelecionado == periodos.DIA_ESPECIFICO
+              ? 'col-4 '
+              : 'col-6 ') + 'col-sm-2 col-md-1 fade'
+          "
+        >
+          <q-select
+            dense
+            outlined
+            v-model="mesSelecionado"
+            :options="opcoesMeses"
+            label="Mês"
+          />
         </div>
-        <div v-if="periodoSelecionado == periodos.MES_ESPECIFICO || periodoSelecionado == periodos.DIA_ESPECIFICO"
-          :class="(periodoSelecionado == periodos.DIA_ESPECIFICO ? 'col-4 ' : 'col-6 ') + 'col-sm-2 col-md-1 fade'">
-          <q-select dense outlined v-model="anoSelecionado" :options="opcoesAnos" label="Ano" />
+        <div
+          v-if="
+            periodoSelecionado == periodos.MES_ESPECIFICO ||
+            periodoSelecionado == periodos.DIA_ESPECIFICO
+          "
+          :class="
+            (periodoSelecionado == periodos.DIA_ESPECIFICO
+              ? 'col-4 '
+              : 'col-6 ') + 'col-sm-2 col-md-1 fade'
+          "
+        >
+          <q-select
+            dense
+            outlined
+            v-model="anoSelecionado"
+            :options="opcoesAnos"
+            label="Ano"
+          />
         </div>
         <div class="col-12 col-sm-4 col-md-2 col-lg-1 fade">
-          <q-btn push @click="obterCalcularEAtualizar" style="width: 100%" :loading="carregando" color="primary">Filtrar
+          <q-btn
+            push
+            @click="obterCalcularEAtualizar"
+            style="width: 100%"
+            :loading="carregando"
+            color="primary"
+            >Filtrar
             <template v-slot:loading>
               <q-spinner-hourglass class="on-left" />
               Loading
@@ -28,8 +82,13 @@
     </q-card>
     <div class="row q-col-gutter-md fade">
       <div class="col-12 col-sm-6 col-md-3">
-        <q-card flat dark @mouseover="mostrarInformacoesCard[0] = false" @mouseleave="mostrarInformacoesCard[0] = true"
-          class="maxima">
+        <q-card
+          flat
+          dark
+          @mouseover="mostrarInformacoesCard[0] = false"
+          @mouseleave="mostrarInformacoesCard[0] = true"
+          class="maxima"
+        >
           <q-card-section class="fade" v-if="mostrarInformacoesCard[0]">
             <q-item>
               <q-item-section>
@@ -47,23 +106,35 @@
           <q-card-section class="fade" v-else>
             <q-item>
               <q-item-section>
-                <q-item-label> Em {{ estacoes[dadosMaxima.stationID].NOME }} ({{ dadosMaxima.stationID }})</q-item-label>
+                <q-item-label>
+                  Em {{ estacoes[dadosMaxima.stationID].NOME }} ({{
+                    dadosMaxima.stationID
+                  }})</q-item-label
+                >
                 <q-item-label class="text-bold text-h6">
                   {{ new Date(dadosMaxima.obsTimeLocal).toLocaleDateString() }}
                 </q-item-label>
               </q-item-section>
-
             </q-item>
           </q-card-section>
 
-          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-red"
-            label-style="font-size: 1.1em" />
+          <q-inner-loading
+            :showing="carregando"
+            label="Aguarde..."
+            label-class="text-red"
+            label-style="font-size: 1.1em"
+          />
         </q-card>
       </div>
 
       <div class="col-12 col-sm-6 col-md-3">
-        <q-card flat dark @mouseover="mostrarInformacoesCard[1] = false" @mouseleave="mostrarInformacoesCard[1] = true"
-          class="minima">
+        <q-card
+          flat
+          dark
+          @mouseover="mostrarInformacoesCard[1] = false"
+          @mouseleave="mostrarInformacoesCard[1] = true"
+          class="minima"
+        >
           <q-card-section class="fade" v-if="mostrarInformacoesCard[1]">
             <q-item>
               <q-item-section>
@@ -82,23 +153,35 @@
           <q-card-section class="fade" v-else>
             <q-item>
               <q-item-section>
-                <q-item-label> Em {{ estacoes[dadosMinima.stationID].NOME }} ({{ dadosMinima.stationID }})</q-item-label>
+                <q-item-label>
+                  Em {{ estacoes[dadosMinima.stationID].NOME }} ({{
+                    dadosMinima.stationID
+                  }})</q-item-label
+                >
                 <q-item-label class="text-bold text-h6">
                   {{ new Date(dadosMinima.obsTimeLocal).toLocaleDateString() }}
                 </q-item-label>
               </q-item-section>
-
             </q-item>
           </q-card-section>
 
-          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-primary"
-            label-style="font-size: 1.1em" />
+          <q-inner-loading
+            :showing="carregando"
+            label="Aguarde..."
+            label-class="text-primary"
+            label-style="font-size: 1.1em"
+          />
         </q-card>
       </div>
 
       <div class="col-12 col-sm-6 col-md-3">
-        <q-card flat dark @mouseover="mostrarInformacoesCard[2] = false" @mouseleave="mostrarInformacoesCard[2] = true"
-          class="vento">
+        <q-card
+          flat
+          dark
+          @mouseover="mostrarInformacoesCard[2] = false"
+          @mouseleave="mostrarInformacoesCard[2] = true"
+          class="vento"
+        >
           <q-card-section class="fade" v-if="mostrarInformacoesCard[2]">
             <q-item>
               <q-item-section>
@@ -117,24 +200,37 @@
           <q-card-section class="fade" v-else>
             <q-item>
               <q-item-section>
-                <q-item-label> Em {{ estacoes[dadosVentoMaximo.stationID].NOME }} ({{ dadosVentoMaximo.stationID
-                }})</q-item-label>
+                <q-item-label>
+                  Em {{ estacoes[dadosVentoMaximo.stationID].NOME }} ({{
+                    dadosVentoMaximo.stationID
+                  }})</q-item-label
+                >
                 <q-item-label class="text-bold text-h6">
-                  {{ new Date(dadosVentoMaximo.obsTimeLocal).toLocaleDateString() }}
+                  {{
+                    new Date(dadosVentoMaximo.obsTimeLocal).toLocaleDateString()
+                  }}
                 </q-item-label>
               </q-item-section>
-
             </q-item>
           </q-card-section>
 
-          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
-            label-style="font-size: 1.1em" />
+          <q-inner-loading
+            :showing="carregando"
+            label="Aguarde..."
+            label-class="text-teal"
+            label-style="font-size: 1.1em"
+          />
         </q-card>
       </div>
 
       <div class="col-12 col-sm-6 col-md-3">
-        <q-card flat dark @mouseover="mostrarInformacoesCard[3] = false" @mouseleave="mostrarInformacoesCard[3] = true"
-          class="precipitacao">
+        <q-card
+          flat
+          dark
+          @mouseover="mostrarInformacoesCard[3] = false"
+          @mouseleave="mostrarInformacoesCard[3] = true"
+          class="precipitacao"
+        >
           <q-card-section class="fade" v-if="mostrarInformacoesCard[3]">
             <q-item>
               <q-item-section>
@@ -152,53 +248,101 @@
           <q-card-section class="fade" v-else>
             <q-item>
               <q-item-section>
-                <q-item-label> Em {{ estacoes[dadosPrecipitacaoMaxima.stationID].NOME }} ({{
-                  dadosPrecipitacaoMaxima.stationID }})</q-item-label>
+                <q-item-label>
+                  Em {{ estacoes[dadosPrecipitacaoMaxima.stationID].NOME }} ({{
+                    dadosPrecipitacaoMaxima.stationID
+                  }})</q-item-label
+                >
                 <q-item-label class="text-bold text-h6">
-                  {{ new Date(dadosPrecipitacaoMaxima.obsTimeLocal).toLocaleDateString() }}
+                  {{
+                    new Date(
+                      dadosPrecipitacaoMaxima.obsTimeLocal
+                    ).toLocaleDateString()
+                  }}
                 </q-item-label>
               </q-item-section>
-
             </q-item>
           </q-card-section>
 
-          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-indigo"
-            label-style="font-size: 1.1em" />
+          <q-inner-loading
+            :showing="carregando"
+            label="Aguarde..."
+            label-class="text-indigo"
+            label-style="font-size: 1.1em"
+          />
         </q-card>
       </div>
 
       <div class="col-12 col-md-4">
         <q-card flat>
-          <q-card-section class="text-h6"> Agora ({{ atualizacao }}) </q-card-section>
+          <q-card-section class="text-h6">
+            Agora ({{ atualizacao }})
+          </q-card-section>
           <q-card-section>
-            <q-carousel v-model="slide" transition-duration="600" transition-prev="slide-right"
-              transition-next="slide-left" swipeable animated :control-color="darkMode ? 'white' : 'primary'" padding
-              arrows infinite height="265px" :autoplay="autoplayCarousel" class="bg-transparent"
-              @mouseenter="autoplay = false" @mouseleave="autoplay = true">
-              <q-carousel-slide v-for="dados in dadosAgora" :key="dados.stationID" :name="estacoes[dados.stationID].NOME"
-                class="column no-wrap flex-center">
+            <q-carousel
+              v-model="slide"
+              transition-duration="600"
+              transition-prev="slide-right"
+              transition-next="slide-left"
+              swipeable
+              animated
+              :control-color="darkMode ? 'white' : 'primary'"
+              padding
+              arrows
+              infinite
+              height="265px"
+              :autoplay="autoplayCarousel"
+              class="bg-transparent"
+              @mouseenter="autoplay = false"
+              @mouseleave="autoplay = true"
+            >
+              <q-carousel-slide
+                v-for="dados in dadosAgora"
+                :key="dados.stationID"
+                :name="estacoes[dados.stationID].NOME"
+                class="column no-wrap flex-center"
+              >
                 <div class="q-mt-md text-center text-h6">
                   {{ estacoes[dados.stationID].NOME }}
                 </div>
                 <div class="justify-start">
                   <div class="q-mt-md text-h6 text-start">
-                    <q-icon class="icon" :color="darkMode ? 'white' : 'primary'" size="md" name="ion-thermometer" />
+                    <q-icon
+                      class="icon"
+                      :color="darkMode ? 'white' : 'primary'"
+                      size="md"
+                      name="ion-thermometer"
+                    />
                     {{ dados.metric.temp }}°C
                   </div>
                   <div class="q-mt-md text-h6 text-start">
-                    <q-icon class="icon" :color="darkMode ? 'white' : 'primary'" size="md" name="ion-rainy" />
+                    <q-icon
+                      class="icon"
+                      :color="darkMode ? 'white' : 'primary'"
+                      size="md"
+                      name="ion-rainy"
+                    />
                     {{ dados.metric.precipRate }}mm/h
                   </div>
                 </div>
                 <div class="q-mt-md text-h6 text-start">
-                  <q-icon class="icon" :color="darkMode ? 'white' : 'primary'" size="md" name="water_drop" />
+                  <q-icon
+                    class="icon"
+                    :color="darkMode ? 'white' : 'primary'"
+                    size="md"
+                    name="water_drop"
+                  />
                   {{ dados.humidity }}%
                 </div>
               </q-carousel-slide>
             </q-carousel>
           </q-card-section>
-          <q-inner-loading :showing="carregandoTempoReal" label="Aguarde..." label-class="text-teal"
-            label-style="font-size: 1.1em" />
+          <q-inner-loading
+            :showing="carregandoTempoReal"
+            label="Aguarde..."
+            label-class="text-teal"
+            label-style="font-size: 1.1em"
+          />
         </q-card>
       </div>
 
@@ -206,11 +350,20 @@
         <q-card flat>
           <q-card-section class="text-h6"> Máximas e mínimas </q-card-section>
           <q-card-section>
-            <apexchart type="bar" height="250" :options="chartTemperaturaOptions" :series="seriesTemperatura"
-              ref="graficoColunaTemperatura"></apexchart>
+            <apexchart
+              type="bar"
+              height="250"
+              :options="chartTemperaturaOptions"
+              :series="seriesTemperatura"
+              ref="graficoColunaTemperatura"
+            ></apexchart>
           </q-card-section>
-          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
-            label-style="font-size: 1.1em" />
+          <q-inner-loading
+            :showing="carregando"
+            label="Aguarde..."
+            label-class="text-teal"
+            label-style="font-size: 1.1em"
+          />
         </q-card>
       </div>
 
@@ -218,11 +371,20 @@
         <q-card flat>
           <q-card-section class="text-h6"> Precipitação </q-card-section>
           <q-card-section>
-            <apexchart type="bar" height="250" :options="chartPrecipitacaoOptions" :series="seriesPrecipitacao"
-              ref="graficoPrecipitacao"></apexchart>
+            <apexchart
+              type="bar"
+              height="250"
+              :options="chartPrecipitacaoOptions"
+              :series="seriesPrecipitacao"
+              ref="graficoPrecipitacao"
+            ></apexchart>
           </q-card-section>
-          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
-            label-style="font-size: 1.1em" />
+          <q-inner-loading
+            :showing="carregando"
+            label="Aguarde..."
+            label-class="text-teal"
+            label-style="font-size: 1.1em"
+          />
         </q-card>
       </div>
 
@@ -230,20 +392,46 @@
         <q-card flat>
           <q-card-section class="text-h6"> Séries temporais </q-card-section>
           <q-card-section>
-            <apexchart height="250" :options="chartSerieTemporalOptions" :series="seriesTemporal" ref="graficoTemporal" />
+            <apexchart
+              height="250"
+              :options="chartSerieTemporalOptions"
+              :series="seriesTemporal"
+              ref="graficoTemporal"
+            />
           </q-card-section>
-          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
-            label-style="font-size: 1.1em" />
+          <q-inner-loading
+            :showing="carregando"
+            label="Aguarde..."
+            label-class="text-teal"
+            label-style="font-size: 1.1em"
+          />
         </q-card>
       </div>
 
       <div class="col-12">
-        <q-table :class="darkMode ? 'my-sticky-header-table-dark' : 'my-sticky-header-table'" flat column-sort-order="ad"
-          title="Dados das estações" :rows="observacoes" :columns="columns" :pagination="pagination" :filter="filter"
-          :rows-per-page-options="[6, 12, 24, 48, 96]" row-key="name" :loading="carregando
-          ">
+        <q-table
+          :class="
+            darkMode ? 'my-sticky-header-table-dark' : 'my-sticky-header-table'
+          "
+          flat
+          column-sort-order="ad"
+          title="Dados das estações"
+          :rows="observacoes"
+          :columns="columns"
+          :pagination="pagination"
+          :filter="filter"
+          :rows-per-page-options="[6, 12, 24, 48, 96]"
+          row-key="name"
+          :loading="carregando"
+        >
           <template v-slot:top-right>
-            <q-input borderless dense debounce="300" v-model="filter" placeholder="Pesquisar">
+            <q-input
+              borderless
+              dense
+              debounce="300"
+              v-model="filter"
+              placeholder="Pesquisar"
+            >
               <template v-slot:append>
                 <q-icon name="search" />
               </template>
@@ -252,7 +440,6 @@
         </q-table>
       </div>
     </div>
-
   </q-page>
 </template>
 
@@ -262,6 +449,7 @@ import { STATIONS, CORES, PERIODOS } from "../constants/constants";
 import { API_KEY } from "src/constants/secrets";
 import arrayUtils from "src/utils/array-utils";
 import dataUtils from "src/utils/data-utils";
+import weatherApi from "src/api/weather-api";
 
 export default defineComponent({
   name: "IndexPage",
@@ -271,29 +459,29 @@ export default defineComponent({
   computed: {
     darkMode() {
       return this.$q.dark.isActive;
-    }
+    },
   },
 
   watch: {
     darkMode(newThemeDark, oldThemeDark) {
       this.$refs.graficoColunaTemperatura.updateOptions({
         theme: {
-          mode: newThemeDark ? "dark" : "light"
-        }
-      })
+          mode: newThemeDark ? "dark" : "light",
+        },
+      });
 
       this.$refs.graficoPrecipitacao.updateOptions({
         theme: {
-          mode: newThemeDark ? "dark" : "light"
-        }
-      })
+          mode: newThemeDark ? "dark" : "light",
+        },
+      });
 
       this.$refs.graficoTemporal.updateOptions({
         theme: {
-          mode: newThemeDark ? "dark" : "light"
-        }
-      })
-    }
+          mode: newThemeDark ? "dark" : "light",
+        },
+      });
+    },
   },
 
   data() {
@@ -320,8 +508,8 @@ export default defineComponent({
       opcoesAnos: arrayUtils.arrayRange(2020, new Date().getFullYear(), 1),
       anoSelecionado: new Date().getFullYear(),
       atualizacao: new Date().toLocaleTimeString(navigator.language, {
-        hour: '2-digit',
-        minute: '2-digit'
+        hour: "2-digit",
+        minute: "2-digit",
       }),
       observacoes: [],
       minima: 0,
@@ -333,7 +521,7 @@ export default defineComponent({
       precipitacaoMaxima: 0,
       dadosPrecipitacaoMaxima: [],
       pagination: {
-        rowsPerPage: 12
+        rowsPerPage: 12,
       },
       filter: "",
       columns: [
@@ -345,7 +533,7 @@ export default defineComponent({
           field: (row) => row.obsTimeLocal,
           format: (val) => `${new Date(val).toLocaleDateString()}`,
           sortable: true,
-          style: 'width: 50px',
+          style: "width: 50px",
           align: "left",
         },
         {
@@ -354,12 +542,13 @@ export default defineComponent({
           label: "Hora",
           align: "left",
           field: (row) => row.obsTimeLocal,
-          format: (val) => `${new Date(val).toLocaleTimeString(navigator.language, {
-            hour: '2-digit',
-            minute: '2-digit'
-          })}`,
+          format: (val) =>
+            `${new Date(val).toLocaleTimeString(navigator.language, {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}`,
           sortable: true,
-          style: 'width: 50px',
+          style: "width: 50px",
           align: "left",
         },
         {
@@ -368,7 +557,7 @@ export default defineComponent({
           label: "ID estação",
           field: (row) => row.stationID,
           sortable: true,
-          style: 'width: 50px',
+          style: "width: 50px",
           align: "left",
         },
         {
@@ -428,7 +617,7 @@ export default defineComponent({
             horizontal: false,
             columnWidth: "45%",
             borderRadius: 2,
-            borderRadiusApplication: 'end',
+            borderRadiusApplication: "end",
             endingShape: "rounded",
           },
         },
@@ -466,8 +655,8 @@ export default defineComponent({
         plotOptions: {
           bar: {
             borderRadius: 3,
-            borderRadiusWhenStacked: 'last',
-            borderRadiusApplication: 'end',
+            borderRadiusWhenStacked: "last",
+            borderRadiusApplication: "end",
             horizontal: true,
             stacked: true,
             dataLabels: {
@@ -476,14 +665,14 @@ export default defineComponent({
                 offsetX: 12,
                 offsetY: 6,
                 style: {
-                  fontSize: '12px',
-                  fontWeight: 800
+                  fontSize: "12px",
+                  fontWeight: 800,
                 },
                 formatter: function (val) {
-                  return val.toFixed(1) + " mm"
-                }
-              }
-            }
+                  return val.toFixed(1) + " mm";
+                },
+              },
+            },
           },
         },
         grid: {
@@ -552,7 +741,7 @@ export default defineComponent({
   },
 
   beforeUnmount() {
-    clearInterval(this.atualizarDadosAtuais)
+    clearInterval(this.atualizarDadosAtuais);
   },
 
   methods: {
@@ -563,7 +752,9 @@ export default defineComponent({
         const inicioObtencao = new Date();
 
         await this.filtrarDadosPeriodo();
-        console.log(`Tempo de execução para obter dados: ${new Date() - inicioObtencao}ms`);
+        console.log(
+          `Tempo de execução para obter dados: ${new Date() - inicioObtencao}ms`
+        );
 
         const inicioCalculo = new Date();
 
@@ -571,21 +762,28 @@ export default defineComponent({
         this.atualizarGraficoTemperatura();
         this.atualizarGraficoPrecipitacao();
         this.atualizarGraficoTemporal();
-        console.log(`Tempo de execução para manipular dados: ${new Date() - inicioCalculo}ms`);
+        console.log(
+          `Tempo de execução para manipular dados: ${
+            new Date() - inicioCalculo
+          }ms`
+        );
       } catch (error) {
         this.$q.notify({
-          message: error && error.message || "Erro ao obter os dados.",
-          type: 'negative',
+          message: (error && error.message) || "Erro ao obter os dados.",
+          type: "negative",
           progress: true,
-          position: 'top',
+          position: "top",
           actions: [
-            { label: 'Fechar', color: 'white', handler: () => { /* ... */ } }
-          ]
-        })
+            {
+              label: "Fechar",
+              color: "white",
+              handler: () => {},
+            },
+          ],
+        });
       }
       this.observacoes = this.observacoes.reverse();
       this.carregando = false;
-
     },
 
     async filtrarDadosPeriodo() {
@@ -598,12 +796,18 @@ export default defineComponent({
         case PERIODOS.ULTIMOS_SETE_DIAS:
           this.dataInicial = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
           this.dataFinal = new Date(Date.now());
-          await this.obterObservacoesDiariasPeriodoTodasEstacoes(this.dataInicial, this.dataFinal);
+          await this.obterObservacoesDiariasPeriodoTodasEstacoes(
+            this.dataInicial,
+            this.dataFinal
+          );
           break;
         case PERIODOS.ULTIMOS_TRINTA_DIAS:
           this.dataInicial = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
           this.dataFinal = new Date(Date.now());
-          await this.obterObservacoesDiariasPeriodoTodasEstacoes(this.dataInicial, this.dataFinal);
+          await this.obterObservacoesDiariasPeriodoTodasEstacoes(
+            this.dataInicial,
+            this.dataFinal
+          );
           break;
         case PERIODOS.MES_ESPECIFICO:
           await this.filtrarMesEspecifico();
@@ -616,57 +820,38 @@ export default defineComponent({
     async filtrarMesEspecifico() {
       const hoje = new Date();
 
-      if (this.mesSelecionado > hoje.getMonth() + 1 && this.anoSelecionado >= hoje.getFullYear()) {
+      if (
+        this.mesSelecionado > hoje.getMonth() + 1 &&
+        this.anoSelecionado >= hoje.getFullYear()
+      ) {
         throw new Error("Não é possivel obter dados do futuro!");
       }
 
-      this.dataInicial = new Date(this.anoSelecionado, this.mesSelecionado - 1, 1);
+      this.dataInicial = new Date(
+        this.anoSelecionado,
+        this.mesSelecionado - 1,
+        1
+      );
 
-      if (this.mesSelecionado == hoje.getMonth() + 1 && this.anoSelecionado == hoje.getFullYear()) {
+      if (
+        this.mesSelecionado == hoje.getMonth() + 1 &&
+        this.anoSelecionado == hoje.getFullYear()
+      ) {
         this.dataFinal = hoje;
       } else {
         this.dataFinal = new Date(this.anoSelecionado, this.mesSelecionado, 0);
       }
 
-      await this.obterObservacoesDiariasPeriodoTodasEstacoes(this.dataInicial, this.dataFinal);
-    },
-
-    async obterObservacoesDiaAtualEstacao(codigoEstacao) {
-      return new Promise((resolve, reject) => {
-        return this.$api
-          .get(
-            `/pws/observations/all/1day?apiKey=${this.apiKey}&stationId=${codigoEstacao}&numericPrecision=decimal&format=json&units=m`
-          )
-          .then((response) => resolve(response.data))
-          .catch((error) => reject(error));
-      });
-    },
-
-    async obterObservacoesDiariasPeriodo(codigoEstacao, dataInicial, dataFinal) {
-      //Formato das datas YYYYMMDD
-      return new Promise((resolve, reject) => {
-        return this.$api
-          .get(
-            `/pws/history/daily?stationId=${codigoEstacao}&format=json&units=m&startDate=${dataInicial}&endDate=${dataFinal}&numericPrecision=decimal&apiKey=${this.apiKey}`
-          )
-          .then((response) => resolve(response.data))
-          .catch((error) => reject(error));
-      });
-    },
-
-    async obterDadosTempoReal(codigoEstacao) {
-      return new Promise((resolve, reject) => {
-        return this.$api
-          .get(
-            `/pws/observations/current?apiKey=${this.apiKey}&stationId=${codigoEstacao}&numericPrecision=decimal&format=json&units=m`
-          )
-          .then((response) => resolve(response.data))
-          .catch((error) => reject(error));
-      });
+      await this.obterObservacoesDiariasPeriodoTodasEstacoes(
+        this.dataInicial,
+        this.dataFinal
+      );
     },
 
     formatarDataParaQuery(data) {
-      return `${data.getFullYear()}${data.getMonth() + 1 < 10 ? '0' : ''}${data.getMonth() + 1}${data.getDate() < 10 ? '0' : ''}${data.getDate()}`;
+      return `${data.getFullYear()}${data.getMonth() + 1 < 10 ? "0" : ""}${
+        data.getMonth() + 1
+      }${data.getDate() < 10 ? "0" : ""}${data.getDate()}`;
     },
 
     async obterObservacoesDiaAtualTodasEstacoes() {
@@ -675,7 +860,7 @@ export default defineComponent({
       try {
         const dados = await Promise.all(
           stations.map((station) =>
-            this.obterObservacoesDiaAtualEstacao(station)
+            weatherApi.obterObservacoesDiaAtualEstacao(station)
           )
         );
 
@@ -691,13 +876,17 @@ export default defineComponent({
     async obterObservacoesDiariasPeriodoTodasEstacoes(dataInicial, dataFinal) {
       const stations = Object.keys(STATIONS);
 
-      const dataInicialFormatada = this.formatarDataParaQuery(dataInicial)
-      const dataFinalFormatada = this.formatarDataParaQuery(dataFinal)
+      const dataInicialFormatada = this.formatarDataParaQuery(dataInicial);
+      const dataFinalFormatada = this.formatarDataParaQuery(dataFinal);
 
       try {
         const dados = await Promise.all(
           stations.map((station) =>
-            this.obterObservacoesDiariasPeriodo(station, dataInicialFormatada, dataFinalFormatada)
+            weatherApi.obterObservacoesDiariasPeriodo(
+              station,
+              dataInicialFormatada,
+              dataFinalFormatada
+            )
           )
         );
 
@@ -715,9 +904,7 @@ export default defineComponent({
 
       try {
         const dados = await Promise.all(
-          stations.map((station) =>
-            this.obterDadosTempoReal(station)
-          )
+          stations.map((station) => weatherApi.obterDadosTempoReal(station))
         );
 
         this.dadosAgora = [];
@@ -758,30 +945,37 @@ export default defineComponent({
           precipitacaoAcumulada: this.observacoes
             .filter((x) => x.stationID == station && !!x.metric.precipTotal)
             .reduce((acc, valor) => acc + valor.metric.precipTotal, 0)
-            .toFixed(2)
+            .toFixed(2),
         });
       });
 
       this.maxima = Math.max(
         ...this.metadadosEstacoes.map((dado) => dado.maxima)
       );
-      this.dadosMaxima = this.observacoes.find(obs => obs.metric.tempHigh == this.maxima);
+      this.dadosMaxima = this.observacoes.find(
+        (obs) => obs.metric.tempHigh == this.maxima
+      );
 
       this.minima = Math.min(
         ...this.metadadosEstacoes.map((dado) => dado.minima)
       );
-      this.dadosMinima = this.observacoes.find(obs => obs.metric.tempLow == this.minima);
+      this.dadosMinima = this.observacoes.find(
+        (obs) => obs.metric.tempLow == this.minima
+      );
 
       this.ventoMaximo = Math.max(
         ...this.metadadosEstacoes.map((dado) => dado.ventoMaximo)
       );
-      this.dadosVentoMaximo = this.observacoes.find(obs => obs.metric.windgustHigh == this.ventoMaximo);
-
+      this.dadosVentoMaximo = this.observacoes.find(
+        (obs) => obs.metric.windgustHigh == this.ventoMaximo
+      );
 
       this.precipitacaoMaxima = Math.max(
         ...this.metadadosEstacoes.map((dado) => dado.precipitacaoMaxima)
       );
-      this.dadosPrecipitacaoMaxima = this.observacoes.find(obs => obs.metric.precipTotal == this.precipitacaoMaxima);
+      this.dadosPrecipitacaoMaxima = this.observacoes.find(
+        (obs) => obs.metric.precipTotal == this.precipitacaoMaxima
+      );
     },
 
     atualizarDadosAtuais() {
@@ -789,11 +983,11 @@ export default defineComponent({
         this.carregandoTempoReal = true;
         await this.obterDadosAtuaisTodasEstacoes();
         this.atualizacao = new Date().toLocaleTimeString(navigator.language, {
-          hour: '2-digit',
-          minute: '2-digit'
+          hour: "2-digit",
+          minute: "2-digit",
         });
         this.carregandoTempoReal = false;
-      }, 30000)
+      }, 30000);
     },
 
     atualizarGraficoTemperatura() {
@@ -824,12 +1018,19 @@ export default defineComponent({
     },
 
     atualizarGraficoPrecipitacao() {
-      if (this.periodoSelecionado == this.periodos.DIA_ESPECIFICO || this.periodoSelecionado == this.periodos.HOJE) {
+      if (
+        this.periodoSelecionado == this.periodos.DIA_ESPECIFICO ||
+        this.periodoSelecionado == this.periodos.HOJE
+      ) {
         this.$refs.graficoPrecipitacao.updateSeries([
           {
             name: "Precipitação",
             data: this.metadadosEstacoes
-              .filter((x) => x.precipitacaoMaxima != (-Infinity || Infinity))
+              .filter(
+                (x) =>
+                  x.precipitacaoMaxima != (-Infinity || Infinity) &&
+                  x.precipitacaoAcumulada != (-Infinity || Infinity)
+              )
               .map((x) => x.precipitacaoMaxima),
           },
         ]);
@@ -838,49 +1039,61 @@ export default defineComponent({
           {
             name: "Precipitação máxima",
             data: this.metadadosEstacoes
-              .filter((x) => x.precipitacaoMaxima != (-Infinity || Infinity))
+              .filter(
+                (x) =>
+                  x.precipitacaoMaxima != (-Infinity || Infinity) &&
+                  x.precipitacaoAcumulada != (-Infinity || Infinity)
+              )
               .map((x) => x.precipitacaoMaxima),
-            color: this.cores.INDIGO_ESCURO
+            color: this.cores.INDIGO_ESCURO,
           },
           {
             name: "Precipitação restante",
             data: this.metadadosEstacoes
-              .filter((x) => x.precipitacaoAcumulada != (-Infinity || Infinity))
-              .map((x) => (x.precipitacaoAcumulada - x.precipitacaoMaxima).toFixed(2)),
-            color: this.cores.INDIGO
+              .filter(
+                (x) =>
+                  x.precipitacaoMaxima != (-Infinity || Infinity) &&
+                  x.precipitacaoAcumulada != (-Infinity || Infinity)
+              )
+              .map((x) =>
+                (x.precipitacaoAcumulada - x.precipitacaoMaxima).toFixed(2)
+              ),
+            color: this.cores.INDIGO,
           },
         ]);
       }
 
       this.$refs.graficoPrecipitacao.updateOptions({
         chart: {
-          type: 'bar',
-          stacked: true
+          type: "bar",
+          stacked: true,
         },
         xaxis: {
           categories: this.metadadosEstacoes
-            .filter((x) => x.precipitacao != (-Infinity || Infinity))
+            .filter(
+              (x) =>
+                x.precipitacaoMaxima != (-Infinity || Infinity) &&
+                x.precipitacaoAcumulada != (-Infinity || Infinity)
+            )
             .map((x) => x.id),
         },
       });
     },
 
     atualizarGraficoTemporal() {
-      let dados = []
+      let dados = [];
 
-      Object.keys(this.estacoes).forEach(estacao => {
+      Object.keys(this.estacoes).forEach((estacao) => {
         dados.push({
           name: this.estacoes[estacao].NOME,
-          data:
-            this.observacoes &&
-            this.observacoes
-              .filter(ob => ob.stationID == estacao)
-              .map((ob) => [
-                dataUtils.subtrairHoras(new Date(ob.obsTimeLocal), 3),
-                ob.metric.tempAvg,
-              ]),
-        })
-      })
+          data: this.observacoes
+            .filter((ob) => ob.stationID == estacao && !!ob.metric.tempAvg)
+            .map((ob) => [
+              dataUtils.subtrairHoras(new Date(ob.obsTimeLocal), 3),
+              ob.metric.tempAvg,
+            ]),
+        });
+      });
 
       this.$refs.graficoTemporal.updateSeries(dados);
 
@@ -889,12 +1102,10 @@ export default defineComponent({
           tickAmount: 8,
         },
       });
-
     },
   },
 });
 </script>
-
 
 <style lang="sass">
 \:root
@@ -989,5 +1200,4 @@ export default defineComponent({
   thead tr:first-child th
     /* bg color is important for th; just specify one */
     background-color: $dark
-
 </style>
