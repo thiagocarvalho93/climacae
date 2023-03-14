@@ -1,8 +1,5 @@
 <template>
-  <q-page
-    style="padding-top: 66px"
-    :class="`q-pa-md ${darkMode ? 'bg-dark-page' : 'bg-blue-grey-1'}`"
-  >
+  <q-page :class="`q-pa-md ${darkMode ? 'bg-dark-page' : 'bg-blue-grey-1'}`">
     <q-card flat class="q-pa-md q-mb-md fade">
       <div class="row q-col-gutter-md">
         <div class="col-12 col-sm-4 col-md-2 fade">
@@ -85,11 +82,10 @@
         <q-card
           flat
           dark
-          @mouseover="mostrarInformacoesCard[0] = false"
-          @mouseleave="mostrarInformacoesCard[0] = true"
-          class="maxima"
+          @click="mostrarInformacoesCard[0] = !mostrarInformacoesCard[0]"
+          class="cursor-pointer maxima"
         >
-          <q-card-section class="fade" v-if="mostrarInformacoesCard[0]">
+          <q-card-section class="grow" v-if="mostrarInformacoesCard[0]">
             <q-item>
               <q-item-section>
                 <q-item-label> MÁXIMA </q-item-label>
@@ -103,7 +99,7 @@
             </q-item>
           </q-card-section>
 
-          <q-card-section class="fade" v-else>
+          <q-card-section class="grow" v-else>
             <q-item>
               <q-item-section>
                 <q-item-label>
@@ -131,11 +127,10 @@
         <q-card
           flat
           dark
-          @mouseover="mostrarInformacoesCard[1] = false"
-          @mouseleave="mostrarInformacoesCard[1] = true"
-          class="minima"
+          @click="mostrarInformacoesCard[1] = !mostrarInformacoesCard[1]"
+          class="cursor-pointer minima"
         >
-          <q-card-section class="fade" v-if="mostrarInformacoesCard[1]">
+          <q-card-section class="grow" v-if="mostrarInformacoesCard[1]">
             <q-item>
               <q-item-section>
                 <q-item-label> MÍNIMA </q-item-label>
@@ -150,7 +145,7 @@
             </q-item>
           </q-card-section>
 
-          <q-card-section class="fade" v-else>
+          <q-card-section class="grow" v-else>
             <q-item>
               <q-item-section>
                 <q-item-label>
@@ -178,11 +173,10 @@
         <q-card
           flat
           dark
-          @mouseover="mostrarInformacoesCard[2] = false"
-          @mouseleave="mostrarInformacoesCard[2] = true"
-          class="vento"
+          @click="mostrarInformacoesCard[2] = !mostrarInformacoesCard[2]"
+          class="cursor-pointer vento"
         >
-          <q-card-section class="fade" v-if="mostrarInformacoesCard[2]">
+          <q-card-section class="grow" v-if="mostrarInformacoesCard[2]">
             <q-item>
               <q-item-section>
                 <q-item-label> VENTO MÁXIMO </q-item-label>
@@ -197,7 +191,7 @@
             </q-item>
           </q-card-section>
 
-          <q-card-section class="fade" v-else>
+          <q-card-section class="grow" v-else>
             <q-item>
               <q-item-section>
                 <q-item-label>
@@ -227,9 +221,8 @@
         <q-card
           flat
           dark
-          @mouseover="mostrarInformacoesCard[3] = false"
-          @mouseleave="mostrarInformacoesCard[3] = true"
-          class="precipitacao"
+          @click="mostrarInformacoesCard[3] = !mostrarInformacoesCard[3]"
+          class="cursor-pointer precipitacao"
         >
           <q-card-section class="fade" v-if="mostrarInformacoesCard[3]">
             <q-item>
