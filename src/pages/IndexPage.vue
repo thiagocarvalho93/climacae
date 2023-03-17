@@ -444,6 +444,7 @@ import arrayUtils from "src/utils/array-utils";
 import dataUtils from "src/utils/data-utils";
 import weatherApi from "src/api/weather-api";
 import Observation from "src/models/observation-model";
+import ObservationCurrent from "src/models/observation-current-model";
 
 export default defineComponent({
   name: "IndexPage",
@@ -900,8 +901,8 @@ export default defineComponent({
           stations.map((station) => weatherApi.obterDadosTempoReal(station))
         );
 
-        this.observacoes = responses.flatMap((response) =>
-          (response.observations || []).map((ob) => new Observation(ob))
+        this.dadosAgora = responses.flatMap((response) =>
+          (response.observations || []).map((ob) => new ObservationCurrent(ob))
         );
       } catch (error) {
         throw error;
@@ -986,77 +987,65 @@ export default defineComponent({
     },
 
     atualizarGraficoTemperatura() {
+      const dadosFiltrados = this.metadadosEstacoes.filter(
+        (x) => x.maxima != -Infinity || x.minima != Infinity
+      );
       this.$refs.graficoColunaTemperatura.updateSeries([
         {
           name: "Máxima",
           color: CORES.VERMELHO,
-          data: this.metadadosEstacoes
-            .map((x) => x.maxima)
-            .filter((x) => x != -Infinity),
+          data: dadosFiltrados.map((x) => x.maxima),
         },
         {
           name: "Mínima",
           color: CORES.AZUL,
-          data: this.metadadosEstacoes
-            .map((x) => x.minima)
-            .filter((x) => x != Infinity),
+          data: dadosFiltrados.map((x) => x.minima),
         },
       ]);
 
       this.$refs.graficoColunaTemperatura.updateOptions({
         xaxis: {
-          categories: this.metadadosEstacoes
-            .filter((x) => x.maxima != -Infinity || x.minima != Infinity)
-            .map((x) => x.id),
+          categories: dadosFiltrados.map((x) => x.id),
         },
       });
     },
 
     atualizarGraficoPrecipitacao() {
+      const dadosFiltrados = this.metadadosEstacoes.filter(
+        (x) =>
+          x.precipitacaoMaxima !== (-Infinity || Infinity) &&
+          x.precipitacaoAcumulada !== (-Infinity || Infinity)
+      );
+
+      const data = dadosFiltrados.map((x) => ({
+        name: x.NOME,
+        precipitacaoMaxima: x.precipitacaoMaxima,
+        precipitacaoRestante: (
+          x.precipitacaoAcumulada - x.precipitacaoMaxima
+        ).toFixed(2),
+      }));
+
+      const series = [
+        {
+          name: "Precipitação máxima",
+          data: data.map((x) => x.precipitacaoMaxima),
+          color: this.cores.INDIGO_ESCURO,
+        },
+        {
+          name: "Precipitação restante",
+          data: data.map((x) => x.precipitacaoRestante),
+          color: this.cores.INDIGO,
+        },
+      ];
+
       if (
         this.periodoSelecionado == this.periodos.DIA_ESPECIFICO ||
         this.periodoSelecionado == this.periodos.HOJE
       ) {
-        this.$refs.graficoPrecipitacao.updateSeries([
-          {
-            name: "Precipitação",
-            data: this.metadadosEstacoes
-              .filter(
-                (x) =>
-                  x.precipitacaoMaxima != (-Infinity || Infinity) &&
-                  x.precipitacaoAcumulada != (-Infinity || Infinity)
-              )
-              .map((x) => x.precipitacaoMaxima),
-          },
-        ]);
-      } else {
-        this.$refs.graficoPrecipitacao.updateSeries([
-          {
-            name: "Precipitação máxima",
-            data: this.metadadosEstacoes
-              .filter(
-                (x) =>
-                  x.precipitacaoMaxima != (-Infinity || Infinity) &&
-                  x.precipitacaoAcumulada != (-Infinity || Infinity)
-              )
-              .map((x) => x.precipitacaoMaxima),
-            color: this.cores.INDIGO_ESCURO,
-          },
-          {
-            name: "Precipitação restante",
-            data: this.metadadosEstacoes
-              .filter(
-                (x) =>
-                  x.precipitacaoMaxima != (-Infinity || Infinity) &&
-                  x.precipitacaoAcumulada != (-Infinity || Infinity)
-              )
-              .map((x) =>
-                (x.precipitacaoAcumulada - x.precipitacaoMaxima).toFixed(2)
-              ),
-            color: this.cores.INDIGO,
-          },
-        ]);
+        series.splice(1, 1); // Remove a série "Precipitação restante"
       }
+
+      this.$refs.graficoPrecipitacao.updateSeries(series);
 
       this.$refs.graficoPrecipitacao.updateOptions({
         chart: {
@@ -1064,31 +1053,24 @@ export default defineComponent({
           stacked: true,
         },
         xaxis: {
-          categories: this.metadadosEstacoes
-            .filter(
-              (x) =>
-                x.precipitacaoMaxima != (-Infinity || Infinity) &&
-                x.precipitacaoAcumulada != (-Infinity || Infinity)
-            )
-            .map((x) => x.id),
+          categories: dadosFiltrados.map((x) => x.id),
         },
       });
     },
 
     atualizarGraficoTemporal() {
-      let dados = [];
-
-      Object.keys(this.estacoes).forEach((estacao) => {
-        dados.push({
-          name: this.estacoes[estacao].NOME,
-          data: this.observacoes
-            .filter((ob) => ob.stationID == estacao && !!ob.metric.tempAvg)
-            .map((ob) => [
+      const dados = Object.keys(this.estacoes).map((estacao) => ({
+        name: this.estacoes[estacao].NOME,
+        data: this.observacoes.reduce((acc, ob) => {
+          if (ob.stationID === estacao && ob.metric.tempAvg) {
+            acc.push([
               dataUtils.subtrairHoras(new Date(ob.obsTimeLocal), 3),
               ob.metric.tempAvg,
-            ]),
-        });
-      });
+            ]);
+          }
+          return acc;
+        }, []),
+      }));
 
       this.$refs.graficoTemporal.updateSeries(dados);
 
