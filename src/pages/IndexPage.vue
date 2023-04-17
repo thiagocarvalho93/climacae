@@ -808,6 +808,9 @@ export default defineComponent({
         case PERIODOS.MES_ESPECIFICO:
           await this.filtrarMesEspecifico();
           break;
+        case PERIODOS.DIA_ESPECIFICO:
+          await this.filtrarDiaEspecifico();
+          break;
         default:
           throw new Error("Período inválido!");
       }
@@ -844,6 +847,24 @@ export default defineComponent({
       );
     },
 
+    async filtrarDiaEspecifico() {
+      const hoje = new Date();
+
+      const dataSelecionada = new Date(
+        this.anoSelecionado,
+        this.mesSelecionado - 1,
+        this.diaSelecionado
+      );
+
+      if (dataSelecionada > hoje) {
+        throw new Error("Não é possivel obter dados do futuro!");
+      }
+
+      this.dataInicial = new Date(dataSelecionada);
+
+      await this.obterObservacoesDiaEspecificoTodasEstacoes(this.dataInicial);
+    },
+
     formatarDataParaQuery(data) {
       return `${data.getFullYear()}${data.getMonth() + 1 < 10 ? "0" : ""}${
         data.getMonth() + 1
@@ -857,6 +878,26 @@ export default defineComponent({
         const responses = await Promise.all(
           stations.map((station) =>
             weatherApi.obterObservacoesDiaAtualEstacao(station)
+          )
+        );
+
+        this.observacoes = responses.flatMap((response) =>
+          (response.observations || []).map((ob) => new Observation(ob))
+        );
+      } catch (error) {
+        throw error;
+      }
+    },
+
+    async obterObservacoesDiaEspecificoTodasEstacoes(data) {
+      const stations = Object.keys(STATIONS);
+
+      const dataFormatada = this.formatarDataParaQuery(data);
+
+      try {
+        const responses = await Promise.all(
+          stations.map((station) =>
+            weatherApi.obterTodasObservacoesDia(station, dataFormatada)
           )
         );
 

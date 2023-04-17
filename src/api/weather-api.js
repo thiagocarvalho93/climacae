@@ -28,6 +28,18 @@ async function obterObservacoesDiariasPeriodo(
   });
 }
 
+async function obterTodasObservacoesDia(codigoEstacao, data) {
+  //Formato das datas YYYYMMDD
+  return new Promise((resolve, reject) => {
+    return api
+      .get(
+        `/pws/history/all?stationId=${codigoEstacao}&format=json&units=m&date=${data}&numericPrecision=decimal&apiKey=${API_KEY}`
+      )
+      .then((response) => resolve(response.data))
+      .catch((error) => reject(error));
+  });
+}
+
 async function obterObservacoesDiaAtualEstacao(codigoEstacao) {
   return new Promise((resolve, reject) => {
     return api
@@ -41,6 +53,7 @@ async function obterObservacoesDiaAtualEstacao(codigoEstacao) {
 
 export default {
   obterDadosTempoReal,
+  obterTodasObservacoesDia,
   obterObservacoesDiariasPeriodo,
   obterObservacoesDiaAtualEstacao,
 };
