@@ -1031,20 +1031,20 @@ export default defineComponent({
       const dadosFiltrados = this.metadadosEstacoes.filter(
         (x) => x.maxima != -Infinity || x.minima != Infinity
       );
-      this.$refs.graficoColunaTemperatura.updateSeries([
-        {
-          name: "Máxima",
-          color: CORES.VERMELHO,
-          data: dadosFiltrados.map((x) => x.maxima),
-        },
-        {
-          name: "Mínima",
-          color: CORES.AZUL,
-          data: dadosFiltrados.map((x) => x.minima),
-        },
-      ]);
 
       this.$refs.graficoColunaTemperatura.updateOptions({
+        series: [
+          {
+            name: "Máxima",
+            color: CORES.VERMELHO,
+            data: dadosFiltrados.map((x) => x.maxima),
+          },
+          {
+            name: "Mínima",
+            color: CORES.AZUL,
+            data: dadosFiltrados.map((x) => x.minima),
+          },
+        ],
         xaxis: {
           categories: dadosFiltrados.map((x) => x.id),
         },
@@ -1086,9 +1086,8 @@ export default defineComponent({
         series.splice(1, 1); // Remove a série "Precipitação restante"
       }
 
-      this.$refs.graficoPrecipitacao.updateSeries(series);
-
       this.$refs.graficoPrecipitacao.updateOptions({
+        series: series,
         chart: {
           type: "bar",
           stacked: true,
@@ -1114,12 +1113,6 @@ export default defineComponent({
       }));
 
       this.$refs.graficoTemporal.updateSeries(dados);
-
-      this.$refs.graficoTemporal.updateOptions({
-        xaxis: {
-          tickAmount: 8,
-        },
-      });
     },
   },
 });
