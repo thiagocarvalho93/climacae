@@ -645,6 +645,7 @@ export default defineComponent({
       chartPrecipitacaoOptions: {
         chart: {
           type: "bar",
+          stacked: true,
           height: 350,
         },
         plotOptions: {
@@ -1088,10 +1089,6 @@ export default defineComponent({
 
       this.$refs.graficoPrecipitacao.updateOptions({
         series: series,
-        chart: {
-          type: "bar",
-          stacked: true,
-        },
         xaxis: {
           categories: dadosFiltrados.map((x) => x.id),
         },
@@ -1111,7 +1108,6 @@ export default defineComponent({
           return acc;
         }, []),
       }));
-
       this.$refs.graficoTemporal.updateSeries(dados);
     },
   },

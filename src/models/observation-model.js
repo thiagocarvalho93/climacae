@@ -13,10 +13,10 @@ export default class Observation {
     this.obsTimeLocal = obj.obsTimeLocal || "";
     this.obsTimeUtc = obj.obsTimeUtc || "";
     this.qcStatus = obj.qcStatus || "";
-    this.solarRadiationHigh = obj.solarRadiationHigh || "";
+    this.solarRadiationHigh = obj.solarRadiationHigh || 0;
     this.stationID = obj.stationID || "";
     this.tz = obj.tz || "";
-    this.uvHigh = obj.uvHigh || "";
+    this.uvHigh = obj.uvHigh || 0;
     this.winddirAvg = obj.winddirAvg || "";
   }
 }
