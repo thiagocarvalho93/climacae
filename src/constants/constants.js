@@ -7,6 +7,7 @@ const STATIONS = {
   IMACA30: { ID: "IMACA30", NOME: "Imboassica" },
   IMACA31: { ID: "IMACA31", NOME: "Centro" },
   IMACA32: { ID: "IMACA32", NOME: "Visconde" },
+  IMACA32: { ID: "IMACA36", NOME: "Glicério" },
 };
 
 const CORES = {
