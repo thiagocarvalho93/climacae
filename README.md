@@ -13,3 +13,8 @@
 ## Demo
 
 https://climacae.vercel.app
+
+## Deploy
+
+quasar build
+vercel --prod
