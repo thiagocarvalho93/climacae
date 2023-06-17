@@ -1155,8 +1155,33 @@ export default defineComponent({
 
         await writable.write(csvString);
         await writable.close();
+        this.$q.notify({
+          message: `Arquivo ${handle.name} salvo com sucesso!`,
+          type: "positive",
+          progress: true,
+          position: "top",
+          actions: [
+            {
+              label: "Fechar",
+              color: "white",
+              handler: () => {},
+            },
+          ],
+        });
       } catch (err) {
-        console.error(err.name, err.message);
+        this.$q.notify({
+          message: `${err.message}`,
+          type: "negative",
+          progress: true,
+          position: "top",
+          actions: [
+            {
+              label: "Fechar",
+              color: "white",
+              handler: () => {},
+            },
+          ],
+        });
       }
     },
   },
