@@ -12,7 +12,7 @@
           />
         </div>
         <div
-          v-if="periodoSelecionado == periodos.DIA_ESPECIFICO"
+          v-if="periodoSelecionado === periodos.DIA_ESPECIFICO"
           class="col-4 col-sm-2 col-md-1 fade"
         >
           <q-select
@@ -25,11 +25,11 @@
         </div>
         <div
           v-if="
-            periodoSelecionado == periodos.MES_ESPECIFICO ||
-            periodoSelecionado == periodos.DIA_ESPECIFICO
+            periodoSelecionado === periodos.MES_ESPECIFICO ||
+            periodoSelecionado === periodos.DIA_ESPECIFICO
           "
           :class="
-            (periodoSelecionado == periodos.DIA_ESPECIFICO
+            (periodoSelecionado === periodos.DIA_ESPECIFICO
               ? 'col-4 '
               : 'col-6 ') + 'col-sm-2 col-md-1 fade'
           "
@@ -44,11 +44,11 @@
         </div>
         <div
           v-if="
-            periodoSelecionado == periodos.MES_ESPECIFICO ||
-            periodoSelecionado == periodos.DIA_ESPECIFICO
+            periodoSelecionado === periodos.MES_ESPECIFICO ||
+            periodoSelecionado === periodos.DIA_ESPECIFICO
           "
           :class="
-            (periodoSelecionado == periodos.DIA_ESPECIFICO
+            (periodoSelecionado === periodos.DIA_ESPECIFICO
               ? 'col-4 '
               : 'col-6 ') + 'col-sm-2 col-md-1 fade'
           "
@@ -419,7 +419,7 @@
         >
           <template v-slot:top-right>
             <q-input
-              borderless
+              outlined
               dense
               debounce="300"
               v-model="filter"
@@ -429,6 +429,17 @@
                 <q-icon name="search" />
               </template>
             </q-input>
+
+            <q-btn push color="primary" class="q-ml-md q-pa-sm">
+              <q-icon class="icon" size="sm" name="download" />
+              <q-menu>
+                <q-list style="min-width: 100px">
+                  <q-item clickable v-close-popup>
+                    <q-item-section @click="donwloadCsv">.csv</q-item-section>
+                  </q-item>
+                </q-list>
+              </q-menu>
+            </q-btn>
           </template>
         </q-table>
       </div>
@@ -1081,8 +1092,8 @@ export default defineComponent({
       ];
 
       if (
-        this.periodoSelecionado == this.periodos.DIA_ESPECIFICO ||
-        this.periodoSelecionado == this.periodos.HOJE
+        this.periodoSelecionado === this.periodos.DIA_ESPECIFICO ||
+        this.periodoSelecionado === this.periodos.HOJE
       ) {
         series.splice(1, 1); // Remove a série "Precipitação restante"
       }
@@ -1109,6 +1120,44 @@ export default defineComponent({
         }, []),
       }));
       this.$refs.graficoTemporal.updateSeries(dados);
+    },
+
+    async donwloadCsv() {
+      const dados = [...this.observacoes];
+
+      const opts = {
+        types: [
+          {
+            description: "CSV",
+            accept: { "text/csv": [".csv"] },
+          },
+        ],
+        suggestedName: `dados.csv`,
+      };
+
+      try {
+        const handle = await window.showSaveFilePicker(opts);
+        const writable = await handle.createWritable();
+
+        const csvString = dados.reduce((acc, valor) => {
+          return (
+            acc +
+            "\n" +
+            Object.keys(valor).map((key) =>
+              key === "metric"
+                ? Object.keys(valor[key]).map(
+                    (metricKey) => `${metricKey},${valor[key][metricKey]}`
+                  )
+                : `${key},${valor[key]}`
+            )
+          );
+        }, "");
+
+        await writable.write(csvString);
+        await writable.close();
+      } catch (err) {
+        console.error(err.name, err.message);
+      }
     },
   },
 });
