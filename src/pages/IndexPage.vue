@@ -634,7 +634,7 @@ export default defineComponent({
               show: false,
             },
           },
-          strokeDashArray: 5,
+          strokeDashArray: 6,
         },
         xaxis: {
           categories: Object.keys(STATIONS),
