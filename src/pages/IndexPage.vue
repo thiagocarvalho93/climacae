@@ -741,8 +741,6 @@ export default defineComponent({
   },
 
   async created() {
-    // Accessing terminal variables
-    console.log(process.env);
     await this.obterCalcularEAtualizar();
     await this.obterDadosAtuaisTodasEstacoes();
     this.atualizarDadosAtuais();
