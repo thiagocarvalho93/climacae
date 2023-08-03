@@ -1,11 +1,10 @@
 import { api } from "src/boot/axios";
-import { API_KEY } from "src/constants/secrets";
 
 async function obterDadosTempoReal(codigoEstacao) {
   return new Promise((resolve, reject) => {
     return api
       .get(
-        `/pws/observations/current?apiKey=${API_KEY}&stationId=${codigoEstacao}&numericPrecision=decimal&format=json&units=m`
+        `/pws/observations/current?apiKey=e1f10a1e78da46f5b10a1e78da96f525&stationId=${codigoEstacao}&numericPrecision=decimal&format=json&units=m`
       )
       .then((response) => resolve(response.data))
       .catch((error) => reject(error));
@@ -21,7 +20,7 @@ async function obterObservacoesDiariasPeriodo(
   return new Promise((resolve, reject) => {
     return api
       .get(
-        `/pws/history/daily?stationId=${codigoEstacao}&format=json&units=m&startDate=${dataInicial}&endDate=${dataFinal}&numericPrecision=decimal&apiKey=${API_KEY}`
+        `/pws/history/daily?stationId=${codigoEstacao}&format=json&units=m&startDate=${dataInicial}&endDate=${dataFinal}&numericPrecision=decimal&apiKey=e1f10a1e78da46f5b10a1e78da96f525`
       )
       .then((response) => resolve(response.data))
       .catch((error) => reject(error));
@@ -33,7 +32,7 @@ async function obterTodasObservacoesDia(codigoEstacao, data) {
   return new Promise((resolve, reject) => {
     return api
       .get(
-        `/pws/history/all?stationId=${codigoEstacao}&format=json&units=m&date=${data}&numericPrecision=decimal&apiKey=${API_KEY}`
+        `/pws/history/all?stationId=${codigoEstacao}&format=json&units=m&date=${data}&numericPrecision=decimal&apiKey=e1f10a1e78da46f5b10a1e78da96f525`
       )
       .then((response) => resolve(response.data))
       .catch((error) => reject(error));
@@ -44,7 +43,7 @@ async function obterObservacoesDiaAtualEstacao(codigoEstacao) {
   return new Promise((resolve, reject) => {
     return api
       .get(
-        `/pws/observations/all/1day?apiKey=${API_KEY}&stationId=${codigoEstacao}&numericPrecision=decimal&format=json&units=m`
+        `/pws/observations/all/1day?apiKey=e1f10a1e78da46f5b10a1e78da96f525&stationId=${codigoEstacao}&numericPrecision=decimal&format=json&units=m`
       )
       .then((response) => resolve(response.data))
       .catch((error) => reject(error));

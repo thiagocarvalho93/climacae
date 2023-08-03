@@ -450,7 +450,6 @@
 <script>
 import { defineComponent } from "vue";
 import { STATIONS, CORES, PERIODOS } from "../constants/constants";
-import { API_KEY } from "src/constants/secrets";
 import arrayUtils from "src/utils/array-utils";
 import dataUtils from "src/utils/data-utils";
 import weatherApi from "src/api/weather-api";
@@ -498,7 +497,6 @@ export default defineComponent({
       mostrarInformacoesCard: [true, true, true, true],
       autoplayCarousel: true,
       cores: CORES,
-      apiKey: API_KEY,
       estacoes: STATIONS,
       metadadosEstacoes: [],
       dadosAgora: [],
@@ -743,6 +741,8 @@ export default defineComponent({
   },
 
   async created() {
+    // Accessing terminal variables
+    console.log(process.env);
     await this.obterCalcularEAtualizar();
     await this.obterDadosAtuaisTodasEstacoes();
     this.atualizarDadosAtuais();
