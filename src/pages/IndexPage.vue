@@ -636,13 +636,14 @@ export default defineComponent({
               show: false,
             },
           },
-          strokeDashArray: 7,
+          strokeDashArray: 5,
         },
         xaxis: {
           categories: Object.keys(STATIONS),
         },
         yaxis: {
           max: 40,
+          tickAmount: 5,
         },
 
         tooltip: {
@@ -1058,7 +1059,9 @@ export default defineComponent({
           },
         ],
         xaxis: {
-          categories: dadosFiltrados.map((x) => x.id),
+          categories: dadosFiltrados.map((x) =>
+            x.id.length > 12 ? `${x.id.substring(0, 12)}...` : x.id
+          ),
         },
       });
     },
@@ -1101,7 +1104,9 @@ export default defineComponent({
       this.$refs.graficoPrecipitacao.updateOptions({
         series: series,
         xaxis: {
-          categories: dadosFiltrados.map((x) => x.id),
+          categories: dadosFiltrados.map((x) =>
+            x.id.length > 15 ? `${x.id.substring(0, 15)}...` : x.id
+          ),
         },
       });
     },
