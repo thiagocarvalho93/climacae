@@ -760,42 +760,52 @@ export default defineComponent({
       this.carregando = true;
 
       try {
-        const inicioObtencao = new Date();
-
         await this.filtrarDadosPeriodo();
-        console.log(
-          `Tempo de execução para obter dados: ${new Date() - inicioObtencao}ms`
-        );
-
-        const inicioCalculo = new Date();
 
         this.calcularMetadados();
         this.calcularMaximosGlobais();
         this.atualizarGraficoTemperatura();
         this.atualizarGraficoPrecipitacao();
         this.atualizarGraficoTemporal();
-        console.log(
-          `Tempo de execução para manipular dados: ${
-            new Date() - inicioCalculo
-          }ms`
-        );
       } catch (error) {
-        this.$q.notify({
-          message: (error && error.message) || "Erro ao obter os dados.",
-          type: "negative",
-          progress: true,
-          position: "top",
-          actions: [
-            {
-              label: "Fechar",
-              color: "white",
-              handler: () => {},
-            },
-          ],
-        });
+        const mensagem = (error && error.message) || "Erro ao obter os dados.";
+        this.mensagemErro(mensagem);
+      } finally {
+        this.observacoes = this.observacoes.reverse();
+        this.carregando = false;
       }
-      this.observacoes = this.observacoes.reverse();
-      this.carregando = false;
+    },
+
+    mensagemErro(mensagem) {
+      this.$q.notify({
+        message: mensagem,
+        type: "negative",
+        progress: true,
+        position: "top",
+        actions: [
+          {
+            label: "Fechar",
+            color: "white",
+            handler: () => {},
+          },
+        ],
+      });
+    },
+
+    mensagemSucesso(mensagem) {
+      this.$q.notify({
+        message: mensagem,
+        type: "positive",
+        progress: true,
+        position: "top",
+        actions: [
+          {
+            label: "Fechar",
+            color: "white",
+            handler: () => {},
+          },
+        ],
+      });
     },
 
     async filtrarDadosPeriodo() {
@@ -834,13 +844,11 @@ export default defineComponent({
 
     async filtrarMesEspecifico() {
       const hoje = new Date();
-
-      if (
+      let isFuturo =
         this.mesSelecionado > hoje.getMonth() + 1 &&
-        this.anoSelecionado >= hoje.getFullYear()
-      ) {
-        throw new Error("Não é possivel obter dados do futuro!");
-      }
+        this.anoSelecionado >= hoje.getFullYear();
+
+      if (isFuturo) throw new Error("Não é possivel obter dados do futuro!");
 
       this.dataInicial = new Date(
         this.anoSelecionado,
@@ -848,10 +856,11 @@ export default defineComponent({
         1
       );
 
-      if (
+      let isEsseMes =
         this.mesSelecionado == hoje.getMonth() + 1 &&
-        this.anoSelecionado == hoje.getFullYear()
-      ) {
+        this.anoSelecionado == hoje.getFullYear();
+
+      if (isEsseMes) {
         this.dataFinal = hoje;
       } else {
         this.dataFinal = new Date(this.anoSelecionado, this.mesSelecionado, 0);
@@ -890,12 +899,12 @@ export default defineComponent({
     async obterObservacoesDiaAtualTodasEstacoes() {
       const stations = Object.keys(STATIONS);
 
+      const promises = stations.map((station) =>
+        weatherApi.obterObservacoesDiaAtualEstacao(station)
+      );
+
       try {
-        const responses = await Promise.all(
-          stations.map((station) =>
-            weatherApi.obterObservacoesDiaAtualEstacao(station)
-          )
-        );
+        const responses = await Promise.all(promises);
 
         this.observacoes = responses.flatMap((response) =>
           (response.observations || []).map((ob) => new Observation(ob))
@@ -907,15 +916,14 @@ export default defineComponent({
 
     async obterObservacoesDiaEspecificoTodasEstacoes(data) {
       const stations = Object.keys(STATIONS);
-
       const dataFormatada = this.formatarDataParaQuery(data);
 
+      const promises = stations.map((station) =>
+        weatherApi.obterTodasObservacoesDia(station, dataFormatada)
+      );
+
       try {
-        const responses = await Promise.all(
-          stations.map((station) =>
-            weatherApi.obterTodasObservacoesDia(station, dataFormatada)
-          )
-        );
+        const responses = await Promise.all(promises);
 
         this.observacoes = responses.flatMap((response) =>
           (response.observations || []).map((ob) => new Observation(ob))
@@ -927,20 +935,19 @@ export default defineComponent({
 
     async obterObservacoesDiariasPeriodoTodasEstacoes(dataInicial, dataFinal) {
       const stations = Object.keys(STATIONS);
-
       const dataInicialFormatada = this.formatarDataParaQuery(dataInicial);
       const dataFinalFormatada = this.formatarDataParaQuery(dataFinal);
 
+      const promises = stations.map((station) =>
+        weatherApi.obterObservacoesDiariasPeriodo(
+          station,
+          dataInicialFormatada,
+          dataFinalFormatada
+        )
+      );
+
       try {
-        const responses = await Promise.all(
-          stations.map((station) =>
-            weatherApi.obterObservacoesDiariasPeriodo(
-              station,
-              dataInicialFormatada,
-              dataFinalFormatada
-            )
-          )
-        );
+        const responses = await Promise.all(promises);
 
         this.observacoes = responses.flatMap((response) =>
           (response.observations || []).map((ob) => new Observation(ob))
@@ -952,11 +959,12 @@ export default defineComponent({
 
     async obterDadosAtuaisTodasEstacoes() {
       const stations = Object.keys(STATIONS);
+      const promises = stations.map((station) =>
+        weatherApi.obterDadosTempoReal(station)
+      );
 
       try {
-        const responses = await Promise.all(
-          stations.map((station) => weatherApi.obterDadosTempoReal(station))
-        );
+        const responses = await Promise.all(promises);
 
         this.dadosAgora = responses.flatMap((response) =>
           (response.observations || []).map((ob) => new ObservationCurrent(ob))
@@ -969,6 +977,7 @@ export default defineComponent({
     calcularMetadados() {
       this.metadadosEstacoes = [];
 
+      // TODO fazer o método calcularMaximosGlobais nesse mesmo loop
       this.observacoes.forEach((obs) => {
         const obsModel = new Observation(obs);
         const { metric, stationID } = obsModel;
@@ -1053,7 +1062,9 @@ export default defineComponent({
     atualizarDadosAtuais() {
       setInterval(async () => {
         this.carregandoTempoReal = true;
+
         await this.obterDadosAtuaisTodasEstacoes();
+
         this.atualizacao = new Date().toLocaleTimeString(navigator.language, {
           hour: "2-digit",
           minute: "2-digit",
@@ -1212,34 +1223,12 @@ export default defineComponent({
         await writable.write(csv);
         await writable.close();
 
-        this.$q.notify({
-          message: `Arquivo ${handle.name} salvo com sucesso!`,
-          type: "positive",
-          progress: true,
-          position: "top",
-          actions: [
-            {
-              label: "Fechar",
-              color: "white",
-              handler: () => {},
-            },
-          ],
-        });
+        const mensagem = `Arquivo ${handle.name} salvo com sucesso!`;
+        this.mensagemSucesso(mensagem);
       } catch (err) {
         if (err.message === "The user aborted a request.") return; // cancelar
-        this.$q.notify({
-          message: `${err.message}`,
-          type: "negative",
-          progress: true,
-          position: "top",
-          actions: [
-            {
-              label: "Fechar",
-              color: "white",
-              handler: () => {},
-            },
-          ],
-        });
+        const mensagem = `${err.message}`;
+        this.mensagemErro(mensagem);
       }
     },
   },

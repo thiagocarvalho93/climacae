@@ -2,7 +2,7 @@ const STATIONS = {
   // IRIODA1: { ID: "IRIODA1", NOME: "RO - Alphaville" },
   // IRIODA5: { ID: "IRIODA5", NOME: "RO - Parque dos Pássaros" },
   // IRIODA6: { ID: "IRIODA6", NOME: "Canta Galo" },
-  IMACA6: { ID: "IMACA6", NOME: "Mirante" },
+  IMACA7: { ID: "IMACA7", NOME: "Mirante" },
   IMACA13: { ID: "IMACA13", NOME: "Serra" },
   IMACA15: { ID: "IMACA15", NOME: "Glória" },
   // IMACA23: { ID: "IMACA23", NOME: "" }, desativada
