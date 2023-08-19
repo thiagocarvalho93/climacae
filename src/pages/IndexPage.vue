@@ -90,7 +90,7 @@
               <q-item-section>
                 <q-item-label> MÁXIMA </q-item-label>
                 <q-item-label class="text-bold text-h6">
-                  {{ maxima }}°C
+                  {{ maximosGlobais.tempHigh }}°C
                 </q-item-label>
               </q-item-section>
               <q-item-section avatar>
@@ -103,12 +103,17 @@
             <q-item>
               <q-item-section>
                 <q-item-label>
-                  Em {{ estacoes[dadosMaxima.stationID].NOME }} ({{
-                    dadosMaxima.stationID
+                  Em
+                  {{ estacoes[maximosGlobais.tempHighObs.stationID].NOME }} ({{
+                    maximosGlobais.tempHighObs.stationID
                   }})</q-item-label
                 >
                 <q-item-label class="text-bold text-h6">
-                  {{ new Date(dadosMaxima.obsTimeLocal).toLocaleDateString() }}
+                  {{
+                    new Date(
+                      maximosGlobais.tempHighObs.obsTimeLocal
+                    ).toLocaleDateString()
+                  }}
                 </q-item-label>
               </q-item-section>
             </q-item>
@@ -149,12 +154,17 @@
             <q-item>
               <q-item-section>
                 <q-item-label>
-                  Em {{ estacoes[dadosMinima.stationID].NOME }} ({{
-                    dadosMinima.stationID
+                  Em
+                  {{ estacoes[maximosGlobais.tempLowObs.stationID].NOME }} ({{
+                    maximosGlobais.tempLowObs.stationID
                   }})</q-item-label
                 >
                 <q-item-label class="text-bold text-h6">
-                  {{ new Date(dadosMinima.obsTimeLocal).toLocaleDateString() }}
+                  {{
+                    new Date(
+                      maximosGlobais.tempLowObs.obsTimeLocal
+                    ).toLocaleDateString()
+                  }}
                 </q-item-label>
               </q-item-section>
             </q-item>
@@ -456,6 +466,7 @@ import weatherApi from "src/api/weather-api";
 import Observation from "src/models/observation-model";
 import ObservationCurrent from "src/models/observation-current-model";
 import Metric from "src/models/metric-model";
+import MetadadosModel from "src/models/metadados-model";
 
 export default defineComponent({
   name: "IndexPage",
@@ -532,6 +543,7 @@ export default defineComponent({
       seriesTemperatura: [],
       seriesPrecipitacao: [],
       seriesTemporal: [],
+      maximosGlobais: new MetadadosModel(),
 
       //TABELA DE DADOS
       columns: [
@@ -763,7 +775,6 @@ export default defineComponent({
         await this.filtrarDadosPeriodo();
 
         this.calcularMetadados();
-        this.calcularMaximosGlobais();
         this.atualizarGraficoTemperatura();
         this.atualizarGraficoPrecipitacao();
         this.atualizarGraficoTemporal();
@@ -977,86 +988,47 @@ export default defineComponent({
     calcularMetadados() {
       this.metadadosEstacoes = [];
 
-      // TODO fazer o método calcularMaximosGlobais nesse mesmo loop
       this.observacoes.forEach((obs) => {
         const obsModel = new Observation(obs);
         const { metric, stationID } = obsModel;
-        const { tempHigh, tempLow, windgustHigh, precipRate, precipTotal } =
-          new Metric(metric);
+        const obsFlat = Object.assign(obs, metric);
 
-        let indiceMetadadosEstacao = this.metadadosEstacoes.findIndex(
-          (x) => x.id === this.estacoes[stationID].NOME
+        let index = this.metadadosEstacoes.findIndex(
+          (x) => x.stationID === stationID
         );
 
-        if (indiceMetadadosEstacao === -1) {
-          this.metadadosEstacoes.push({
-            id: this.estacoes[stationID].NOME,
-            minima: tempLow,
-            maxima: tempHigh,
-            ventoMaximo: windgustHigh,
-            precipitacaoMaxima: precipRate,
-            precipitacaoAcumulada: precipTotal,
-          });
+        const naoEncontrado = index === -1;
+
+        if (naoEncontrado) {
+          let novoMetadosEstacao = new MetadadosModel(obsFlat);
+          this.metadadosEstacoes.push(novoMetadosEstacao);
         } else {
-          const {
-            maxima,
-            minima,
-            ventoMaximo,
-            precipitacaoMaxima,
-            precipitacaoAcumulada,
-          } = this.metadadosEstacoes[indiceMetadadosEstacao];
+          let metadadosEstacao = this.metadadosEstacoes[index];
 
-          this.metadadosEstacoes[indiceMetadadosEstacao] = {
-            id: this.estacoes[stationID].NOME,
-            maxima: Math.max(tempHigh, maxima),
-            minima: Math.min(tempLow, minima),
-            ventoMaximo: Math.max(windgustHigh, ventoMaximo),
-            precipitacaoMaxima: Math.max(precipTotal, precipitacaoMaxima),
-            precipitacaoAcumulada: precipitacaoAcumulada + precipTotal,
-          };
+          Object.keys(metadadosEstacao).forEach((key) => {
+            const isTempLow = key === "tempLow";
+            const isLower = obsFlat[key] < metadadosEstacao[key];
+            const isHigher = obsFlat[key] > metadadosEstacao[key];
+
+            if ((isTempLow && isLower) || (!isTempLow && isHigher)) {
+              metadadosEstacao[key] = obsFlat[key];
+              metadadosEstacao[key + "Obs"] = obs;
+
+              const isLowerGlobal = obsFlat[key] < this.maximosGlobais[key];
+              const isHigherGlobal = obsFlat[key] > this.maximosGlobais[key];
+
+              if (
+                !this.maximosGlobais[key] ||
+                (isTempLow && isLowerGlobal) ||
+                (!isTempLow && isHigherGlobal)
+              ) {
+                this.maximosGlobais[key] = obsFlat[key];
+                this.maximosGlobais[key + "Obs"] = obs;
+              }
+            }
+          });
         }
       });
-    },
-
-    calcularMaximosGlobais() {
-      this.metadadosEstacoes.forEach((metadadosEstacao) => {
-        const {
-          id,
-          maxima,
-          minima,
-          ventoMaximo,
-          precipitacaoMaxima,
-          precipitacaoAcumulada,
-        } = metadadosEstacao;
-
-        if (maxima > this.maxima) {
-          this.maxima = maxima;
-        }
-        if (this.minima === 0 || (minima < this.minima && minima != 0)) {
-          this.minima = minima;
-        }
-        if (ventoMaximo > this.ventoMaximo) {
-          this.ventoMaximo = ventoMaximo;
-        }
-        if (precipitacaoMaxima > this.precipitacaoMaxima) {
-          this.precipitacaoMaxima = precipitacaoMaxima;
-        }
-      });
-
-      for (const obs of this.observacoes) {
-        if (obs.metric.tempHigh == this.maxima) {
-          this.dadosMaxima = obs;
-        }
-        if (obs.metric.tempLow == this.minima) {
-          this.dadosMinima = obs;
-        }
-        if (obs.metric.windgustHigh == this.ventoMaximo) {
-          this.dadosVentoMaximo = obs;
-        }
-        if (obs.metric.precipTotal == this.precipitacaoMaxima) {
-          this.dadosPrecipitacaoMaxima = obs;
-        }
-      }
     },
 
     atualizarDadosAtuais() {
@@ -1329,3 +1301,4 @@ export default defineComponent({
     /* bg color is important for th; just specify one */
     background-color: $dark
 </style>
+src/models/metadados-model
