@@ -455,6 +455,7 @@ import dataUtils from "src/utils/data-utils";
 import weatherApi from "src/api/weather-api";
 import Observation from "src/models/observation-model";
 import ObservationCurrent from "src/models/observation-current-model";
+import Metric from "src/models/metric-model";
 
 export default defineComponent({
   name: "IndexPage",
@@ -962,68 +963,86 @@ export default defineComponent({
     },
 
     calcularMetadados() {
-      this.metadadosEstacoes = Object.keys(STATIONS).map((station) => {
-        const observacoesEstacao = this.observacoes.filter(
-          (x) => x.stationID === station
+      this.metadadosEstacoes = [];
+
+      this.observacoes.forEach((obs) => {
+        const obsModel = new Observation(obs);
+        const { metric, stationID } = obsModel;
+        const { tempHigh, tempLow, windgustHigh, precipRate, precipTotal } =
+          new Metric(metric);
+
+        let metadadosEstacao = this.metadadosEstacoes.find(
+          (x) => x.id === this.estacoes[stationID].NOME
         );
-        const minima = Math.min(
-          ...observacoesEstacao
-            .filter((x) => !!x.metric.tempLow)
-            .map((x) => x.metric.tempLow)
-        );
-        const maxima = Math.max(
-          ...observacoesEstacao
-            .filter((x) => !!x.metric.tempHigh)
-            .map((x) => x.metric.tempHigh)
-        );
-        const ventoMaximo = Math.max(
-          ...observacoesEstacao
-            .filter((x) => !!x.metric.windgustHigh)
-            .map((x) => x.metric.windgustHigh)
-        );
-        const precipitacaoMaxima = Math.max(
-          ...observacoesEstacao.map((x) => x.metric.precipTotal)
-        );
-        const precipitacaoAcumulada = observacoesEstacao
-          .filter((x) => !!x.metric.precipTotal)
-          .reduce((acc, valor) => acc + valor.metric.precipTotal, 0)
-          .toFixed(2);
-        return {
-          id: STATIONS[station].NOME,
-          minima,
-          maxima,
-          ventoMaximo,
-          precipitacaoMaxima,
-          precipitacaoAcumulada,
-        };
+
+        if (!metadadosEstacao) {
+          this.metadadosEstacoes.push({
+            id: this.estacoes[stationID].NOME,
+            minima: tempLow,
+            maxima: tempHigh,
+            ventoMaximo: windgustHigh,
+            precipitacaoMaxima: precipRate,
+            precipitacaoAcumulada: precipTotal,
+          });
+        } else {
+          const {
+            maxima,
+            minima,
+            ventoMaximo,
+            precipitacaoMaxima,
+            precipitacaoAcumulada,
+          } = metadadosEstacao;
+
+          metadadosEstacao = {
+            maxima: Math.max(tempHigh, maxima),
+            minima: Math.min(tempLow, minima),
+            ventoMaximo: Math.max(windgustHigh, ventoMaximo),
+            precipitacaoMaxima: Math.max(precipRate, precipitacaoMaxima),
+            precipitacaoAcumulada: Math.max(precipTotal, precipitacaoAcumulada),
+          };
+        }
       });
     },
 
     calcularMaximosGlobais() {
-      this.maxima = Math.max(
-        ...this.metadadosEstacoes.map((dado) => dado.maxima)
-      );
-      this.dadosMaxima = this.observacoes.find(
-        (obs) => obs.metric.tempHigh == this.maxima
-      );
-      this.minima = Math.min(
-        ...this.metadadosEstacoes.map((dado) => dado.minima)
-      );
-      this.dadosMinima = this.observacoes.find(
-        (obs) => obs.metric.tempLow == this.minima
-      );
-      this.ventoMaximo = Math.max(
-        ...this.metadadosEstacoes.map((dado) => dado.ventoMaximo)
-      );
-      this.dadosVentoMaximo = this.observacoes.find(
-        (obs) => obs.metric.windgustHigh == this.ventoMaximo
-      );
-      this.precipitacaoMaxima = Math.max(
-        ...this.metadadosEstacoes.map((dado) => dado.precipitacaoMaxima)
-      );
-      this.dadosPrecipitacaoMaxima = this.observacoes.find(
-        (obs) => obs.metric.precipTotal == this.precipitacaoMaxima
-      );
+      this.metadadosEstacoes.forEach((metadadosEstacao) => {
+        const {
+          id,
+          maxima,
+          minima,
+          ventoMaximo,
+          precipitacaoMaxima,
+          precipitacaoAcumulada,
+        } = metadadosEstacao;
+
+        if (maxima > this.maxima) {
+          this.maxima = maxima;
+        }
+        if (this.minima === 0 || (minima < this.minima && minima != 0)) {
+          this.minima = minima;
+        }
+        if (ventoMaximo > this.ventoMaximo) {
+          this.ventoMaximo = ventoMaximo;
+        }
+        if (precipitacaoMaxima > this.precipitacaoMaxima) {
+          this.precipitacaoMaxima = precipitacaoMaxima;
+        }
+      });
+
+      for (const obs of this.observacoes) {
+        if (obs.metric.tempHigh == this.maxima) {
+          this.dadosMaxima = obs;
+        }
+        if (obs.metric.tempLow == this.minima) {
+          this.dadosMinima = obs;
+        }
+        if (obs.metric.windgustHigh == this.ventoMaximo) {
+          this.dadosVentoMaximo = obs;
+        }
+        if (obs.metric.precipTotal == this.precipitacaoMaxima) {
+          this.dadosPrecipitacaoMaxima = obs;
+        }
+      }
     },
 
     atualizarDadosAtuais() {
@@ -1081,7 +1100,7 @@ export default defineComponent({
 
       const series = [
         {
-          name: "Precipitação máxima",
+          name: "Máxima em 24h",
           data: data.map((x) => x.precipitacaoMaxima),
           color: this.cores.INDIGO_ESCURO,
         },
