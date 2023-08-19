@@ -1146,8 +1146,6 @@ export default defineComponent({
     },
 
     async donwloadCsv() {
-      const dados = [...this.observacoes];
-
       const opts = {
         types: [
           {
@@ -1162,19 +1160,27 @@ export default defineComponent({
         const handle = await window.showSaveFilePicker(opts);
         const writable = await handle.createWritable();
 
-        const csvString = dados.reduce((acc, valor) => {
-          return (
-            acc +
-            "\n" +
-            Object.keys(valor).map((key) =>
-              key === "metric"
-                ? Object.keys(valor[key]).map(
-                    (metricKey) => `${metricKey},${valor[key][metricKey]}`
-                  )
-                : `${key},${valor[key]}`
-            )
-          );
-        }, "");
+        let props = [
+          "obsTimeLocal",
+          "stationID",
+          "humidityAvg",
+          "humidityHigh",
+          "humidityLow",
+          "winddirAvg",
+        ];
+
+        let csvString = "";
+        csvString += props.join(",");
+        csvString += ",";
+        csvString += Object.keys(new Metric()).join(",");
+        csvString += "\n";
+
+        for (const obs of this.observacoes) {
+          csvString += props.map((prop) => obs[prop]).join(",");
+          csvString += ",";
+          csvString += Object.values(obs.metric).join(",");
+          csvString += "\n";
+        }
 
         await writable.write(csvString);
         await writable.close();
