@@ -755,41 +755,41 @@ export default defineComponent({
     async obterCalcularEAtualizar() {
       this.carregando = true;
 
-      try {
-        const inicioObtencao = new Date();
+      // try {
+      const inicioObtencao = new Date();
 
-        await this.filtrarDadosPeriodo();
-        console.log(
-          `Tempo de execução para obter dados: ${new Date() - inicioObtencao}ms`
-        );
+      await this.filtrarDadosPeriodo();
+      console.log(
+        `Tempo de execução para obter dados: ${new Date() - inicioObtencao}ms`
+      );
 
-        const inicioCalculo = new Date();
+      const inicioCalculo = new Date();
 
-        this.calcularMetadados();
-        this.calcularMaximosGlobais();
-        this.atualizarGraficoTemperatura();
-        this.atualizarGraficoPrecipitacao();
-        this.atualizarGraficoTemporal();
-        console.log(
-          `Tempo de execução para manipular dados: ${
-            new Date() - inicioCalculo
-          }ms`
-        );
-      } catch (error) {
-        this.$q.notify({
-          message: (error && error.message) || "Erro ao obter os dados.",
-          type: "negative",
-          progress: true,
-          position: "top",
-          actions: [
-            {
-              label: "Fechar",
-              color: "white",
-              handler: () => {},
-            },
-          ],
-        });
-      }
+      this.calcularMetadados();
+      this.calcularMaximosGlobais();
+      this.atualizarGraficoTemperatura();
+      this.atualizarGraficoPrecipitacao();
+      this.atualizarGraficoTemporal();
+      console.log(
+        `Tempo de execução para manipular dados: ${
+          new Date() - inicioCalculo
+        }ms`
+      );
+      // } catch (error) {
+      //   this.$q.notify({
+      //     message: (error && error.message) || "Erro ao obter os dados.",
+      //     type: "negative",
+      //     progress: true,
+      //     position: "top",
+      //     actions: [
+      //       {
+      //         label: "Fechar",
+      //         color: "white",
+      //         handler: () => {},
+      //       },
+      //     ],
+      //   });
+      // }
       this.observacoes = this.observacoes.reverse();
       this.carregando = false;
     },
@@ -971,11 +971,11 @@ export default defineComponent({
         const { tempHigh, tempLow, windgustHigh, precipRate, precipTotal } =
           new Metric(metric);
 
-        let metadadosEstacao = this.metadadosEstacoes.find(
+        let indiceMetadadosEstacao = this.metadadosEstacoes.findIndex(
           (x) => x.id === this.estacoes[stationID].NOME
         );
 
-        if (!metadadosEstacao) {
+        if (indiceMetadadosEstacao === -1) {
           this.metadadosEstacoes.push({
             id: this.estacoes[stationID].NOME,
             minima: tempLow,
@@ -991,9 +991,10 @@ export default defineComponent({
             ventoMaximo,
             precipitacaoMaxima,
             precipitacaoAcumulada,
-          } = metadadosEstacao;
+          } = this.metadadosEstacoes[indiceMetadadosEstacao];
 
-          metadadosEstacao = {
+          this.metadadosEstacoes[indiceMetadadosEstacao] = {
+            id: this.estacoes[stationID].NOME,
             maxima: Math.max(tempHigh, maxima),
             minima: Math.min(tempLow, minima),
             ventoMaximo: Math.max(windgustHigh, ventoMaximo),
