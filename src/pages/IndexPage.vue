@@ -998,8 +998,8 @@ export default defineComponent({
             maxima: Math.max(tempHigh, maxima),
             minima: Math.min(tempLow, minima),
             ventoMaximo: Math.max(windgustHigh, ventoMaximo),
-            precipitacaoMaxima: Math.max(precipRate, precipitacaoMaxima),
-            precipitacaoAcumulada: Math.max(precipTotal, precipitacaoAcumulada),
+            precipitacaoMaxima: Math.max(precipTotal, precipitacaoMaxima),
+            precipitacaoAcumulada: precipitacaoAcumulada + precipTotal,
           };
         }
       });
