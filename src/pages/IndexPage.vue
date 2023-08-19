@@ -529,6 +529,11 @@ export default defineComponent({
         rowsPerPage: 12,
       },
       filter: "",
+      seriesTemperatura: [],
+      seriesPrecipitacao: [],
+      seriesTemporal: [],
+
+      //TABELA DE DADOS
       columns: [
         {
           name: "data",
@@ -609,9 +614,8 @@ export default defineComponent({
           align: "left",
         },
       ],
-      seriesTemperatura: [],
-      seriesPrecipitacao: [],
-      seriesTemporal: [],
+
+      // GRÁFICOS
       chartTemperaturaOptions: {
         chart: {
           type: "bar",
@@ -1145,6 +1149,49 @@ export default defineComponent({
       this.$refs.graficoTemporal.updateSeries(dados);
     },
 
+    montarCsv() {
+      let props = [
+        "obsTimeLocal",
+        "stationID",
+        "humidityAvg",
+        "humidityHigh",
+        "humidityLow",
+        "winddirAvg",
+      ];
+
+      let csvString = "";
+      csvString += props.join(",");
+      csvString += ",";
+      csvString += Object.keys(new Metric()).join(",");
+      csvString += "\n";
+
+      for (const obs of this.observacoes) {
+        csvString += props.map((prop) => obs[prop]).join(",");
+        csvString += ",";
+        csvString += Object.values(obs.metric).join(",");
+        csvString += "\n";
+      }
+
+      return csvString;
+    },
+
+    formatarData(data) {
+      const dia = new Date(data).getDate();
+      const mes = new Date(data).getMonth();
+      const ano = new Date(data).getFullYear();
+
+      return `${dia}_${mes}_${ano}`;
+    },
+
+    nomePadraoCSV() {
+      if (this.periodoSelecionado === PERIODOS.HOJE) {
+        return `${this.formatarData(this.dataInicial)}.csv`;
+      }
+      return `${this.formatarData(this.dataInicial)}-${this.formatarData(
+        this.dataFinal
+      )}.csv`;
+    },
+
     async donwloadCsv() {
       const opts = {
         types: [
@@ -1153,36 +1200,16 @@ export default defineComponent({
             accept: { "text/csv": [".csv"] },
           },
         ],
-        suggestedName: `dados.csv`,
+        suggestedName: this.nomePadraoCSV(),
       };
 
       try {
         const handle = await window.showSaveFilePicker(opts);
         const writable = await handle.createWritable();
 
-        let props = [
-          "obsTimeLocal",
-          "stationID",
-          "humidityAvg",
-          "humidityHigh",
-          "humidityLow",
-          "winddirAvg",
-        ];
+        let csv = this.montarCsv();
 
-        let csvString = "";
-        csvString += props.join(",");
-        csvString += ",";
-        csvString += Object.keys(new Metric()).join(",");
-        csvString += "\n";
-
-        for (const obs of this.observacoes) {
-          csvString += props.map((prop) => obs[prop]).join(",");
-          csvString += ",";
-          csvString += Object.values(obs.metric).join(",");
-          csvString += "\n";
-        }
-
-        await writable.write(csvString);
+        await writable.write(csv);
         await writable.close();
         this.$q.notify({
           message: `Arquivo ${handle.name} salvo com sucesso!`,
