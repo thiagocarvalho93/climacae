@@ -759,41 +759,41 @@ export default defineComponent({
     async obterCalcularEAtualizar() {
       this.carregando = true;
 
-      // try {
-      const inicioObtencao = new Date();
+      try {
+        const inicioObtencao = new Date();
 
-      await this.filtrarDadosPeriodo();
-      console.log(
-        `Tempo de execução para obter dados: ${new Date() - inicioObtencao}ms`
-      );
+        await this.filtrarDadosPeriodo();
+        console.log(
+          `Tempo de execução para obter dados: ${new Date() - inicioObtencao}ms`
+        );
 
-      const inicioCalculo = new Date();
+        const inicioCalculo = new Date();
 
-      this.calcularMetadados();
-      this.calcularMaximosGlobais();
-      this.atualizarGraficoTemperatura();
-      this.atualizarGraficoPrecipitacao();
-      this.atualizarGraficoTemporal();
-      console.log(
-        `Tempo de execução para manipular dados: ${
-          new Date() - inicioCalculo
-        }ms`
-      );
-      // } catch (error) {
-      //   this.$q.notify({
-      //     message: (error && error.message) || "Erro ao obter os dados.",
-      //     type: "negative",
-      //     progress: true,
-      //     position: "top",
-      //     actions: [
-      //       {
-      //         label: "Fechar",
-      //         color: "white",
-      //         handler: () => {},
-      //       },
-      //     ],
-      //   });
-      // }
+        this.calcularMetadados();
+        this.calcularMaximosGlobais();
+        this.atualizarGraficoTemperatura();
+        this.atualizarGraficoPrecipitacao();
+        this.atualizarGraficoTemporal();
+        console.log(
+          `Tempo de execução para manipular dados: ${
+            new Date() - inicioCalculo
+          }ms`
+        );
+      } catch (error) {
+        this.$q.notify({
+          message: (error && error.message) || "Erro ao obter os dados.",
+          type: "negative",
+          progress: true,
+          position: "top",
+          actions: [
+            {
+              label: "Fechar",
+              color: "white",
+              handler: () => {},
+            },
+          ],
+        });
+      }
       this.observacoes = this.observacoes.reverse();
       this.carregando = false;
     },
@@ -1211,6 +1211,7 @@ export default defineComponent({
 
         await writable.write(csv);
         await writable.close();
+
         this.$q.notify({
           message: `Arquivo ${handle.name} salvo com sucesso!`,
           type: "positive",
@@ -1225,6 +1226,7 @@ export default defineComponent({
           ],
         });
       } catch (err) {
+        if (err.message === "The user aborted a request.") return; // cancelar
         this.$q.notify({
           message: `${err.message}`,
           type: "negative",
