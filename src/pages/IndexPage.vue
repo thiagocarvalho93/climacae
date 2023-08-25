@@ -1019,6 +1019,11 @@ export default defineComponent({
     },
 
     calcularMaximosGlobais() {
+      this.maxima = 0;
+      this.minima = 0;
+      this.ventoMaximo = 0;
+      this.precipitacaoMaxima = 0;
+
       this.metadadosEstacoes.forEach((metadadosEstacao) => {
         const {
           id,
