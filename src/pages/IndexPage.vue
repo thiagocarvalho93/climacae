@@ -1017,9 +1017,7 @@ export default defineComponent({
       const data = dadosFiltrados.map((x) => ({
         name: x.NOME,
         precipitacaoMaxima: x.precipitacaoMaxima,
-        precipitacaoRestante: (
-          x.precipitacaoAcumulada - x.precipitacaoMaxima
-        ).toFixed(2),
+        precipitacaoRestante: x.precipitacaoAcumulada - x.precipitacaoMaxima,
       }));
 
       const series = [
@@ -1035,11 +1033,20 @@ export default defineComponent({
         },
       ];
 
-      if (
+      let precipitacaoMaxima = 0;
+      let isDiario =
         this.periodoSelecionado === this.periodos.DIA_ESPECIFICO ||
-        this.periodoSelecionado === this.periodos.HOJE
-      ) {
+        this.periodoSelecionado === this.periodos.HOJE;
+
+      if (isDiario) {
+        const precMaximas = data.map((x) => x.precipitacaoMaxima);
+        precipitacaoMaxima = Math.max(...precMaximas);
         series.splice(1, 1); // Remove a série "Precipitação restante"
+      } else {
+        const precMaximas = data.map(
+          (x) => x.precipitacaoMaxima + x.precipitacaoRestante
+        );
+        precipitacaoMaxima = Math.max(...precMaximas);
       }
 
       this.$refs.graficoPrecipitacao.updateOptions({
@@ -1048,6 +1055,10 @@ export default defineComponent({
           categories: dadosFiltrados.map((x) =>
             x.id.length > 15 ? `${x.id.substring(0, 15)}...` : x.id
           ),
+        },
+        yaxis: {
+          max: precipitacaoMaxima * 1.4,
+          tickAmount: 5,
         },
       });
     },
