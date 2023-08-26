@@ -34,4 +34,141 @@ const PERIODOS = {
   MES_ESPECIFICO: "Mês específico",
 };
 
-export { STATIONS, CORES, PERIODOS };
+// GRÁFICOS
+const CHART_TEMPERATURA_OPTIONS = {
+  chart: {
+    type: "bar",
+    height: 350,
+  },
+  plotOptions: {
+    bar: {
+      horizontal: false,
+      columnWidth: "45%",
+      borderRadius: 2,
+      borderRadiusApplication: "end",
+      endingShape: "rounded",
+    },
+  },
+  dataLabels: {
+    enabled: false,
+  },
+  grid: {
+    xaxis: {
+      lines: {
+        show: false,
+      },
+    },
+    strokeDashArray: 6,
+  },
+  xaxis: {
+    categories: Object.keys(STATIONS),
+  },
+  yaxis: {
+    max: 40,
+    tickAmount: 5,
+  },
+
+  tooltip: {
+    y: {
+      formatter: function (value) {
+        return value.toFixed(1) + "°C";
+      },
+    },
+  },
+};
+
+const CHART_PRECIPITACAO_OPTIONS = {
+  chart: {
+    type: "bar",
+    stacked: true,
+    height: 350,
+  },
+  plotOptions: {
+    bar: {
+      borderRadius: 3,
+      borderRadiusWhenStacked: "last",
+      borderRadiusApplication: "end",
+      horizontal: true,
+      stacked: true,
+      dataLabels: {
+        total: {
+          enabled: true,
+          offsetX: 12,
+          offsetY: 6,
+          style: {
+            fontSize: "12px",
+            fontWeight: 800,
+          },
+          formatter: function (val) {
+            return val.toFixed(1) + " mm";
+          },
+        },
+      },
+    },
+  },
+  grid: {
+    yaxis: {
+      lines: {
+        show: false,
+      },
+    },
+    strokeDashArray: 7,
+  },
+  dataLabels: {
+    enabled: false,
+  },
+  xaxis: {
+    categories: Object.keys(STATIONS),
+  },
+};
+
+const CHART_SERIE_TEMPORAL_OPTIONS = {
+  chart: {
+    type: "line",
+    zoom: {
+      enabled: false,
+    },
+    animations: {
+      enabled: true,
+      easing: "easeinout",
+      speed: 800,
+      animateGradually: {
+        enabled: true,
+        delay: 150,
+      },
+      dynamicAnimation: {
+        enabled: true,
+        speed: 350,
+      },
+    },
+  },
+  dataLabels: {
+    enabled: false,
+  },
+  stroke: {
+    width: 3,
+    curve: "smooth",
+  },
+  grid: {
+    row: {
+      opacity: 0.5,
+    },
+  },
+  xaxis: {
+    type: "datetime",
+    tickAmount: 8,
+  },
+  yaxis: {
+    min: 5,
+    max: 40,
+  },
+};
+
+export {
+  STATIONS,
+  CORES,
+  PERIODOS,
+  CHART_TEMPERATURA_OPTIONS,
+  CHART_PRECIPITACAO_OPTIONS,
+  CHART_SERIE_TEMPORAL_OPTIONS,
+};
