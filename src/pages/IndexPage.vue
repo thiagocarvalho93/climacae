@@ -266,8 +266,8 @@
         </q-card>
       </div>
 
-      <div class="col-12 col-md-4">
-        <q-card flat>
+      <div class="col-12 col-md-4 flex">
+        <q-card flat class="full-width">
           <q-card-section class="text-h6">
             Agora ({{ atualizacao }})
           </q-card-section>
@@ -339,8 +339,8 @@
         </q-card>
       </div>
 
-      <div class="col-12 col-md-8">
-        <q-card flat>
+      <div class="col-12 col-md-8 flex">
+        <q-card flat class="full-width">
           <q-card-section class="text-h6"> Máximas e mínimas </q-card-section>
           <q-card-section>
             <apexchart
@@ -360,13 +360,13 @@
         </q-card>
       </div>
 
-      <div class="col-12 col-sm-5">
-        <q-card flat>
+      <div class="col-12 col-sm-5 flex">
+        <q-card flat class="full-width">
           <q-card-section class="text-h6"> Precipitação </q-card-section>
           <q-card-section>
             <apexchart
               type="bar"
-              height="250"
+              height="350"
               :options="chartPrecipitacaoOptions"
               :series="seriesPrecipitacao"
               ref="graficoPrecipitacao"
@@ -381,12 +381,30 @@
         </q-card>
       </div>
 
-      <div class="col-12 col-sm-7">
-        <q-card flat>
-          <q-card-section class="text-h6"> Séries temporais </q-card-section>
+      <div class="col-12 col-sm-7 flex">
+        <q-card flat class="full-width">
+          <q-card-section class="text-h6">
+            <div class="row">
+              <div class="col-12 col-sm-8 col-md-10">
+                <span>Séries temporais</span>
+              </div>
+              <div class="col-12 col-sm-4 col-md-2">
+                <q-select
+                  dense
+                  v-model="estacaoSelecionada"
+                  :options="Object.values(estacoes)"
+                  outlined
+                  hide-bottom-space
+                  input-style="{ background-color: red }"
+                  option-label="NOME"
+                  label="Estação"
+                />
+              </div>
+            </div>
+          </q-card-section>
           <q-card-section>
             <apexchart
-              height="250"
+              height="350"
               :options="chartSerieTemporalOptions"
               :series="seriesTemporal"
               ref="graficoTemporal"
@@ -449,7 +467,14 @@
 
 <script>
 import { defineComponent } from "vue";
-import { STATIONS, CORES, PERIODOS } from "../constants/constants";
+import {
+  STATIONS,
+  CORES,
+  PERIODOS,
+  CHART_TEMPERATURA_OPTIONS,
+  CHART_PRECIPITACAO_OPTIONS,
+  CHART_SERIE_TEMPORAL_OPTIONS,
+} from "../constants/constants";
 import arrayUtils from "src/utils/array-utils";
 import dataUtils from "src/utils/data-utils";
 import weatherApi from "src/api/weather-api";
@@ -499,6 +524,7 @@ export default defineComponent({
       autoplayCarousel: true,
       cores: CORES,
       estacoes: STATIONS,
+      estacaoSelecionada: Object.values(STATIONS)[0],
       metadadosEstacoes: [],
       dadosAgora: [],
       dataInicial: new Date(),
@@ -525,13 +551,7 @@ export default defineComponent({
       dadosVentoMaximo: [],
       precipitacaoMaxima: 0,
       dadosPrecipitacaoMaxima: [],
-      pagination: {
-        rowsPerPage: 12,
-      },
       filter: "",
-      seriesTemperatura: [],
-      seriesPrecipitacao: [],
-      seriesTemporal: [],
 
       //TABELA DE DADOS
       columns: [
@@ -614,134 +634,17 @@ export default defineComponent({
           align: "left",
         },
       ],
+      pagination: {
+        rowsPerPage: 12,
+      },
 
       // GRÁFICOS
-      chartTemperaturaOptions: {
-        chart: {
-          type: "bar",
-          height: 350,
-        },
-        plotOptions: {
-          bar: {
-            horizontal: false,
-            columnWidth: "45%",
-            borderRadius: 2,
-            borderRadiusApplication: "end",
-            endingShape: "rounded",
-          },
-        },
-        dataLabels: {
-          enabled: false,
-        },
-        grid: {
-          xaxis: {
-            lines: {
-              show: false,
-            },
-          },
-          strokeDashArray: 6,
-        },
-        xaxis: {
-          categories: Object.keys(STATIONS),
-        },
-        yaxis: {
-          max: 40,
-          tickAmount: 5,
-        },
-
-        tooltip: {
-          y: {
-            formatter: function (val) {
-              return val.toFixed(1) + "°C";
-            },
-          },
-        },
-      },
-      chartPrecipitacaoOptions: {
-        chart: {
-          type: "bar",
-          stacked: true,
-          height: 350,
-        },
-        plotOptions: {
-          bar: {
-            borderRadius: 3,
-            borderRadiusWhenStacked: "last",
-            borderRadiusApplication: "end",
-            horizontal: true,
-            stacked: true,
-            dataLabels: {
-              total: {
-                enabled: true,
-                offsetX: 12,
-                offsetY: 6,
-                style: {
-                  fontSize: "12px",
-                  fontWeight: 800,
-                },
-                formatter: function (val) {
-                  return val.toFixed(1) + " mm";
-                },
-              },
-            },
-          },
-        },
-        grid: {
-          yaxis: {
-            lines: {
-              show: false,
-            },
-          },
-          strokeDashArray: 7,
-        },
-        dataLabels: {
-          enabled: false,
-        },
-        xaxis: {
-          categories: Object.keys(STATIONS),
-        },
-      },
-      chartSerieTemporalOptions: {
-        chart: {
-          type: "line",
-          zoom: {
-            enabled: false,
-          },
-          animations: {
-            enabled: true,
-            easing: "easeinout",
-            speed: 800,
-            animateGradually: {
-              enabled: true,
-              delay: 150,
-            },
-            dynamicAnimation: {
-              enabled: true,
-              speed: 350,
-            },
-          },
-        },
-        dataLabels: {
-          enabled: false,
-        },
-        stroke: {
-          width: 3,
-          curve: "smooth",
-        },
-        grid: {
-          row: {
-            opacity: 0.5,
-          },
-        },
-        xaxis: {
-          type: "datetime",
-          tickAmount: 8,
-        },
-        yaxis: {
-          min: 5,
-          max: 40,
-        },
-      },
+      seriesTemperatura: [],
+      seriesPrecipitacao: [],
+      seriesTemporal: [],
+      chartTemperaturaOptions: CHART_TEMPERATURA_OPTIONS,
+      chartPrecipitacaoOptions: CHART_PRECIPITACAO_OPTIONS,
+      chartSerieTemporalOptions: CHART_SERIE_TEMPORAL_OPTIONS,
     };
   },
 
