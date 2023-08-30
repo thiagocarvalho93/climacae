@@ -164,6 +164,87 @@ const CHART_SERIE_TEMPORAL_OPTIONS = {
   },
 };
 
+const COLUNAS_TABELA = [
+  {
+    name: "data",
+    required: true,
+    label: "Data",
+    align: "left",
+    field: (row) => row.obsTimeLocal,
+    format: (val) => `${new Date(val).toLocaleDateString()}`,
+    sortable: true,
+    style: "width: 50px",
+    align: "left",
+  },
+  {
+    name: "hora",
+    required: true,
+    label: "Hora",
+    align: "left",
+    field: (row) => row.obsTimeLocal,
+    format: (val) =>
+      `${new Date(val).toLocaleTimeString(navigator.language, {
+        hour: "2-digit",
+        minute: "2-digit",
+      })}`,
+    sortable: true,
+    style: "width: 50px",
+    align: "left",
+  },
+  {
+    name: "idEstacao",
+    align: "center",
+    label: "ID estação",
+    field: (row) => row.stationID,
+    sortable: true,
+    style: "width: 50px",
+    align: "left",
+  },
+  {
+    name: "estacao",
+    align: "center",
+    label: "Local",
+    field: (row) => STATIONS[row.stationID].NOME,
+    sortable: true,
+    align: "left",
+  },
+  {
+    name: "max",
+    label: "Máxima (°C)",
+    field: (row) => row.metric.tempHigh,
+    sortable: true,
+    align: "left",
+  },
+  {
+    name: "min",
+    label: "Mínima (°C)",
+    field: (row) => row.metric.tempLow,
+    sortable: true,
+    align: "left",
+  },
+  {
+    name: "humid",
+    label: "Umidade (%)",
+    field: (row) => row.humidityAvg,
+    sortable: true,
+    align: "left",
+  },
+  {
+    name: "precipitacao",
+    label: "Precipitação (mm)",
+    field: (row) => row.metric.precipTotal,
+    sortable: true,
+    align: "left",
+  },
+  {
+    name: "gustHigh",
+    label: "Vento máximo (km/h)",
+    field: (row) => row.metric.windgustHigh,
+    sortable: true,
+    align: "left",
+  },
+];
+
 export {
   STATIONS,
   CORES,
@@ -171,4 +252,5 @@ export {
   CHART_TEMPERATURA_OPTIONS,
   CHART_PRECIPITACAO_OPTIONS,
   CHART_SERIE_TEMPORAL_OPTIONS,
+  COLUNAS_TABELA,
 };
