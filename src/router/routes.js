@@ -13,6 +13,14 @@ const routes = [
         component: () => import("pages/IndexPage.vue"),
       },
       {
+        path: "/estacao",
+        title: "Estacao",
+        icon: "bar_chart",
+        name: "Estacao",
+        showMenu: true,
+        component: () => import("pages/EstacaoPage.vue"),
+      },
+      {
         path: "/:catchAll(.*)*",
         showMenu: false,
         component: () => import("pages/ErrorNotFound.vue"),

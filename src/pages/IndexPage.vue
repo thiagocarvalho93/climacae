@@ -71,7 +71,7 @@
             >Filtrar
             <template v-slot:loading>
               <q-spinner-hourglass class="on-left" />
-              Loading
+              Carregando
             </template>
           </q-btn>
         </div>

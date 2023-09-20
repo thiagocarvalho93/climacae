@@ -25,6 +25,11 @@
           unchecked-icon="light_mode"
         />
       </q-toolbar>
+
+      <q-tabs class="text-primary" v-model="tab">
+        <q-route-tab to="/" label="Geral" />
+        <q-route-tab to="/estacao" label="Estação" />
+      </q-tabs>
     </q-header>
 
     <q-page-container>
@@ -77,6 +82,12 @@ export default {
   setup() {
     return {
       isDarkMode: ref(false),
+    };
+  },
+
+  data() {
+    return {
+      tab: "",
     };
   },
 
