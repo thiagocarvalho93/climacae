@@ -1,3 +1,6 @@
+import arrayUtils from "src/utils/array-utils";
+import dataUtils from "src/utils/data-utils";
+
 const STATIONS = {
   // IRIODA1: { ID: "IRIODA1", NOME: "RO - Alphaville" },
   // IRIODA5: { ID: "IRIODA5", NOME: "RO - Parque dos Pássaros" },
@@ -33,6 +36,16 @@ const PERIODOS = {
   DIA_ESPECIFICO: "Dia específico",
   MES_ESPECIFICO: "Mês específico",
 };
+
+const OPCOES_DIAS = arrayUtils.arrayRange(
+  1,
+  dataUtils.calcularDiaMesAtual(),
+  1
+);
+
+const OPCOES_MESES = Array.from({ length: 12 }, (_, i) => i + 1);
+
+const OPCOES_ANOS = arrayUtils.arrayRange(2020, new Date().getFullYear(), 1);
 
 // GRÁFICOS
 const CHART_TEMPERATURA_OPTIONS = {
@@ -249,6 +262,9 @@ export {
   STATIONS,
   CORES,
   PERIODOS,
+  OPCOES_DIAS,
+  OPCOES_MESES,
+  OPCOES_ANOS,
   CHART_TEMPERATURA_OPTIONS,
   CHART_PRECIPITACAO_OPTIONS,
   CHART_SERIE_TEMPORAL_OPTIONS,

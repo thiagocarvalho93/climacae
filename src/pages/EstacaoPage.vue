@@ -6,7 +6,7 @@
           <q-select
             dense
             v-model="estacaoSelecionada"
-            :options="Object.values(estacoes)"
+            :options="Object.values(STATIONS)"
             outlined
             hide-bottom-space
             input-style="{ background-color: red }"
@@ -19,29 +19,29 @@
             dense
             outlined
             v-model="periodoSelecionado"
-            :options="opcoesPeriodos"
+            :options="OPCOES_PERIODOS"
             label="Período"
           />
         </div>
         <div
-          v-if="periodoSelecionado === periodos.DIA_ESPECIFICO"
+          v-if="periodoSelecionado === PERIODOS.DIA_ESPECIFICO"
           class="col-4 col-sm-2 col-md-1 fade"
         >
           <q-select
             dense
             outlined
             v-model="diaSelecionado"
-            :options="opcoesDias"
+            :options="OPCOES_DIAS"
             label="Dia"
           />
         </div>
         <div
           v-if="
-            periodoSelecionado === periodos.MES_ESPECIFICO ||
-            periodoSelecionado === periodos.DIA_ESPECIFICO
+            periodoSelecionado === PERIODOS.MES_ESPECIFICO ||
+            periodoSelecionado === PERIODOS.DIA_ESPECIFICO
           "
           :class="
-            (periodoSelecionado === periodos.DIA_ESPECIFICO
+            (periodoSelecionado === PERIODOS.DIA_ESPECIFICO
               ? 'col-4 '
               : 'col-6 ') + 'col-sm-2 col-md-1 fade'
           "
@@ -50,17 +50,17 @@
             dense
             outlined
             v-model="mesSelecionado"
-            :options="opcoesMeses"
+            :options="OPCOES_MESES"
             label="Mês"
           />
         </div>
         <div
           v-if="
-            periodoSelecionado === periodos.MES_ESPECIFICO ||
-            periodoSelecionado === periodos.DIA_ESPECIFICO
+            periodoSelecionado === PERIODOS.MES_ESPECIFICO ||
+            periodoSelecionado === PERIODOS.DIA_ESPECIFICO
           "
           :class="
-            (periodoSelecionado === periodos.DIA_ESPECIFICO
+            (periodoSelecionado === PERIODOS.DIA_ESPECIFICO
               ? 'col-4 '
               : 'col-6 ') + 'col-sm-2 col-md-1 fade'
           "
@@ -69,7 +69,7 @@
             dense
             outlined
             v-model="anoSelecionado"
-            :options="opcoesAnos"
+            :options="OPCOES_ANOS"
             label="Ano"
           />
         </div>
@@ -98,7 +98,13 @@
 
 <script>
 import { defineComponent } from "vue";
-import { STATIONS, PERIODOS } from "../constants/constants";
+import {
+  STATIONS,
+  PERIODOS,
+  OPCOES_DIAS,
+  OPCOES_MESES,
+  OPCOES_ANOS,
+} from "../constants/constants";
 import arrayUtils from "src/utils/array-utils";
 import dataUtils from "src/utils/data-utils";
 
@@ -117,13 +123,6 @@ export default defineComponent({
       carregando: false,
       dataInicial: new Date(),
       dataFinal: new Date(),
-      //opções
-      estacoes: STATIONS,
-      periodos: PERIODOS,
-      opcoesPeriodos: Object.values(PERIODOS),
-      opcoesDias: arrayUtils.arrayRange(1, dataUtils.calcularDiaMesAtual(), 1),
-      opcoesMeses: Array.from({ length: 12 }, (_, i) => i + 1),
-      opcoesAnos: arrayUtils.arrayRange(2020, new Date().getFullYear(), 1),
       //seleções
       estacaoSelecionada: Object.values(STATIONS)[0],
       periodoSelecionado: PERIODOS.HOJE,
@@ -133,7 +132,20 @@ export default defineComponent({
     };
   },
 
+  created() {
+    this.declararConstantes();
+  },
+
   methods: {
+    declararConstantes() {
+      this.STATIONS = STATIONS;
+      this.PERIODOS = PERIODOS;
+      this.OPCOES_PERIODOS = Object.values(PERIODOS);
+      this.OPCOES_DIAS = OPCOES_DIAS;
+      this.OPCOES_MESES = OPCOES_MESES;
+      this.OPCOES_ANOS = OPCOES_ANOS;
+    },
+
     obterCalcularEAtualizar() {
       this.carregando = false;
     },
