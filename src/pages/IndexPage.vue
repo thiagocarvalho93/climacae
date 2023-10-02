@@ -103,7 +103,7 @@
             <q-item>
               <q-item-section>
                 <q-item-label>
-                  Em {{ estacoes[dadosMaxima.stationID].NOME }} ({{
+                  Em {{ STATIONS[dadosMaxima.stationID].NOME }} ({{
                     dadosMaxima.stationID
                   }})</q-item-label
                 >
@@ -224,7 +224,7 @@
           @click="mostrarInformacoesCard[3] = !mostrarInformacoesCard[3]"
           class="cursor-pointer precipitacao"
         >
-          <q-card-section class="fade" v-if="mostrarInformacoesCard[3]">
+          <q-card-section class="grow" v-if="mostrarInformacoesCard[3]">
             <q-item>
               <q-item-section>
                 <q-item-label> PRECIPITAÇÃO MÁXIMA </q-item-label>
@@ -238,7 +238,7 @@
             </q-item>
           </q-card-section>
 
-          <q-card-section class="fade" v-else>
+          <q-card-section class="grow" v-else>
             <q-item>
               <q-item-section>
                 <q-item-label>
@@ -269,7 +269,7 @@
       <div class="col-12 col-md-4 flex">
         <q-card flat class="full-width">
           <q-card-section class="text-h6">
-            Agora ({{ atualizacao }})
+            Agora ({{ ultimaAtualizacao }})
           </q-card-section>
           <q-card-section>
             <q-carousel
@@ -392,7 +392,7 @@
                 <q-select
                   dense
                   v-model="estacaoSelecionada"
-                  :options="Object.values(estacoes)"
+                  :options="nomesEstacoes"
                   outlined
                   hide-bottom-space
                   input-style="{ background-color: red }"
@@ -428,7 +428,7 @@
           column-sort-order="ad"
           title="Dados das estações"
           :rows="observacoes"
-          :columns="columns"
+          :columns="colunasTabela"
           :pagination="pagination"
           :filter="filter"
           :rows-per-page-options="[6, 12, 24, 48, 96]"
@@ -475,8 +475,10 @@ import {
   CHART_PRECIPITACAO_OPTIONS,
   CHART_SERIE_TEMPORAL_OPTIONS,
   COLUNAS_TABELA,
+  OPCOES_MESES,
+  OPCOES_DIAS,
+  OPCOES_ANOS,
 } from "../constants/constants";
-import arrayUtils from "src/utils/array-utils";
 import dataUtils from "src/utils/data-utils";
 import weatherApi from "src/api/weather-api";
 import Observation from "src/models/observation-model";
@@ -491,6 +493,39 @@ export default defineComponent({
   computed: {
     darkMode() {
       return this.$q.dark.isActive;
+    },
+    estacoes() {
+      return STATIONS;
+    },
+    nomesEstacoes() {
+      return Object.values(STATIONS);
+    },
+    periodos() {
+      return PERIODOS;
+    },
+    opcoesPeriodos() {
+      return Object.values(PERIODOS);
+    },
+    opcoesDias() {
+      return OPCOES_DIAS;
+    },
+    opcoesMeses() {
+      return OPCOES_MESES;
+    },
+    opcoesAnos() {
+      return OPCOES_ANOS;
+    },
+    colunasTabela() {
+      return COLUNAS_TABELA;
+    },
+    chartTemperaturaOptions() {
+      return CHART_TEMPERATURA_OPTIONS;
+    },
+    chartPrecipitacaoOptions() {
+      return CHART_PRECIPITACAO_OPTIONS;
+    },
+    chartSerieTemporalOptions() {
+      return CHART_SERIE_TEMPORAL_OPTIONS;
     },
   },
 
@@ -518,55 +553,45 @@ export default defineComponent({
 
   data() {
     return {
+      //estados
       carregando: true,
       carregandoTempoReal: false,
-      slide: STATIONS[Object.keys(STATIONS)[0]].NOME,
       mostrarInformacoesCard: [true, true, true, true],
       autoplayCarousel: true,
-      cores: CORES,
-      estacoes: STATIONS,
+      //inputs
+      slide: STATIONS[Object.keys(STATIONS)[0]].NOME,
       estacaoSelecionada: Object.values(STATIONS)[0],
-      metadadosEstacoes: [],
-      dadosAgora: [],
+      periodoSelecionado: PERIODOS.HOJE,
+      diaSelecionado: new Date().getDate(),
+      mesSelecionado: new Date().getMonth() + 1,
+      anoSelecionado: new Date().getFullYear(),
       dataInicial: new Date(),
       dataFinal: new Date(),
-      periodos: PERIODOS,
-      periodoSelecionado: PERIODOS.HOJE,
-      opcoesPeriodos: Object.values(PERIODOS),
-      diaSelecionado: new Date().getDate(),
-      opcoesDias: arrayUtils.arrayRange(1, dataUtils.calcularDiaMesAtual(), 1),
-      mesSelecionado: new Date().getMonth() + 1,
-      opcoesMeses: Array.from({ length: 12 }, (_, i) => i + 1),
-      opcoesAnos: arrayUtils.arrayRange(2020, new Date().getFullYear(), 1),
-      anoSelecionado: new Date().getFullYear(),
-      atualizacao: new Date().toLocaleTimeString(navigator.language, {
+      filter: "",
+      //outputs
+      metadadosEstacoes: [],
+      dadosAgora: [],
+      ultimaAtualizacao: new Date().toLocaleTimeString(navigator.language, {
         hour: "2-digit",
         minute: "2-digit",
       }),
       observacoes: [],
-      minima: 0,
       dadosMinima: [],
-      maxima: 0,
       dadosMaxima: [],
-      ventoMaximo: 0,
       dadosVentoMaximo: [],
-      precipitacaoMaxima: 0,
       dadosPrecipitacaoMaxima: [],
-      filter: "",
-
-      //TABELA DE DADOS
-      columns: COLUNAS_TABELA,
-      pagination: {
-        rowsPerPage: 12,
-      },
-
-      // GRÁFICOS
+      minima: 0,
+      maxima: 0,
+      precipitacaoMaxima: 0,
+      ventoMaximo: 0,
+      //gráficos
       seriesTemperatura: [],
       seriesPrecipitacao: [],
       seriesTemporal: [],
-      chartTemperaturaOptions: CHART_TEMPERATURA_OPTIONS,
-      chartPrecipitacaoOptions: CHART_PRECIPITACAO_OPTIONS,
-      chartSerieTemporalOptions: CHART_SERIE_TEMPORAL_OPTIONS,
+      //tabela
+      pagination: {
+        rowsPerPage: 12,
+      },
     };
   },
 
@@ -810,12 +835,12 @@ export default defineComponent({
           new Metric(metric);
 
         let indiceMetadadosEstacao = this.metadadosEstacoes.findIndex(
-          (x) => x.id === this.estacoes[stationID].NOME
+          (x) => x.id === STATIONS[stationID].NOME
         );
 
         if (indiceMetadadosEstacao === -1) {
           this.metadadosEstacoes.push({
-            id: this.estacoes[stationID].NOME,
+            id: STATIONS[stationID].NOME,
             minima: tempLow,
             maxima: tempHigh,
             ventoMaximo: windgustHigh,
@@ -832,7 +857,7 @@ export default defineComponent({
           } = this.metadadosEstacoes[indiceMetadadosEstacao];
 
           this.metadadosEstacoes[indiceMetadadosEstacao] = {
-            id: this.estacoes[stationID].NOME,
+            id: STATIONS[stationID].NOME,
             maxima: Math.max(tempHigh, maxima),
             minima: Math.min(tempLow, minima),
             ventoMaximo: Math.max(windgustHigh, ventoMaximo),
@@ -895,10 +920,13 @@ export default defineComponent({
 
         await this.obterDadosAtuaisTodasEstacoes();
 
-        this.atualizacao = new Date().toLocaleTimeString(navigator.language, {
-          hour: "2-digit",
-          minute: "2-digit",
-        });
+        this.ultimaAtualizacao = new Date().toLocaleTimeString(
+          navigator.language,
+          {
+            hour: "2-digit",
+            minute: "2-digit",
+          }
+        );
         this.carregandoTempoReal = false;
       }, 30000);
     },
@@ -946,12 +974,12 @@ export default defineComponent({
         {
           name: "Máxima em 24h",
           data: data.map((x) => x.precipitacaoMaxima),
-          color: this.cores.INDIGO_ESCURO,
+          color: CORES.INDIGO_ESCURO,
         },
         {
           name: "Precipitação restante",
           data: data.map((x) => x.precipitacaoRestante),
-          color: this.cores.INDIGO,
+          color: CORES.INDIGO,
         },
       ];
 
@@ -986,8 +1014,8 @@ export default defineComponent({
     },
 
     atualizarGraficoTemporal() {
-      const dados = Object.keys(this.estacoes).map((estacao) => ({
-        name: this.estacoes[estacao].NOME,
+      const dados = Object.keys(STATIONS).map((estacao) => ({
+        name: STATIONS[estacao].NOME,
         data: this.observacoes.reduce((acc, ob) => {
           if (ob.stationID === estacao && ob.metric.tempAvg) {
             acc.push([

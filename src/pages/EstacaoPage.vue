@@ -6,7 +6,7 @@
           <q-select
             dense
             v-model="estacaoSelecionada"
-            :options="Object.values(STATIONS)"
+            :options="nomesEstacoes"
             outlined
             hide-bottom-space
             input-style="{ background-color: red }"
@@ -19,29 +19,29 @@
             dense
             outlined
             v-model="periodoSelecionado"
-            :options="OPCOES_PERIODOS"
+            :options="opcoesPeriodos"
             label="Período"
           />
         </div>
         <div
-          v-if="periodoSelecionado === PERIODOS.DIA_ESPECIFICO"
+          v-if="periodoSelecionado === periodos.DIA_ESPECIFICO"
           class="col-4 col-sm-2 col-md-1 fade"
         >
           <q-select
             dense
             outlined
             v-model="diaSelecionado"
-            :options="OPCOES_DIAS"
+            :options="opcoesDias"
             label="Dia"
           />
         </div>
         <div
           v-if="
-            periodoSelecionado === PERIODOS.MES_ESPECIFICO ||
-            periodoSelecionado === PERIODOS.DIA_ESPECIFICO
+            periodoSelecionado === periodos.MES_ESPECIFICO ||
+            periodoSelecionado === periodos.DIA_ESPECIFICO
           "
           :class="
-            (periodoSelecionado === PERIODOS.DIA_ESPECIFICO
+            (periodoSelecionado === periodos.DIA_ESPECIFICO
               ? 'col-4 '
               : 'col-6 ') + 'col-sm-2 col-md-1 fade'
           "
@@ -50,17 +50,17 @@
             dense
             outlined
             v-model="mesSelecionado"
-            :options="OPCOES_MESES"
+            :options="opcoesMeses"
             label="Mês"
           />
         </div>
         <div
           v-if="
-            periodoSelecionado === PERIODOS.MES_ESPECIFICO ||
-            periodoSelecionado === PERIODOS.DIA_ESPECIFICO
+            periodoSelecionado === periodos.MES_ESPECIFICO ||
+            periodoSelecionado === periodos.DIA_ESPECIFICO
           "
           :class="
-            (periodoSelecionado === PERIODOS.DIA_ESPECIFICO
+            (periodoSelecionado === periodos.DIA_ESPECIFICO
               ? 'col-4 '
               : 'col-6 ') + 'col-sm-2 col-md-1 fade'
           "
@@ -69,7 +69,7 @@
             dense
             outlined
             v-model="anoSelecionado"
-            :options="OPCOES_ANOS"
+            :options="opcoesAnos"
             label="Ano"
           />
         </div>
@@ -116,6 +116,27 @@ export default defineComponent({
     darkMode() {
       return this.$q.dark.isActive;
     },
+    estacoes() {
+      return STATIONS;
+    },
+    nomesEstacoes() {
+      return Object.values(STATIONS);
+    },
+    periodos() {
+      return PERIODOS;
+    },
+    opcoesPeriodos() {
+      return Object.values(PERIODOS);
+    },
+    opcoesDias() {
+      return OPCOES_DIAS;
+    },
+    opcoesMeses() {
+      return OPCOES_MESES;
+    },
+    opcoesAnos() {
+      return OPCOES_ANOS;
+    },
   },
 
   data() {
@@ -123,31 +144,123 @@ export default defineComponent({
       carregando: false,
       dataInicial: new Date(),
       dataFinal: new Date(),
-      //seleções
+      //inputs
       estacaoSelecionada: Object.values(STATIONS)[0],
       periodoSelecionado: PERIODOS.HOJE,
       diaSelecionado: new Date().getDate(),
       mesSelecionado: new Date().getMonth() + 1,
       anoSelecionado: new Date().getFullYear(),
+      //outputs
+      observacoes: [],
     };
   },
 
   created() {
-    this.declararConstantes();
+    this.obterDadosEstacao();
   },
 
   methods: {
-    declararConstantes() {
-      this.STATIONS = STATIONS;
-      this.PERIODOS = PERIODOS;
-      this.OPCOES_PERIODOS = Object.values(PERIODOS);
-      this.OPCOES_DIAS = OPCOES_DIAS;
-      this.OPCOES_MESES = OPCOES_MESES;
-      this.OPCOES_ANOS = OPCOES_ANOS;
+    obterDadosEstacao() {
+      this.carregando = true;
+      this.filtrarDadosPeriodo()
+        .then((response) => {})
+        .catch((error) => {
+          const mensagem =
+            (error && error.message) || "Erro ao obter os dados.";
+          this.mensagemErro(mensagem);
+        })
+        .finally(() => {
+          this.observacoes = this.observacoes.reverse();
+          this.carregando = false;
+        });
     },
 
-    obterCalcularEAtualizar() {
-      this.carregando = false;
+    async filtrarDadosPeriodo() {
+      switch (this.periodoSelecionado) {
+        case PERIODOS.HOJE:
+          this.dataInicial = new Date(Date.now());
+          this.dataFinal = new Date(Date.now());
+          await this.obterObservacoesDiaAtualTodasEstacoes();
+          break;
+        case PERIODOS.ULTIMOS_SETE_DIAS:
+          this.dataInicial = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+          this.dataFinal = new Date(Date.now());
+          await this.obterObservacoesDiariasPeriodoTodasEstacoes(
+            this.dataInicial,
+            this.dataFinal
+          );
+          break;
+        case PERIODOS.ULTIMOS_TRINTA_DIAS:
+          this.dataInicial = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+          this.dataFinal = new Date(Date.now());
+          await this.obterObservacoesDiariasPeriodoTodasEstacoes(
+            this.dataInicial,
+            this.dataFinal
+          );
+          break;
+        case PERIODOS.MES_ESPECIFICO:
+          await this.filtrarMesEspecifico();
+          break;
+        case PERIODOS.DIA_ESPECIFICO:
+          await this.filtrarDiaEspecifico();
+          break;
+        default:
+          throw new Error("Período inválido!");
+      }
+    },
+
+    async filtrarMesEspecifico() {
+      const hoje = new Date();
+      let isFuturo =
+        this.mesSelecionado > hoje.getMonth() + 1 &&
+        this.anoSelecionado >= hoje.getFullYear();
+
+      if (isFuturo) throw new Error("Não é possivel obter dados do futuro!");
+
+      this.dataInicial = new Date(
+        this.anoSelecionado,
+        this.mesSelecionado - 1,
+        1
+      );
+
+      let isEsseMes =
+        this.mesSelecionado == hoje.getMonth() + 1 &&
+        this.anoSelecionado == hoje.getFullYear();
+
+      if (isEsseMes) {
+        this.dataFinal = hoje;
+      } else {
+        this.dataFinal = new Date(this.anoSelecionado, this.mesSelecionado, 0);
+      }
+
+      await this.obterObservacoesDiariasPeriodoTodasEstacoes(
+        this.dataInicial,
+        this.dataFinal
+      );
+    },
+
+    async filtrarDiaEspecifico() {
+      const hoje = new Date();
+
+      const dataSelecionada = new Date(
+        this.anoSelecionado,
+        this.mesSelecionado - 1,
+        this.diaSelecionado
+      );
+
+      if (dataSelecionada > hoje) {
+        throw new Error("Não é possivel obter dados do futuro!");
+      }
+
+      this.dataInicial = new Date(dataSelecionada);
+
+      await this.obterObservacoesDiaEspecificoTodasEstacoes(this.dataInicial);
+    },
+
+    formatarDataParaQuery(data) {
+      return `${data.getFullYear()}${data.getMonth() + 1 < 10 ? "0" : ""}${
+        data.getMonth() + 1
+      }${data.getDate() < 10 ? "0" : ""}${data.getDate()}`;
     },
   },
 });
