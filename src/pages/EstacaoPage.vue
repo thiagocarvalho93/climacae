@@ -76,7 +76,7 @@
         <div class="col-12 col-sm-4 col-md-2 col-lg-1 fade">
           <q-btn
             push
-            @click="obterCalcularEAtualizar"
+            @click="obterDadosEstacao"
             style="width: 100%"
             :loading="carregando"
             color="primary"
@@ -90,9 +90,91 @@
       </div>
     </q-card>
 
-    <q-card flat class="q-pa-md q-mb-md fade">
-      <p>Em construção :)</p>
-    </q-card>
+    <div class="row q-col-gutter-md">
+      <div class="col-12 col-md-6 flex">
+        <q-card flat class="full-width">
+          <q-card-section class="text-h6"> Temperatura </q-card-section>
+          <q-card-section>
+            <!-- <apexchart
+              type="bar"
+              height="250"
+              :options="chartTemperaturaOptions"
+              :series="seriesTemperatura"
+              ref="graficoColunaTemperatura"
+            ></apexchart> -->
+          </q-card-section>
+          <q-inner-loading
+            :showing="carregando"
+            label="Aguarde..."
+            label-class="text-teal"
+            label-style="font-size: 1.1em"
+          />
+        </q-card>
+      </div>
+
+      <div class="col-12 col-md-6 flex">
+        <q-card flat class="full-width">
+          <q-card-section class="text-h6"> Pressão </q-card-section>
+          <q-card-section>
+            <!-- <apexchart
+              type="bar"
+              height="250"
+              :options="chartTemperaturaOptions"
+              :series="seriesTemperatura"
+              ref="graficoColunaTemperatura"
+            ></apexchart> -->
+          </q-card-section>
+          <q-inner-loading
+            :showing="carregando"
+            label="Aguarde..."
+            label-class="text-teal"
+            label-style="font-size: 1.1em"
+          />
+        </q-card>
+      </div>
+
+      <div class="col-12 col-md-6 flex">
+        <q-card flat class="full-width">
+          <q-card-section class="text-h6"> Precipitação </q-card-section>
+          <q-card-section>
+            <!-- <apexchart
+              type="bar"
+              height="250"
+              :options="chartTemperaturaOptions"
+              :series="seriesTemperatura"
+              ref="graficoColunaTemperatura"
+            ></apexchart> -->
+          </q-card-section>
+          <q-inner-loading
+            :showing="carregando"
+            label="Aguarde..."
+            label-class="text-teal"
+            label-style="font-size: 1.1em"
+          />
+        </q-card>
+      </div>
+
+      <div class="col-12 col-md-6 flex">
+        <q-card flat class="full-width">
+          <q-card-section class="text-h6"> Vento </q-card-section>
+          <q-card-section>
+            <!-- <apexchart
+              type="bar"
+              height="250"
+              :options="chartTemperaturaOptions"
+              :series="seriesTemperatura"
+              ref="graficoColunaTemperatura"
+            ></apexchart> -->
+          </q-card-section>
+          <q-inner-loading
+            :showing="carregando"
+            label="Aguarde..."
+            label-class="text-teal"
+            label-style="font-size: 1.1em"
+          />
+        </q-card>
+      </div>
+    </div>
   </q-page>
 </template>
 
@@ -107,6 +189,8 @@ import {
 } from "../constants/constants";
 import arrayUtils from "src/utils/array-utils";
 import dataUtils from "src/utils/data-utils";
+import weatherApi from "src/api/weather-api";
+import Observation from "src/models/observation-model";
 
 export default defineComponent({
   name: "EstacaoPage",
@@ -160,32 +244,30 @@ export default defineComponent({
   },
 
   methods: {
-    obterDadosEstacao() {
+    async obterDadosEstacao() {
       this.carregando = true;
-      this.filtrarDadosPeriodo()
-        .then((response) => {})
-        .catch((error) => {
-          const mensagem =
-            (error && error.message) || "Erro ao obter os dados.";
-          this.mensagemErro(mensagem);
-        })
-        .finally(() => {
-          this.observacoes = this.observacoes.reverse();
-          this.carregando = false;
-        });
+      try {
+        await this.obterDadosPeriodo();
+      } catch (error) {
+        const mensagem = (error && error.message) || "Erro ao obter os dados.";
+        this.mensagemErro(mensagem);
+      } finally {
+        this.observacoes = this.observacoes.reverse();
+        this.carregando = false;
+      }
     },
 
-    async filtrarDadosPeriodo() {
+    async obterDadosPeriodo() {
       switch (this.periodoSelecionado) {
         case PERIODOS.HOJE:
           this.dataInicial = new Date(Date.now());
           this.dataFinal = new Date(Date.now());
-          await this.obterObservacoesDiaAtualTodasEstacoes();
+          await this.obterObservacoesDiaAtual();
           break;
         case PERIODOS.ULTIMOS_SETE_DIAS:
           this.dataInicial = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
           this.dataFinal = new Date(Date.now());
-          await this.obterObservacoesDiariasPeriodoTodasEstacoes(
+          await this.obterObservacoesDiariasPeriodo(
             this.dataInicial,
             this.dataFinal
           );
@@ -193,7 +275,7 @@ export default defineComponent({
         case PERIODOS.ULTIMOS_TRINTA_DIAS:
           this.dataInicial = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
           this.dataFinal = new Date(Date.now());
-          await this.obterObservacoesDiariasPeriodoTodasEstacoes(
+          await this.obterObservacoesDiariasPeriodo(
             this.dataInicial,
             this.dataFinal
           );
@@ -233,7 +315,7 @@ export default defineComponent({
         this.dataFinal = new Date(this.anoSelecionado, this.mesSelecionado, 0);
       }
 
-      await this.obterObservacoesDiariasPeriodoTodasEstacoes(
+      await this.obterObservacoesDiariasPeriodo(
         this.dataInicial,
         this.dataFinal
       );
@@ -254,13 +336,100 @@ export default defineComponent({
 
       this.dataInicial = new Date(dataSelecionada);
 
-      await this.obterObservacoesDiaEspecificoTodasEstacoes(this.dataInicial);
+      await this.obterObservacoesDiaEspecifico(this.dataInicial);
+    },
+
+    async obterObservacoesDiaAtual() {
+      const station = this.estacaoSelecionada.ID;
+
+      try {
+        const response = await weatherApi.obterObservacoesDiaAtualEstacao(
+          station
+        );
+
+        this.observacoes = response.observations
+          ? response.observations.map((res) => new Observation(res))
+          : [];
+      } catch (error) {
+        throw error;
+      }
+    },
+
+    async obterObservacoesDiariasPeriodo(dataInicial, dataFinal) {
+      const station = this.estacaoSelecionada.ID;
+      const dataInicialFormatada = this.formatarDataParaQuery(dataInicial);
+      const dataFinalFormatada = this.formatarDataParaQuery(dataFinal);
+
+      try {
+        const response = await weatherApi.obterObservacoesDiariasPeriodo(
+          station,
+          dataInicialFormatada,
+          dataFinalFormatada
+        );
+
+        this.observacoes = response.observations
+          ? response.observations.map((res) => new Observation(res))
+          : [];
+      } catch (error) {
+        throw error;
+      }
+    },
+
+    async obterObservacoesDiaEspecifico(data) {
+      const station = this.estacaoSelecionada.ID;
+      const dataFormatada = this.formatarDataParaQuery(data);
+
+      try {
+        const response = await weatherApi.obterTodasObservacoesDia(
+          station,
+          dataFormatada
+        );
+        console.log(response);
+
+        this.observacoes = response.observations
+          ? response.observations.map((res) => new Observation(res))
+          : [];
+      } catch (error) {
+        throw error;
+      }
     },
 
     formatarDataParaQuery(data) {
       return `${data.getFullYear()}${data.getMonth() + 1 < 10 ? "0" : ""}${
         data.getMonth() + 1
       }${data.getDate() < 10 ? "0" : ""}${data.getDate()}`;
+    },
+
+    mensagemErro(mensagem) {
+      this.$q.notify({
+        message: mensagem,
+        type: "negative",
+        progress: true,
+        position: "top",
+        actions: [
+          {
+            label: "Fechar",
+            color: "white",
+            handler: () => {},
+          },
+        ],
+      });
+    },
+
+    mensagemSucesso(mensagem) {
+      this.$q.notify({
+        message: mensagem,
+        type: "positive",
+        progress: true,
+        position: "top",
+        actions: [
+          {
+            label: "Fechar",
+            color: "white",
+            handler: () => {},
+          },
+        ],
+      });
     },
   },
 });
