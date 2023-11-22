@@ -95,13 +95,12 @@
         <q-card flat class="full-width">
           <q-card-section class="text-h6"> Temperatura </q-card-section>
           <q-card-section>
-            <!-- <apexchart
-              type="bar"
+            <apexchart
               height="250"
-              :options="chartTemperaturaOptions"
+              :options="chartSerieTemporalOptions"
               :series="seriesTemperatura"
-              ref="graficoColunaTemperatura"
-            ></apexchart> -->
+              ref="graficoTemporalTemperatura"
+            ></apexchart>
           </q-card-section>
           <q-inner-loading
             :showing="carregando"
@@ -116,13 +115,12 @@
         <q-card flat class="full-width">
           <q-card-section class="text-h6"> Pressão </q-card-section>
           <q-card-section>
-            <!-- <apexchart
-              type="bar"
+            <apexchart
               height="250"
-              :options="chartTemperaturaOptions"
-              :series="seriesTemperatura"
-              ref="graficoColunaTemperatura"
-            ></apexchart> -->
+              :options="chartSerieTemporalOptions"
+              :series="seriesPressao"
+              ref="graficoTemporalPressao"
+            ></apexchart>
           </q-card-section>
           <q-inner-loading
             :showing="carregando"
@@ -137,13 +135,12 @@
         <q-card flat class="full-width">
           <q-card-section class="text-h6"> Precipitação </q-card-section>
           <q-card-section>
-            <!-- <apexchart
-              type="bar"
+            <apexchart
               height="250"
-              :options="chartTemperaturaOptions"
-              :series="seriesTemperatura"
-              ref="graficoColunaTemperatura"
-            ></apexchart> -->
+              :options="chartSerieTemporalOptions"
+              :series="seriesPrecipitacao"
+              ref="graficoTemporalPrecipitacao"
+            ></apexchart>
           </q-card-section>
           <q-inner-loading
             :showing="carregando"
@@ -158,13 +155,12 @@
         <q-card flat class="full-width">
           <q-card-section class="text-h6"> Vento </q-card-section>
           <q-card-section>
-            <!-- <apexchart
-              type="bar"
+            <apexchart
               height="250"
-              :options="chartTemperaturaOptions"
-              :series="seriesTemperatura"
-              ref="graficoColunaTemperatura"
-            ></apexchart> -->
+              :options="chartSerieTemporalOptions"
+              :series="seriesVento"
+              ref="graficoTemporalVento"
+            ></apexchart>
           </q-card-section>
           <q-inner-loading
             :showing="carregando"
@@ -186,11 +182,11 @@ import {
   OPCOES_DIAS,
   OPCOES_MESES,
   OPCOES_ANOS,
+  CHART_SERIE_TEMPORAL_OPTIONS,
 } from "../constants/constants";
-import arrayUtils from "src/utils/array-utils";
-import dataUtils from "src/utils/data-utils";
 import weatherApi from "src/api/weather-api";
 import Observation from "src/models/observation-model";
+import dataUtils from "src/utils/data-utils";
 
 export default defineComponent({
   name: "EstacaoPage",
@@ -236,6 +232,12 @@ export default defineComponent({
       anoSelecionado: new Date().getFullYear(),
       //outputs
       observacoes: [],
+
+      chartSerieTemporalOptions: CHART_SERIE_TEMPORAL_OPTIONS,
+      seriesTemperatura: [],
+      seriesPressao: [],
+      seriesPrecipitacao: [],
+      seriesVento: [],
     };
   },
 
@@ -248,6 +250,10 @@ export default defineComponent({
       this.carregando = true;
       try {
         await this.obterDadosPeriodo();
+        this.atualizarGraficoTemporalTemperatura();
+        this.atualizarGraficoTemporalPressao();
+        this.atualizarGraficoTemporalPrecipitacao();
+        this.atualizarGraficoTemporalVento();
       } catch (error) {
         const mensagem = (error && error.message) || "Erro ao obter os dados.";
         this.mensagemErro(mensagem);
@@ -384,7 +390,6 @@ export default defineComponent({
           station,
           dataFormatada
         );
-        console.log(response);
 
         this.observacoes = response.observations
           ? response.observations.map((res) => new Observation(res))
@@ -398,6 +403,75 @@ export default defineComponent({
       return `${data.getFullYear()}${data.getMonth() + 1 < 10 ? "0" : ""}${
         data.getMonth() + 1
       }${data.getDate() < 10 ? "0" : ""}${data.getDate()}`;
+    },
+
+    atualizarGraficoTemporalTemperatura() {
+      const temperaturas = ["tempAvg", "tempHigh", "tempLow"];
+      const dados = temperaturas.map((x) => {
+        return {
+          name: x,
+          data: this.observacoes.map((obs) => [
+            new Date(obs.obsTimeLocal),
+            obs.metric[x],
+          ]),
+        };
+      });
+
+      this.$refs.graficoTemporalTemperatura.updateSeries(dados);
+    },
+
+    atualizarGraficoTemporalPressao() {
+      const temperaturas = ["pressureMin", "pressureMax"];
+      const dados = temperaturas.map((x) => {
+        return {
+          name: x,
+          data: this.observacoes.map((obs) => [
+            new Date(obs.obsTimeLocal),
+            obs.metric[x],
+          ]),
+        };
+      });
+
+      this.$refs.graficoTemporalPressao.updateOptions({
+        series: dados,
+        yaxis: {},
+      });
+    },
+
+    atualizarGraficoTemporalPrecipitacao() {
+      const temperaturas = ["precipRate", "precipTotal"];
+      const dados = temperaturas.map((x) => {
+        return {
+          name: x,
+          data: this.observacoes.map((obs) => [
+            new Date(obs.obsTimeLocal),
+            obs.metric[x],
+          ]),
+        };
+      });
+
+      this.$refs.graficoTemporalPrecipitacao.updateOptions({
+        series: dados,
+        yaxis: {},
+      });
+    },
+
+    atualizarGraficoTemporalVento() {
+      const temperaturas = ["windspeedAvg", "windspeedHigh", "windspeedLow"];
+      const dados = temperaturas.map((x) => {
+        return {
+          name: x,
+          data: this.observacoes.map((obs) => [
+            new Date(obs.obsTimeLocal),
+            obs.metric[x],
+          ]),
+        };
+      });
+
+      this.$refs.graficoTemporalVento.updateOptions({
+        series: dados,
+        yaxis: {},
+      });
     },
 
     mensagemErro(mensagem) {

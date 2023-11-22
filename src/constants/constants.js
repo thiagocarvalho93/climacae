@@ -173,7 +173,7 @@ const CHART_SERIE_TEMPORAL_OPTIONS = {
   },
   yaxis: {
     min: 5,
-    max: 40,
+    max: 45,
   },
 };
 
