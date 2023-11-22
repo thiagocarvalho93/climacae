@@ -405,73 +405,50 @@ export default defineComponent({
       }${data.getDate() < 10 ? "0" : ""}${data.getDate()}`;
     },
 
-    atualizarGraficoTemporalTemperatura() {
-      const temperaturas = ["tempAvg", "tempHigh", "tempLow"];
-      const dados = temperaturas.map((x) => {
+    atualizarGraficoTemporal(seriesNames, chartRef) {
+      const dados = seriesNames.map((name) => {
         return {
-          name: x,
+          name: name,
           data: this.observacoes.map((obs) => [
             new Date(obs.obsTimeLocal),
-            obs.metric[x],
+            obs.metric[name],
           ]),
         };
       });
 
-      this.$refs.graficoTemporalTemperatura.updateSeries(dados);
+      chartRef.updateOptions({
+        series: dados,
+        yaxis: {},
+      });
+    },
+
+    atualizarGraficoTemporalTemperatura() {
+      const tempProps = ["tempAvg", "tempHigh", "tempLow"];
+      this.atualizarGraficoTemporal(
+        tempProps,
+        this.$refs.graficoTemporalTemperatura
+      );
     },
 
     atualizarGraficoTemporalPressao() {
-      const temperaturas = ["pressureMin", "pressureMax"];
-      const dados = temperaturas.map((x) => {
-        return {
-          name: x,
-          data: this.observacoes.map((obs) => [
-            new Date(obs.obsTimeLocal),
-            obs.metric[x],
-          ]),
-        };
-      });
-
-      this.$refs.graficoTemporalPressao.updateOptions({
-        series: dados,
-        yaxis: {},
-      });
+      const pressureProps = ["pressureMin", "pressureMax"];
+      this.atualizarGraficoTemporal(
+        pressureProps,
+        this.$refs.graficoTemporalPressao
+      );
     },
 
     atualizarGraficoTemporalPrecipitacao() {
-      const temperaturas = ["precipRate", "precipTotal"];
-      const dados = temperaturas.map((x) => {
-        return {
-          name: x,
-          data: this.observacoes.map((obs) => [
-            new Date(obs.obsTimeLocal),
-            obs.metric[x],
-          ]),
-        };
-      });
-
-      this.$refs.graficoTemporalPrecipitacao.updateOptions({
-        series: dados,
-        yaxis: {},
-      });
+      const precipProps = ["precipRate", "precipTotal"];
+      this.atualizarGraficoTemporal(
+        precipProps,
+        this.$refs.graficoTemporalPrecipitacao
+      );
     },
 
     atualizarGraficoTemporalVento() {
-      const temperaturas = ["windspeedAvg", "windspeedHigh", "windspeedLow"];
-      const dados = temperaturas.map((x) => {
-        return {
-          name: x,
-          data: this.observacoes.map((obs) => [
-            new Date(obs.obsTimeLocal),
-            obs.metric[x],
-          ]),
-        };
-      });
-
-      this.$refs.graficoTemporalVento.updateOptions({
-        series: dados,
-        yaxis: {},
-      });
+      const windProps = ["windspeedAvg", "windspeedHigh", "windspeedLow"];
+      this.atualizarGraficoTemporal(windProps, this.$refs.graficoTemporalVento);
     },
 
     mensagemErro(mensagem) {
