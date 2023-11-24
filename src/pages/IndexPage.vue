@@ -272,7 +272,7 @@
           :pagination="pagination" :filter="filter" :rows-per-page-options="[6, 12, 24, 48, 96]" row-key="name"
           :loading="carregando">
           <template v-slot:top-right>
-            <q-input outlined dense debounce="300" v-model="filter" placeholder="Pesquisar">
+            <q-input outlined dense debounce="700" v-model="filter" placeholder="Pesquisar">
               <template v-slot:append>
                 <q-icon name="search" />
               </template>
@@ -288,6 +288,12 @@
                 </q-list>
               </q-menu>
             </q-btn>
+          </template>
+
+          <template #body-cell="props">
+            <q-td :props="props" :class="striped(props)">
+              <span>{{ props.value }}</span>
+            </q-td>
           </template>
         </q-table>
       </div>
@@ -436,6 +442,11 @@ export default defineComponent({
   },
 
   methods: {
+    striped(props) {
+      if (props.rowIndex % 2 != 0) {
+        return 'dark-grey'
+      }
+    },
     async obterCalcularEAtualizar() {
       this.carregando = true;
 
@@ -974,6 +985,9 @@ export default defineComponent({
   animation-timing-function: ease
   animation-delay: 0.6s
   background-image: linear-gradient(to right,$indigo-6, $indigo-8)
+
+.dark-grey
+  background-image: linear-gradient(to right,#eef, #eef)
 
 ::-webkit-scrollbar
   width: var(--scrollbar-width-height)
