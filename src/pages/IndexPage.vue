@@ -3,72 +3,29 @@
     <q-card flat class="q-pa-md q-mb-md fade">
       <div class="row q-col-gutter-md">
         <div class="col-12 col-sm-4 col-md-2 fade">
-          <q-select
-            dense
-            outlined
-            v-model="periodoSelecionado"
-            :options="opcoesPeriodos"
-            label="Período"
-          />
+          <q-select dense outlined v-model="periodoSelecionado" :options="opcoesPeriodos" label="Período" />
         </div>
-        <div
-          v-if="periodoSelecionado === periodos.DIA_ESPECIFICO"
-          class="col-4 col-sm-2 col-md-1 fade"
-        >
-          <q-select
-            dense
-            outlined
-            v-model="diaSelecionado"
-            :options="opcoesDias"
-            label="Dia"
-          />
+        <div v-if="periodoSelecionado === periodos.DIA_ESPECIFICO" class="col-4 col-sm-2 col-md-1 fade">
+          <q-select dense outlined v-model="diaSelecionado" :options="opcoesDias" label="Dia" />
         </div>
-        <div
-          v-if="
-            periodoSelecionado === periodos.MES_ESPECIFICO ||
-            periodoSelecionado === periodos.DIA_ESPECIFICO
-          "
-          :class="
-            (periodoSelecionado === periodos.DIA_ESPECIFICO
-              ? 'col-4 '
-              : 'col-6 ') + 'col-sm-2 col-md-1 fade'
-          "
-        >
-          <q-select
-            dense
-            outlined
-            v-model="mesSelecionado"
-            :options="opcoesMeses"
-            label="Mês"
-          />
+        <div v-if="periodoSelecionado === periodos.MES_ESPECIFICO ||
+          periodoSelecionado === periodos.DIA_ESPECIFICO
+          " :class="(periodoSelecionado === periodos.DIA_ESPECIFICO
+    ? 'col-4 '
+    : 'col-6 ') + 'col-sm-2 col-md-1 fade'
+    ">
+          <q-select dense outlined v-model="mesSelecionado" :options="opcoesMeses" label="Mês" />
         </div>
-        <div
-          v-if="
-            periodoSelecionado === periodos.MES_ESPECIFICO ||
-            periodoSelecionado === periodos.DIA_ESPECIFICO
-          "
-          :class="
-            (periodoSelecionado === periodos.DIA_ESPECIFICO
-              ? 'col-4 '
-              : 'col-6 ') + 'col-sm-2 col-md-1 fade'
-          "
-        >
-          <q-select
-            dense
-            outlined
-            v-model="anoSelecionado"
-            :options="opcoesAnos"
-            label="Ano"
-          />
+        <div v-if="periodoSelecionado === periodos.MES_ESPECIFICO ||
+          periodoSelecionado === periodos.DIA_ESPECIFICO
+          " :class="(periodoSelecionado === periodos.DIA_ESPECIFICO
+    ? 'col-4 '
+    : 'col-6 ') + 'col-sm-2 col-md-1 fade'
+    ">
+          <q-select dense outlined v-model="anoSelecionado" :options="opcoesAnos" label="Ano" />
         </div>
         <div class="col-12 col-sm-4 col-md-2 col-lg-1 fade">
-          <q-btn
-            push
-            @click="obterCalcularEAtualizar"
-            style="width: 100%"
-            :loading="carregando"
-            color="primary"
-            >Filtrar
+          <q-btn push @click="obterCalcularEAtualizar" style="width: 100%" :loading="carregando" color="primary">Filtrar
             <template v-slot:loading>
               <q-spinner-hourglass class="on-left" />
               Carregando
@@ -79,12 +36,7 @@
     </q-card>
     <div class="row q-col-gutter-md fade">
       <div class="col-12 col-sm-6 col-md-3">
-        <q-card
-          flat
-          dark
-          @click="mostrarInformacoesCard[0] = !mostrarInformacoesCard[0]"
-          class="cursor-pointer maxima"
-        >
+        <q-card flat dark @click="mostrarInformacoesCard[0] = !mostrarInformacoesCard[0]" class="cursor-pointer maxima">
           <q-card-section class="grow" v-if="mostrarInformacoesCard[0]">
             <q-item>
               <q-item-section>
@@ -103,10 +55,9 @@
             <q-item>
               <q-item-section>
                 <q-item-label>
-                  Em {{ STATIONS[dadosMaxima.stationID].NOME }} ({{
+                  Em {{ estacoes[dadosMaxima.stationID].NOME }} ({{
                     dadosMaxima.stationID
-                  }})</q-item-label
-                >
+                  }})</q-item-label>
                 <q-item-label class="text-bold text-h6">
                   {{ new Date(dadosMaxima.obsTimeLocal).toLocaleDateString() }}
                 </q-item-label>
@@ -114,22 +65,13 @@
             </q-item>
           </q-card-section>
 
-          <q-inner-loading
-            :showing="carregando"
-            label="Aguarde..."
-            label-class="text-red"
-            label-style="font-size: 1.1em"
-          />
+          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-red"
+            label-style="font-size: 1.1em" />
         </q-card>
       </div>
 
       <div class="col-12 col-sm-6 col-md-3">
-        <q-card
-          flat
-          dark
-          @click="mostrarInformacoesCard[1] = !mostrarInformacoesCard[1]"
-          class="cursor-pointer minima"
-        >
+        <q-card flat dark @click="mostrarInformacoesCard[1] = !mostrarInformacoesCard[1]" class="cursor-pointer minima">
           <q-card-section class="grow" v-if="mostrarInformacoesCard[1]">
             <q-item>
               <q-item-section>
@@ -151,8 +93,7 @@
                 <q-item-label>
                   Em {{ estacoes[dadosMinima.stationID].NOME }} ({{
                     dadosMinima.stationID
-                  }})</q-item-label
-                >
+                  }})</q-item-label>
                 <q-item-label class="text-bold text-h6">
                   {{ new Date(dadosMinima.obsTimeLocal).toLocaleDateString() }}
                 </q-item-label>
@@ -160,22 +101,13 @@
             </q-item>
           </q-card-section>
 
-          <q-inner-loading
-            :showing="carregando"
-            label="Aguarde..."
-            label-class="text-primary"
-            label-style="font-size: 1.1em"
-          />
+          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-primary"
+            label-style="font-size: 1.1em" />
         </q-card>
       </div>
 
       <div class="col-12 col-sm-6 col-md-3">
-        <q-card
-          flat
-          dark
-          @click="mostrarInformacoesCard[2] = !mostrarInformacoesCard[2]"
-          class="cursor-pointer vento"
-        >
+        <q-card flat dark @click="mostrarInformacoesCard[2] = !mostrarInformacoesCard[2]" class="cursor-pointer vento">
           <q-card-section class="grow" v-if="mostrarInformacoesCard[2]">
             <q-item>
               <q-item-section>
@@ -197,8 +129,7 @@
                 <q-item-label>
                   Em {{ estacoes[dadosVentoMaximo.stationID].NOME }} ({{
                     dadosVentoMaximo.stationID
-                  }})</q-item-label
-                >
+                  }})</q-item-label>
                 <q-item-label class="text-bold text-h6">
                   {{
                     new Date(dadosVentoMaximo.obsTimeLocal).toLocaleDateString()
@@ -208,22 +139,14 @@
             </q-item>
           </q-card-section>
 
-          <q-inner-loading
-            :showing="carregando"
-            label="Aguarde..."
-            label-class="text-teal"
-            label-style="font-size: 1.1em"
-          />
+          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
+            label-style="font-size: 1.1em" />
         </q-card>
       </div>
 
       <div class="col-12 col-sm-6 col-md-3">
-        <q-card
-          flat
-          dark
-          @click="mostrarInformacoesCard[3] = !mostrarInformacoesCard[3]"
-          class="cursor-pointer precipitacao"
-        >
+        <q-card flat dark @click="mostrarInformacoesCard[3] = !mostrarInformacoesCard[3]"
+          class="cursor-pointer precipitacao">
           <q-card-section class="grow" v-if="mostrarInformacoesCard[3]">
             <q-item>
               <q-item-section>
@@ -244,8 +167,7 @@
                 <q-item-label>
                   Em {{ estacoes[dadosPrecipitacaoMaxima.stationID].NOME }} ({{
                     dadosPrecipitacaoMaxima.stationID
-                  }})</q-item-label
-                >
+                  }})</q-item-label>
                 <q-item-label class="text-bold text-h6">
                   {{
                     new Date(
@@ -257,12 +179,8 @@
             </q-item>
           </q-card-section>
 
-          <q-inner-loading
-            :showing="carregando"
-            label="Aguarde..."
-            label-class="text-indigo"
-            label-style="font-size: 1.1em"
-          />
+          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-indigo"
+            label-style="font-size: 1.1em" />
         </q-card>
       </div>
 
@@ -272,70 +190,34 @@
             Agora ({{ ultimaAtualizacao }})
           </q-card-section>
           <q-card-section>
-            <q-carousel
-              v-model="slide"
-              transition-duration="600"
-              transition-prev="slide-right"
-              transition-next="slide-left"
-              swipeable
-              animated
-              :control-color="darkMode ? 'white' : 'primary'"
-              padding
-              arrows
-              infinite
-              height="265px"
-              :autoplay="autoplayCarousel"
-              class="bg-transparent"
-              @mouseenter="autoplay = false"
-              @mouseleave="autoplay = true"
-            >
-              <q-carousel-slide
-                v-for="dados in dadosAgora"
-                :key="dados.stationID"
-                :name="estacoes[dados.stationID].NOME"
-                class="column no-wrap flex-center"
-              >
+            <q-carousel v-model="slide" transition-duration="600" transition-prev="slide-right"
+              transition-next="slide-left" swipeable animated :control-color="darkMode ? 'white' : 'primary'" padding
+              arrows infinite height="265px" :autoplay="autoplayCarousel" class="bg-transparent"
+              @mouseenter="autoplay = false" @mouseleave="autoplay = true">
+              <q-carousel-slide v-for="dados in dadosAgora" :key="dados.stationID" :name="estacoes[dados.stationID].NOME"
+                class="column no-wrap flex-center">
                 <div class="q-mt-md text-center text-h6">
                   {{ estacoes[dados.stationID].NOME }}
                 </div>
                 <div class="justify-start">
                   <div class="q-mt-md text-h6 text-start">
-                    <q-icon
-                      class="icon"
-                      :color="darkMode ? 'white' : 'primary'"
-                      size="md"
-                      name="ion-thermometer"
-                    />
+                    <q-icon class="icon" :color="darkMode ? 'white' : 'primary'" size="md" name="ion-thermometer" />
                     {{ dados.metric.temp }}°C
                   </div>
                   <div class="q-mt-md text-h6 text-start">
-                    <q-icon
-                      class="icon"
-                      :color="darkMode ? 'white' : 'primary'"
-                      size="md"
-                      name="ion-rainy"
-                    />
+                    <q-icon class="icon" :color="darkMode ? 'white' : 'primary'" size="md" name="ion-rainy" />
                     {{ dados.metric.precipRate }}mm/h
                   </div>
                 </div>
                 <div class="q-mt-md text-h6 text-start">
-                  <q-icon
-                    class="icon"
-                    :color="darkMode ? 'white' : 'primary'"
-                    size="md"
-                    name="water_drop"
-                  />
+                  <q-icon class="icon" :color="darkMode ? 'white' : 'primary'" size="md" name="water_drop" />
                   {{ dados.humidity }}%
                 </div>
               </q-carousel-slide>
             </q-carousel>
           </q-card-section>
-          <q-inner-loading
-            :showing="carregandoTempoReal"
-            label="Aguarde..."
-            label-class="text-teal"
-            label-style="font-size: 1.1em"
-          />
+          <q-inner-loading :showing="carregandoTempoReal" label="Aguarde..." label-class="text-teal"
+            label-style="font-size: 1.1em" />
         </q-card>
       </div>
 
@@ -343,20 +225,11 @@
         <q-card flat class="full-width">
           <q-card-section class="text-h6"> Máximas e mínimas </q-card-section>
           <q-card-section>
-            <apexchart
-              type="bar"
-              height="250"
-              :options="chartTemperaturaOptions"
-              :series="seriesTemperatura"
-              ref="graficoColunaTemperatura"
-            ></apexchart>
+            <apexchart type="bar" height="250" :options="chartTemperaturaOptions" :series="seriesTemperatura"
+              ref="graficoColunaTemperatura"></apexchart>
           </q-card-section>
-          <q-inner-loading
-            :showing="carregando"
-            label="Aguarde..."
-            label-class="text-teal"
-            label-style="font-size: 1.1em"
-          />
+          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
+            label-style="font-size: 1.1em" />
         </q-card>
       </div>
 
@@ -364,20 +237,11 @@
         <q-card flat class="full-width">
           <q-card-section class="text-h6"> Precipitação </q-card-section>
           <q-card-section>
-            <apexchart
-              type="bar"
-              height="350"
-              :options="chartPrecipitacaoOptions"
-              :series="seriesPrecipitacao"
-              ref="graficoPrecipitacao"
-            ></apexchart>
+            <apexchart type="bar" height="350" :options="chartPrecipitacaoOptions" :series="seriesPrecipitacao"
+              ref="graficoPrecipitacao"></apexchart>
           </q-card-section>
-          <q-inner-loading
-            :showing="carregando"
-            label="Aguarde..."
-            label-class="text-teal"
-            label-style="font-size: 1.1em"
-          />
+          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
+            label-style="font-size: 1.1em" />
         </q-card>
       </div>
 
@@ -389,60 +253,26 @@
                 <span>Séries temporais</span>
               </div>
               <div class="col-12 col-sm-4 col-md-2">
-                <q-select
-                  dense
-                  v-model="estacaoSelecionada"
-                  :options="nomesEstacoes"
-                  outlined
-                  hide-bottom-space
-                  input-style="{ background-color: red }"
-                  option-label="NOME"
-                  label="Estação"
-                />
+                <q-select dense v-model="estacaoSelecionada" :options="nomesEstacoes" outlined hide-bottom-space
+                  input-style="{ background-color: red }" option-label="NOME" label="Estação" />
               </div>
             </div>
           </q-card-section>
           <q-card-section>
-            <apexchart
-              height="350"
-              :options="chartSerieTemporalOptions"
-              :series="seriesTemporal"
-              ref="graficoTemporal"
-            />
+            <apexchart height="350" :options="chartSerieTemporalOptions" :series="seriesTemporal" ref="graficoTemporal" />
           </q-card-section>
-          <q-inner-loading
-            :showing="carregando"
-            label="Aguarde..."
-            label-class="text-teal"
-            label-style="font-size: 1.1em"
-          />
+          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
+            label-style="font-size: 1.1em" />
         </q-card>
       </div>
 
       <div class="col-12">
-        <q-table
-          :class="
-            darkMode ? 'my-sticky-header-table-dark' : 'my-sticky-header-table'
-          "
-          flat
-          column-sort-order="ad"
-          title="Dados das estações"
-          :rows="observacoes"
-          :columns="colunasTabela"
-          :pagination="pagination"
-          :filter="filter"
-          :rows-per-page-options="[6, 12, 24, 48, 96]"
-          row-key="name"
-          :loading="carregando"
-        >
+        <q-table :class="darkMode ? 'my-sticky-header-table-dark' : 'my-sticky-header-table'
+          " flat column-sort-order="ad" title="Dados das estações" :rows="observacoes" :columns="colunasTabela"
+          :pagination="pagination" :filter="filter" :rows-per-page-options="[6, 12, 24, 48, 96]" row-key="name"
+          :loading="carregando">
           <template v-slot:top-right>
-            <q-input
-              outlined
-              dense
-              debounce="300"
-              v-model="filter"
-              placeholder="Pesquisar"
-            >
+            <q-input outlined dense debounce="300" v-model="filter" placeholder="Pesquisar">
               <template v-slot:append>
                 <q-icon name="search" />
               </template>
@@ -636,7 +466,7 @@ export default defineComponent({
           {
             label: "Fechar",
             color: "white",
-            handler: () => {},
+            handler: () => { },
           },
         ],
       });
@@ -652,7 +482,7 @@ export default defineComponent({
           {
             label: "Fechar",
             color: "white",
-            handler: () => {},
+            handler: () => { },
           },
         ],
       });
@@ -741,9 +571,8 @@ export default defineComponent({
     },
 
     formatarDataParaQuery(data) {
-      return `${data.getFullYear()}${data.getMonth() + 1 < 10 ? "0" : ""}${
-        data.getMonth() + 1
-      }${data.getDate() < 10 ? "0" : ""}${data.getDate()}`;
+      return `${data.getFullYear()}${data.getMonth() + 1 < 10 ? "0" : ""}${data.getMonth() + 1
+        }${data.getDate() < 10 ? "0" : ""}${data.getDate()}`;
     },
 
     async obterObservacoesDiaAtualTodasEstacoes() {
