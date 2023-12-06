@@ -544,7 +544,7 @@ export default defineComponent({
           );
           break;
         case PERIODOS.MES_ESPECIFICO:
-          await this.filtrarMesEspecifico();
+          await this.filtrarMesEspecifico(this.mesSelecionado, this.anoSelecionado);
           break;
         case PERIODOS.DIA_ESPECIFICO:
           await this.filtrarDiaEspecifico();
@@ -554,29 +554,10 @@ export default defineComponent({
       }
     },
 
-    async filtrarMesEspecifico() {
-      const hoje = new Date();
-      let isFuturo =
-        this.mesSelecionado > hoje.getMonth() + 1 &&
-        this.anoSelecionado >= hoje.getFullYear();
-
-      if (isFuturo) throw new Error("Não é possivel obter dados do futuro!");
-
-      this.dataInicial = new Date(
-        this.anoSelecionado,
-        this.mesSelecionado - 1,
-        1
-      );
-
-      let isEsseMes =
-        this.mesSelecionado == hoje.getMonth() + 1 &&
-        this.anoSelecionado == hoje.getFullYear();
-
-      if (isEsseMes) {
-        this.dataFinal = hoje;
-      } else {
-        this.dataFinal = new Date(this.anoSelecionado, this.mesSelecionado, 0);
-      }
+    async filtrarMesEspecifico(mes, ano) {
+      const { dataInicial, dataFinal } = dataUtils.definirDataInicialEFinalMes(mes, ano);
+      this.dataInicial = dataInicial;
+      this.dataFinal = dataFinal;
 
       await this.getPeriodDailyObservations(
         this.idsEstacoes,
