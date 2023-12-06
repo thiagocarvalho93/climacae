@@ -194,8 +194,8 @@
               transition-next="slide-left" swipeable animated :control-color="darkMode ? 'white' : 'primary'" padding
               arrows infinite height="265px" :autoplay="autoplayCarousel" class="bg-transparent"
               @mouseenter="autoplay = false" @mouseleave="autoplay = true">
-              <q-carousel-slide v-for="dados in dadosAgora" :key="dados.stationID" :name="estacoes[dados.stationID].NOME"
-                class="column no-wrap flex-center">
+              <q-carousel-slide v-for="dados in realTimeObservations" :key="dados.stationID"
+                :name="estacoes[dados.stationID].NOME" class="column no-wrap flex-center">
                 <div class="q-mt-md text-center text-h6">
                   {{ estacoes[dados.stationID].NOME }}
                 </div>
@@ -268,7 +268,7 @@
 
       <div class="col-12">
         <q-table :class="darkMode ? 'my-sticky-header-table-dark' : 'my-sticky-header-table'
-          " flat column-sort-order="ad" title="Dados das estações" :rows="observacoes" :columns="colunasTabela"
+          " flat column-sort-order="ad" title="Dados das estações" :rows="observations" :columns="colunasTabela"
           :pagination="pagination" :filter="filter" :rows-per-page-options="[6, 12, 24, 48, 96]" row-key="name"
           :loading="carregando">
           <template v-slot:top-right>
@@ -320,6 +320,8 @@ import weatherApi from "src/api/weather-api";
 import Observation from "src/models/observation-model";
 import ObservationCurrent from "src/models/observation-current-model";
 import Metric from "src/models/metric-model";
+import { mapActions, mapState } from "pinia";
+import { useObservationStore } from "src/stores/observations";
 
 export default defineComponent({
   name: "IndexPage",
@@ -327,39 +329,56 @@ export default defineComponent({
   components: {},
 
   computed: {
+    ...mapState(useObservationStore, ['observations', 'realTimeObservations']),
+
     darkMode() {
       return this.$q.dark.isActive;
     },
+
     estacoes() {
       return STATIONS;
     },
+
     nomesEstacoes() {
       return Object.values(STATIONS);
     },
+
+    idsEstacoes() {
+      return Object.keys(STATIONS)
+    },
+
     periodos() {
       return PERIODOS;
     },
+
     opcoesPeriodos() {
       return Object.values(PERIODOS);
     },
+
     opcoesDias() {
       return OPCOES_DIAS;
     },
+
     opcoesMeses() {
       return OPCOES_MESES;
     },
+
     opcoesAnos() {
       return OPCOES_ANOS;
     },
+
     colunasTabela() {
       return COLUNAS_TABELA;
     },
+
     chartTemperaturaOptions() {
       return CHART_TEMPERATURA_OPTIONS;
     },
+
     chartPrecipitacaoOptions() {
       return CHART_PRECIPITACAO_OPTIONS;
     },
+
     chartSerieTemporalOptions() {
       return CHART_SERIE_TEMPORAL_OPTIONS;
     },
@@ -406,12 +425,10 @@ export default defineComponent({
       filter: "",
       //outputs
       metadadosEstacoes: [],
-      dadosAgora: [],
       ultimaAtualizacao: new Date().toLocaleTimeString(navigator.language, {
         hour: "2-digit",
         minute: "2-digit",
       }),
-      observacoes: [],
       dadosMinima: [],
       dadosMaxima: [],
       dadosVentoMaximo: [],
@@ -433,7 +450,7 @@ export default defineComponent({
 
   async created() {
     await this.obterCalcularEAtualizar();
-    await this.obterDadosAtuaisTodasEstacoes();
+    await this.getRealTimeObservations(this.idsEstacoes);
     this.atualizarDadosAtuais();
   },
 
@@ -442,6 +459,8 @@ export default defineComponent({
   },
 
   methods: {
+    ...mapActions(useObservationStore, ['getTodayObservations', 'getSpecificDayObservations', 'getPeriodDailyObservations', 'reverseObservations', 'getRealTimeObservations']),
+
     striped(props) {
       if (props.rowIndex % 2 != 0) {
         return 'dark-grey'
@@ -462,7 +481,7 @@ export default defineComponent({
         const mensagem = (error && error.message) || "Erro ao obter os dados.";
         this.mensagemErro(mensagem);
       } finally {
-        this.observacoes = this.observacoes.reverse();
+        this.reverseObservations();
         this.carregando = false;
       }
     },
@@ -504,12 +523,13 @@ export default defineComponent({
         case PERIODOS.HOJE:
           this.dataInicial = new Date(Date.now());
           this.dataFinal = new Date(Date.now());
-          await this.obterObservacoesDiaAtualTodasEstacoes();
+          await this.getTodayObservations(this.idsEstacoes);
           break;
         case PERIODOS.ULTIMOS_SETE_DIAS:
           this.dataInicial = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
           this.dataFinal = new Date(Date.now());
-          await this.obterObservacoesDiariasPeriodoTodasEstacoes(
+          await this.getPeriodDailyObservations(
+            this.idsEstacoes,
             this.dataInicial,
             this.dataFinal
           );
@@ -517,7 +537,8 @@ export default defineComponent({
         case PERIODOS.ULTIMOS_TRINTA_DIAS:
           this.dataInicial = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
           this.dataFinal = new Date(Date.now());
-          await this.obterObservacoesDiariasPeriodoTodasEstacoes(
+          await this.getPeriodDailyObservations(
+            this.idsEstacoes,
             this.dataInicial,
             this.dataFinal
           );
@@ -557,7 +578,8 @@ export default defineComponent({
         this.dataFinal = new Date(this.anoSelecionado, this.mesSelecionado, 0);
       }
 
-      await this.obterObservacoesDiariasPeriodoTodasEstacoes(
+      await this.getPeriodDailyObservations(
+        this.idsEstacoes,
         this.dataInicial,
         this.dataFinal
       );
@@ -578,97 +600,14 @@ export default defineComponent({
 
       this.dataInicial = new Date(dataSelecionada);
 
-      await this.obterObservacoesDiaEspecificoTodasEstacoes(this.dataInicial);
-    },
-
-    formatarDataParaQuery(data) {
-      return `${data.getFullYear()}${data.getMonth() + 1 < 10 ? "0" : ""}${data.getMonth() + 1
-        }${data.getDate() < 10 ? "0" : ""}${data.getDate()}`;
-    },
-
-    async obterObservacoesDiaAtualTodasEstacoes() {
-      const stations = Object.keys(STATIONS);
-
-      const promises = stations.map((station) =>
-        weatherApi.obterObservacoesDiaAtualEstacao(station)
-      );
-
-      try {
-        const responses = await Promise.all(promises);
-
-        this.observacoes = responses.flatMap((response) =>
-          (response.observations || []).map((ob) => new Observation(ob))
-        );
-      } catch (error) {
-        throw error;
-      }
-    },
-
-    async obterObservacoesDiaEspecificoTodasEstacoes(data) {
-      const stations = Object.keys(STATIONS);
-      const dataFormatada = this.formatarDataParaQuery(data);
-
-      const promises = stations.map((station) =>
-        weatherApi.obterTodasObservacoesDia(station, dataFormatada)
-      );
-
-      try {
-        const responses = await Promise.all(promises);
-
-        this.observacoes = responses.flatMap((response) =>
-          (response.observations || []).map((ob) => new Observation(ob))
-        );
-      } catch (error) {
-        throw error;
-      }
-    },
-
-    async obterObservacoesDiariasPeriodoTodasEstacoes(dataInicial, dataFinal) {
-      const stations = Object.keys(STATIONS);
-      const dataInicialFormatada = this.formatarDataParaQuery(dataInicial);
-      const dataFinalFormatada = this.formatarDataParaQuery(dataFinal);
-
-      const promises = stations.map((station) =>
-        weatherApi.obterObservacoesDiariasPeriodo(
-          station,
-          dataInicialFormatada,
-          dataFinalFormatada
-        )
-      );
-
-      try {
-        const responses = await Promise.all(promises);
-
-        this.observacoes = responses.flatMap((response) =>
-          (response.observations || []).map((ob) => new Observation(ob))
-        );
-      } catch (error) {
-        throw error;
-      }
-    },
-
-    async obterDadosAtuaisTodasEstacoes() {
-      const stations = Object.keys(STATIONS);
-      const promises = stations.map((station) =>
-        weatherApi.obterDadosTempoReal(station)
-      );
-
-      try {
-        const responses = await Promise.all(promises);
-
-        this.dadosAgora = responses.flatMap((response) =>
-          (response.observations || []).map((ob) => new ObservationCurrent(ob))
-        );
-      } catch (error) {
-        throw error;
-      }
+      await this.getSpecificDayObservations(this.idsEstacoes, this.dataInicial);
     },
 
     calcularMetadados() {
       this.metadadosEstacoes = [];
 
       // TODO fazer o método calcularMaximosGlobais nesse mesmo loop
-      this.observacoes.forEach((obs) => {
+      this.observations.forEach((obs) => {
         const obsModel = new Observation(obs);
         const { metric, stationID } = obsModel;
         const { tempHigh, tempLow, windgustHigh, precipRate, precipTotal } =
@@ -738,7 +677,7 @@ export default defineComponent({
         }
       });
 
-      for (const obs of this.observacoes) {
+      for (const obs of this.observations) {
         if (obs.metric.tempHigh == this.maxima) {
           this.dadosMaxima = obs;
         }
@@ -758,7 +697,7 @@ export default defineComponent({
       setInterval(async () => {
         this.carregandoTempoReal = true;
 
-        await this.obterDadosAtuaisTodasEstacoes();
+        await this.getRealTimeObservations(this.idsEstacoes);
 
         this.ultimaAtualizacao = new Date().toLocaleTimeString(
           navigator.language,
@@ -856,7 +795,7 @@ export default defineComponent({
     atualizarGraficoTemporal() {
       const dados = Object.keys(STATIONS).map((estacao) => ({
         name: STATIONS[estacao].NOME,
-        data: this.observacoes.reduce((acc, ob) => {
+        data: this.observations.reduce((acc, ob) => {
           if (ob.stationID === estacao && ob.metric.tempAvg) {
             acc.push([
               dataUtils.subtrairHoras(new Date(ob.obsTimeLocal), 3),
@@ -885,7 +824,7 @@ export default defineComponent({
       csvString += Object.keys(new Metric()).join(",");
       csvString += "\n";
 
-      for (const obs of this.observacoes) {
+      for (const obs of this.observations) {
         csvString += props.map((prop) => obs[prop]).join(",");
         csvString += ",";
         csvString += Object.values(obs.metric).join(",");

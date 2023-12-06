@@ -11,4 +11,15 @@ const subtrairHoras = (data, horas) => {
   return dateCopy;
 };
 
-export default { calcularDiasMes, calcularDiaMesAtual, subtrairHoras };
+const formatDateForQuery = (data) => {
+  return `${data.getFullYear()}${data.getMonth() + 1 < 10 ? "0" : ""}${
+    data.getMonth() + 1
+  }${data.getDate() < 10 ? "0" : ""}${data.getDate()}`;
+};
+
+export default {
+  calcularDiasMes,
+  calcularDiaMesAtual,
+  subtrairHoras,
+  formatDateForQuery,
+};
