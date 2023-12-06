@@ -9,6 +9,7 @@ export const useObservationStore = defineStore("observation", {
     realTimeObservations: [],
     observations: [],
     cachedObservations: new Map(),
+    cachedRealTimeObservations: null,
   }),
 
   getters: {
@@ -18,10 +19,6 @@ export const useObservationStore = defineStore("observation", {
   },
 
   actions: {
-    reverseObservations() {
-      this.observations = this.observations.reverse();
-    },
-
     async getTodayObservations(stationsArray) {
       const cached = this.cachedObservations.get("today");
 
@@ -105,17 +102,33 @@ export const useObservationStore = defineStore("observation", {
     },
 
     async getRealTimeObservations(stationsArray) {
+      if (this.cachedRealTimeObservations) {
+        const { iat, observations } = this.cachedRealTimeObservations;
+        const thirtySecondsAgo = new Date(Date.now() - 30000);
+
+        if (iat >= thirtySecondsAgo) {
+          this.realTimeObservations = observations;
+          return;
+        }
+      }
+
       const promises = stationsArray.map((station) =>
         weatherApi.obterDadosTempoReal(station)
       );
 
       const responses = await Promise.all(promises);
 
-      this.realTimeObservations = responses.flatMap((response) =>
+      const observations = responses.flatMap((response) =>
         (response.data?.observations || []).map(
           (ob) => new ObservationCurrent(ob)
         )
       );
+
+      this.realTimeObservations = observations;
+      this.cachedRealTimeObservations = {
+        observations,
+        iat: new Date(),
+      };
     },
   },
 });
