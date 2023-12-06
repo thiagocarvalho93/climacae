@@ -35,9 +35,11 @@ export const useObservationStore = defineStore("observation", {
       );
 
       const responses = await Promise.all(promises);
-      const observations = responses.flatMap((response) =>
-        (response.observations || []).map((ob) => new Observation(ob))
-      );
+      const observations = responses
+        .flatMap((response) =>
+          (response.observations || []).map((ob) => new Observation(ob))
+        )
+        .reverse();
 
       this.observations = observations;
       this.cachedObservations.set("today", observations);
@@ -60,9 +62,11 @@ export const useObservationStore = defineStore("observation", {
 
       const responses = await Promise.all(promises);
 
-      const observations = responses.flatMap((response) =>
-        (response.observations || []).map((ob) => new Observation(ob))
-      );
+      const observations = responses
+        .flatMap((response) =>
+          (response.observations || []).map((ob) => new Observation(ob))
+        )
+        .reverse();
 
       this.observations = observations;
       this.cachedObservations.set(cacheKey, observations);
@@ -90,9 +94,12 @@ export const useObservationStore = defineStore("observation", {
 
       const responses = await Promise.all(promises);
 
-      const observations = responses.flatMap((response) =>
-        (response.observations || []).map((ob) => new Observation(ob))
-      );
+      const observations = responses
+        .flatMap((response) =>
+          (response.observations || []).map((ob) => new Observation(ob))
+        )
+        .reverse();
+
       this.observations = observations;
       this.cachedObservations.set(cacheKey, observations);
     },

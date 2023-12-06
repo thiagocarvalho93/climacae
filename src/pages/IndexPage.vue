@@ -457,7 +457,7 @@ export default defineComponent({
   },
 
   methods: {
-    ...mapActions(useObservationStore, ['getTodayObservations', 'getSpecificDayObservations', 'getPeriodDailyObservations', 'reverseObservations', 'getRealTimeObservations']),
+    ...mapActions(useObservationStore, ['getTodayObservations', 'getSpecificDayObservations', 'getPeriodDailyObservations', 'getRealTimeObservations']),
 
     striped(props) {
       if (props.rowIndex % 2 != 0) {
@@ -479,7 +479,6 @@ export default defineComponent({
         const mensagem = (error && error.message) || "Erro ao obter os dados.";
         this.mensagemErro(mensagem);
       } finally {
-        this.reverseObservations();
         this.carregando = false;
       }
     },
