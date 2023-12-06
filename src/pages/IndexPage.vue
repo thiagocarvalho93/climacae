@@ -316,9 +316,7 @@ import {
   OPCOES_ANOS,
 } from "../constants/constants";
 import dataUtils from "src/utils/data-utils";
-import weatherApi from "src/api/weather-api";
 import Observation from "src/models/observation-model";
-import ObservationCurrent from "src/models/observation-current-model";
 import Metric from "src/models/metric-model";
 import { mapActions, mapState } from "pinia";
 import { useObservationStore } from "src/stores/observations";
@@ -521,27 +519,14 @@ export default defineComponent({
     async filtrarDadosPeriodo() {
       switch (this.periodoSelecionado) {
         case PERIODOS.HOJE:
-          this.dataInicial = new Date(Date.now());
-          this.dataFinal = new Date(Date.now());
+          this.setDates(new Date(), new Date());
           await this.getTodayObservations(this.idsEstacoes);
           break;
         case PERIODOS.ULTIMOS_SETE_DIAS:
-          this.dataInicial = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-          this.dataFinal = new Date(Date.now());
-          await this.getPeriodDailyObservations(
-            this.idsEstacoes,
-            this.dataInicial,
-            this.dataFinal
-          );
-          break;
         case PERIODOS.ULTIMOS_TRINTA_DIAS:
-          this.dataInicial = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-          this.dataFinal = new Date(Date.now());
-          await this.getPeriodDailyObservations(
-            this.idsEstacoes,
-            this.dataInicial,
-            this.dataFinal
-          );
+          const daysAgo = this.periodoSelecionado === PERIODOS.ULTIMOS_SETE_DIAS ? 7 : 30;
+          this.setDates(new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000), new Date());
+          await this.getPeriodDailyObservations(this.idsEstacoes, this.dataInicial, this.dataFinal);
           break;
         case PERIODOS.MES_ESPECIFICO:
           await this.filtrarMesEspecifico(this.mesSelecionado, this.anoSelecionado);
@@ -554,10 +539,14 @@ export default defineComponent({
       }
     },
 
+    setDates(startDate, endDate) {
+      this.dataInicial = startDate;
+      this.dataFinal = endDate;
+    },
+
     async filtrarMesEspecifico(mes, ano) {
       const { dataInicial, dataFinal } = dataUtils.definirDataInicialEFinalMes(mes, ano);
-      this.dataInicial = dataInicial;
-      this.dataFinal = dataFinal;
+      this.setDates(dataInicial, dataFinal);
 
       await this.getPeriodDailyObservations(
         this.idsEstacoes,

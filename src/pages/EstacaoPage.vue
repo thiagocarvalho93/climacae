@@ -3,84 +3,33 @@
     <q-card flat class="q-pa-md q-mb-md fade">
       <div class="row q-col-gutter-md">
         <div class="col-12 col-sm-4 col-md-2 fade">
-          <q-select
-            dense
-            v-model="estacaoSelecionada"
-            :options="nomesEstacoes"
-            outlined
-            hide-bottom-space
-            input-style="{ background-color: red }"
-            option-label="NOME"
-            label="Estação"
-          />
+          <q-select dense v-model="estacaoSelecionada" :options="nomesEstacoes" outlined hide-bottom-space
+            input-style="{ background-color: red }" option-label="NOME" label="Estação" />
         </div>
         <div class="col-12 col-sm-4 col-md-2 fade">
-          <q-select
-            dense
-            outlined
-            v-model="periodoSelecionado"
-            :options="opcoesPeriodos"
-            label="Período"
-          />
+          <q-select dense outlined v-model="periodoSelecionado" :options="opcoesPeriodos" label="Período" />
         </div>
-        <div
-          v-if="periodoSelecionado === periodos.DIA_ESPECIFICO"
-          class="col-4 col-sm-2 col-md-1 fade"
-        >
-          <q-select
-            dense
-            outlined
-            v-model="diaSelecionado"
-            :options="opcoesDias"
-            label="Dia"
-          />
+        <div v-if="periodoSelecionado === periodos.DIA_ESPECIFICO" class="col-4 col-sm-2 col-md-1 fade">
+          <q-select dense outlined v-model="diaSelecionado" :options="opcoesDias" label="Dia" />
         </div>
-        <div
-          v-if="
-            periodoSelecionado === periodos.MES_ESPECIFICO ||
-            periodoSelecionado === periodos.DIA_ESPECIFICO
-          "
-          :class="
-            (periodoSelecionado === periodos.DIA_ESPECIFICO
-              ? 'col-4 '
-              : 'col-6 ') + 'col-sm-2 col-md-1 fade'
-          "
-        >
-          <q-select
-            dense
-            outlined
-            v-model="mesSelecionado"
-            :options="opcoesMeses"
-            label="Mês"
-          />
+        <div v-if="periodoSelecionado === periodos.MES_ESPECIFICO ||
+          periodoSelecionado === periodos.DIA_ESPECIFICO
+          " :class="(periodoSelecionado === periodos.DIA_ESPECIFICO
+    ? 'col-4 '
+    : 'col-6 ') + 'col-sm-2 col-md-1 fade'
+    ">
+          <q-select dense outlined v-model="mesSelecionado" :options="opcoesMeses" label="Mês" />
         </div>
-        <div
-          v-if="
-            periodoSelecionado === periodos.MES_ESPECIFICO ||
-            periodoSelecionado === periodos.DIA_ESPECIFICO
-          "
-          :class="
-            (periodoSelecionado === periodos.DIA_ESPECIFICO
-              ? 'col-4 '
-              : 'col-6 ') + 'col-sm-2 col-md-1 fade'
-          "
-        >
-          <q-select
-            dense
-            outlined
-            v-model="anoSelecionado"
-            :options="opcoesAnos"
-            label="Ano"
-          />
+        <div v-if="periodoSelecionado === periodos.MES_ESPECIFICO ||
+          periodoSelecionado === periodos.DIA_ESPECIFICO
+          " :class="(periodoSelecionado === periodos.DIA_ESPECIFICO
+    ? 'col-4 '
+    : 'col-6 ') + 'col-sm-2 col-md-1 fade'
+    ">
+          <q-select dense outlined v-model="anoSelecionado" :options="opcoesAnos" label="Ano" />
         </div>
         <div class="col-12 col-sm-4 col-md-2 col-lg-1 fade">
-          <q-btn
-            push
-            @click="obterDadosEstacao"
-            style="width: 100%"
-            :loading="carregando"
-            color="primary"
-            >Filtrar
+          <q-btn push @click="obterDadosEstacao" style="width: 100%" :loading="carregando" color="primary">Filtrar
             <template v-slot:loading>
               <q-spinner-hourglass class="on-left" />
               Carregando
@@ -95,19 +44,11 @@
         <q-card flat class="full-width">
           <q-card-section class="text-h6"> Temperatura </q-card-section>
           <q-card-section>
-            <apexchart
-              height="250"
-              :options="chartSerieTemporalOptions"
-              :series="seriesTemperatura"
-              ref="graficoTemporalTemperatura"
-            ></apexchart>
+            <apexchart height="250" :options="chartSerieTemporalOptions" :series="seriesTemperatura"
+              ref="graficoTemporalTemperatura"></apexchart>
           </q-card-section>
-          <q-inner-loading
-            :showing="carregando"
-            label="Aguarde..."
-            label-class="text-teal"
-            label-style="font-size: 1.1em"
-          />
+          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
+            label-style="font-size: 1.1em" />
         </q-card>
       </div>
 
@@ -115,19 +56,11 @@
         <q-card flat class="full-width">
           <q-card-section class="text-h6"> Pressão </q-card-section>
           <q-card-section>
-            <apexchart
-              height="250"
-              :options="chartSerieTemporalOptions"
-              :series="seriesPressao"
-              ref="graficoTemporalPressao"
-            ></apexchart>
+            <apexchart height="250" :options="chartSerieTemporalOptions" :series="seriesPressao"
+              ref="graficoTemporalPressao"></apexchart>
           </q-card-section>
-          <q-inner-loading
-            :showing="carregando"
-            label="Aguarde..."
-            label-class="text-teal"
-            label-style="font-size: 1.1em"
-          />
+          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
+            label-style="font-size: 1.1em" />
         </q-card>
       </div>
 
@@ -135,19 +68,11 @@
         <q-card flat class="full-width">
           <q-card-section class="text-h6"> Precipitação </q-card-section>
           <q-card-section>
-            <apexchart
-              height="250"
-              :options="chartSerieTemporalOptions"
-              :series="seriesPrecipitacao"
-              ref="graficoTemporalPrecipitacao"
-            ></apexchart>
+            <apexchart height="250" :options="chartSerieTemporalOptions" :series="seriesPrecipitacao"
+              ref="graficoTemporalPrecipitacao"></apexchart>
           </q-card-section>
-          <q-inner-loading
-            :showing="carregando"
-            label="Aguarde..."
-            label-class="text-teal"
-            label-style="font-size: 1.1em"
-          />
+          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
+            label-style="font-size: 1.1em" />
         </q-card>
       </div>
 
@@ -155,19 +80,11 @@
         <q-card flat class="full-width">
           <q-card-section class="text-h6"> Vento </q-card-section>
           <q-card-section>
-            <apexchart
-              height="250"
-              :options="chartSerieTemporalOptions"
-              :series="seriesVento"
-              ref="graficoTemporalVento"
-            ></apexchart>
+            <apexchart height="250" :options="chartSerieTemporalOptions" :series="seriesVento" ref="graficoTemporalVento">
+            </apexchart>
           </q-card-section>
-          <q-inner-loading
-            :showing="carregando"
-            label="Aguarde..."
-            label-class="text-teal"
-            label-style="font-size: 1.1em"
-          />
+          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
+            label-style="font-size: 1.1em" />
         </q-card>
       </div>
     </div>
@@ -266,25 +183,14 @@ export default defineComponent({
     async obterDadosPeriodo() {
       switch (this.periodoSelecionado) {
         case PERIODOS.HOJE:
-          this.dataInicial = new Date(Date.now());
-          this.dataFinal = new Date(Date.now());
+          this.setDates(new Date(), new Date());
           await this.obterObservacoesDiaAtual();
           break;
         case PERIODOS.ULTIMOS_SETE_DIAS:
-          this.dataInicial = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-          this.dataFinal = new Date(Date.now());
-          await this.obterObservacoesDiariasPeriodo(
-            this.dataInicial,
-            this.dataFinal
-          );
-          break;
         case PERIODOS.ULTIMOS_TRINTA_DIAS:
-          this.dataInicial = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-          this.dataFinal = new Date(Date.now());
-          await this.obterObservacoesDiariasPeriodo(
-            this.dataInicial,
-            this.dataFinal
-          );
+          const daysAgo = this.periodoSelecionado === PERIODOS.ULTIMOS_SETE_DIAS ? 7 : 30;
+          this.setDates(new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000), new Date());
+          await this.obterObservacoesDiariasPeriodo(this.dataInicial, this.dataFinal);
           break;
         case PERIODOS.MES_ESPECIFICO:
           await this.filtrarMesEspecifico();
@@ -297,34 +203,15 @@ export default defineComponent({
       }
     },
 
+    setDates(startDate, endDate) {
+      this.dataInicial = startDate;
+      this.dataFinal = endDate;
+    },
+
     async filtrarMesEspecifico() {
-      const hoje = new Date();
-      let isFuturo =
-        this.mesSelecionado > hoje.getMonth() + 1 &&
-        this.anoSelecionado >= hoje.getFullYear();
+      const { dataFinal, dataInicial } = dataUtils.definirDataInicialEFinalMes(this.mesSelecionado, this.anoSelecionado);
 
-      if (isFuturo) throw new Error("Não é possivel obter dados do futuro!");
-
-      this.dataInicial = new Date(
-        this.anoSelecionado,
-        this.mesSelecionado - 1,
-        1
-      );
-
-      let isEsseMes =
-        this.mesSelecionado == hoje.getMonth() + 1 &&
-        this.anoSelecionado == hoje.getFullYear();
-
-      if (isEsseMes) {
-        this.dataFinal = hoje;
-      } else {
-        this.dataFinal = new Date(this.anoSelecionado, this.mesSelecionado, 0);
-      }
-
-      await this.obterObservacoesDiariasPeriodo(
-        this.dataInicial,
-        this.dataFinal
-      );
+      await this.obterObservacoesDiariasPeriodo(dataInicial, dataFinal);
     },
 
     async filtrarDiaEspecifico() {
@@ -348,17 +235,13 @@ export default defineComponent({
     async obterObservacoesDiaAtual() {
       const station = this.estacaoSelecionada.ID;
 
-      try {
-        const response = await weatherApi.obterObservacoesDiaAtualEstacao(
-          station
-        );
+      const response = await weatherApi.obterObservacoesDiaAtualEstacao(
+        station
+      );
 
-        this.observacoes = response.observations
-          ? response.observations.map((res) => new Observation(res))
-          : [];
-      } catch (error) {
-        throw error;
-      }
+      this.observacoes = response.observations
+        ? response.observations.map((res) => new Observation(res))
+        : [];
     },
 
     async obterObservacoesDiariasPeriodo(dataInicial, dataFinal) {
@@ -366,43 +249,34 @@ export default defineComponent({
       const dataInicialFormatada = this.formatarDataParaQuery(dataInicial);
       const dataFinalFormatada = this.formatarDataParaQuery(dataFinal);
 
-      try {
-        const response = await weatherApi.obterObservacoesDiariasPeriodo(
-          station,
-          dataInicialFormatada,
-          dataFinalFormatada
-        );
+      const response = await weatherApi.obterObservacoesDiariasPeriodo(
+        station,
+        dataInicialFormatada,
+        dataFinalFormatada
+      );
 
-        this.observacoes = response.observations
-          ? response.observations.map((res) => new Observation(res))
-          : [];
-      } catch (error) {
-        throw error;
-      }
+      this.observacoes = response.observations
+        ? response.observations.map((res) => new Observation(res))
+        : [];
     },
 
     async obterObservacoesDiaEspecifico(data) {
       const station = this.estacaoSelecionada.ID;
       const dataFormatada = this.formatarDataParaQuery(data);
 
-      try {
-        const response = await weatherApi.obterTodasObservacoesDia(
-          station,
-          dataFormatada
-        );
+      const response = await weatherApi.obterTodasObservacoesDia(
+        station,
+        dataFormatada
+      );
 
-        this.observacoes = response.observations
-          ? response.observations.map((res) => new Observation(res))
-          : [];
-      } catch (error) {
-        throw error;
-      }
+      this.observacoes = response.observations
+        ? response.observations.map((res) => new Observation(res))
+        : [];
     },
 
     formatarDataParaQuery(data) {
-      return `${data.getFullYear()}${data.getMonth() + 1 < 10 ? "0" : ""}${
-        data.getMonth() + 1
-      }${data.getDate() < 10 ? "0" : ""}${data.getDate()}`;
+      return `${data.getFullYear()}${data.getMonth() + 1 < 10 ? "0" : ""}${data.getMonth() + 1
+        }${data.getDate() < 10 ? "0" : ""}${data.getDate()}`;
     },
 
     atualizarGraficoTemporal(seriesNames, chartRef) {
@@ -461,7 +335,7 @@ export default defineComponent({
           {
             label: "Fechar",
             color: "white",
-            handler: () => {},
+            handler: () => { },
           },
         ],
       });
@@ -477,7 +351,7 @@ export default defineComponent({
           {
             label: "Fechar",
             color: "white",
-            handler: () => {},
+            handler: () => { },
           },
         ],
       });
