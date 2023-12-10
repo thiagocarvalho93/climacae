@@ -308,7 +308,7 @@ export default defineComponent({
         return {
           name: name,
           data: this.observacoes.map((obs) => [
-            new Date(obs.obsTimeLocal),
+            dataUtils.subtrairHoras(new Date(obs.obsTimeLocal), 3),
             obs.metric[name],
           ]),
         };
