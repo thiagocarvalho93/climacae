@@ -2,15 +2,10 @@
   <q-page :class="`q-pa-md ${darkMode ? 'bg-dark-page' : 'bg-blue-grey-1'}`">
     <!-- Filtros -->
     <SecaoFiltros
-      v-model:periodoSelecionado="periodoSelecionado"
-      v-model:diaSelecionado="diaSelecionado"
-      v-model:mesSelecionado="mesSelecionado"
-      v-model:anoSelecionado="anoSelecionado"
-      :opcoesPeriodos="opcoesPeriodos"
-      :opcoesDias="opcoesDias"
-      :opcoesMeses="opcoesMeses"
-      :opcoesAnos="opcoesAnos"
-      :periodos="periodos"
+      v-model:periodo-selecionado="periodoSelecionado"
+      v-model:dia-selecionado="diaSelecionado"
+      v-model:mes-selecionado="mesSelecionado"
+      v-model:ano-selecionado="anoSelecionado"
       :carregando="carregando"
       @obterDados="obterCalcularEAtualizar"
     />
@@ -23,9 +18,9 @@
           titulo="MÁXIMA"
           :descricao="`${maxima}°C`"
           icone="thermostat"
-          :tituloVerso="formatarTituloCard(dadosMaxima)"
-          :descricaoVerso="formatarDataCard(dadosMaxima)"
-          classeCard="maxima"
+          :titulo-verso="formatarTituloCard(dadosMaxima)"
+          :descricao-verso="formatarDataCard(dadosMaxima)"
+          classe-card="maxima"
         />
       </div>
 
@@ -35,9 +30,9 @@
           titulo="MÍNIMA"
           :descricao="`${minima}°C`"
           icone="thermostat"
-          :tituloVerso="formatarTituloCard(dadosMinima)"
-          :descricaoVerso="formatarDataCard(dadosMinima)"
-          classeCard="minima"
+          :titulo-verso="formatarTituloCard(dadosMinima)"
+          :descricao-verso="formatarDataCard(dadosMinima)"
+          classe-card="minima"
         />
       </div>
 
@@ -47,9 +42,9 @@
           titulo="VENTO MÁXIMO"
           :descricao="`${ventoMaximo} km/h`"
           icone="wind_power"
-          :tituloVerso="formatarTituloCard(dadosVentoMaximo)"
-          :descricaoVerso="formatarDataCard(dadosVentoMaximo)"
-          classeCard="vento"
+          :titulo-verso="formatarTituloCard(dadosVentoMaximo)"
+          :descricao-verso="formatarDataCard(dadosVentoMaximo)"
+          classe-card="vento"
         />
       </div>
 
@@ -59,20 +54,20 @@
           titulo="PRECIPITAÇÃO MÁXIMA"
           :descricao="`${precipitacaoMaxima}mm`"
           icone="ion-rainy"
-          :tituloVerso="formatarTituloCard(dadosPrecipitacaoMaxima)"
-          :descricaoVerso="formatarDataCard(dadosPrecipitacaoMaxima)"
-          classeCard="precipitacao"
+          :titulo-verso="formatarTituloCard(dadosPrecipitacaoMaxima)"
+          :descricao-verso="formatarDataCard(dadosPrecipitacaoMaxima)"
+          classe-card="precipitacao"
         />
       </div>
 
       <!-- Carrocel -->
       <div class="col-12 col-md-4 flex">
         <RealTimeObservationsCarousel
-          :realTimeObservations="realTimeObservations"
+          :real-time-observations="realTimeObservations"
           :estacoes="estacoes"
-          :ultimaAtualizacao="ultimaAtualizacao"
-          :darkMode="darkMode"
-          :carregandoTempoReal="carregandoTempoReal"
+          :ultima-atualizacao="ultimaAtualizacao"
+          :dark-mode="darkMode"
+          :carregando-tempo-real="carregandoTempoReal"
         />
       </div>
 
@@ -182,9 +177,6 @@ import {
   CHART_PRECIPITACAO_OPTIONS,
   CHART_SERIE_TEMPORAL_OPTIONS,
   COLUNAS_TABELA,
-  OPCOES_MESES,
-  OPCOES_DIAS,
-  OPCOES_ANOS,
 } from "../constants/constants";
 import dataUtils from "src/utils/data-utils";
 import Observation from "src/models/observation-model";
@@ -229,22 +221,6 @@ export default defineComponent({
       return PERIODOS;
     },
 
-    opcoesPeriodos() {
-      return Object.values(PERIODOS);
-    },
-
-    opcoesDias() {
-      return OPCOES_DIAS;
-    },
-
-    opcoesMeses() {
-      return OPCOES_MESES;
-    },
-
-    opcoesAnos() {
-      return OPCOES_ANOS;
-    },
-
     colunasTabela() {
       return COLUNAS_TABELA;
     },
@@ -259,28 +235,6 @@ export default defineComponent({
 
     chartSerieTemporalOptions() {
       return CHART_SERIE_TEMPORAL_OPTIONS;
-    },
-  },
-
-  watch: {
-    darkMode(isDark) {
-      this.$refs.graficoColunaTemperatura.updateOptions({
-        theme: {
-          mode: isDark ? "dark" : "light",
-        },
-      });
-
-      this.$refs.graficoPrecipitacao.updateOptions({
-        theme: {
-          mode: isDark ? "dark" : "light",
-        },
-      });
-
-      this.$refs.graficoTemporal.updateOptions({
-        theme: {
-          mode: isDark ? "dark" : "light",
-        },
-      });
     },
   },
   data() {
@@ -324,6 +278,31 @@ export default defineComponent({
     await this.obterCalcularEAtualizar();
     await this.getRealTimeObservations(this.idsEstacoes);
     this.atualizarDadosAtuais();
+    this.$watch(
+      "darkMode",
+      (isDark) => {
+        this.$refs.graficoColunaTemperatura.updateOptions({
+          theme: {
+            mode: isDark ? "dark" : "light",
+          },
+        });
+
+        this.$refs.graficoPrecipitacao.updateOptions({
+          theme: {
+            mode: isDark ? "dark" : "light",
+          },
+        });
+
+        this.$refs.graficoTemporal.updateOptions({
+          theme: {
+            mode: isDark ? "dark" : "light",
+          },
+        });
+      },
+      {
+        immediate: true,
+      }
+    );
   },
 
   beforeUnmount() {

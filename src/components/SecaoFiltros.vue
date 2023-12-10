@@ -92,6 +92,13 @@
 </template>
 
 <script>
+import {
+  OPCOES_ANOS,
+  OPCOES_DIAS,
+  OPCOES_MESES,
+  PERIODOS,
+  STATIONS,
+} from "src/constants/constants";
 import { computed, defineComponent } from "vue";
 
 export default defineComponent({
@@ -103,11 +110,6 @@ export default defineComponent({
     mesSelecionado: Number,
     anoSelecionado: Number,
     nomesEstacoes: Array,
-    opcoesPeriodos: Array,
-    opcoesDias: Array,
-    opcoesMeses: Array,
-    opcoesAnos: Array,
-    periodos: Object,
   },
   setup(props, context) {
     const estacaoSelecionadaProxy = computed({
@@ -145,6 +147,13 @@ export default defineComponent({
       },
     });
 
+    // const nomesEstacoes = computed(() => Object.values(STATIONS));
+    const opcoesPeriodos = computed(() => Object.values(PERIODOS));
+    const opcoesDias = computed(() => OPCOES_DIAS);
+    const opcoesMeses = computed(() => OPCOES_MESES);
+    const opcoesAnos = computed(() => OPCOES_ANOS);
+    const periodos = computed(() => PERIODOS);
+
     const obterDadosEstacao = () => {
       context.emit("obterDados");
     };
@@ -156,6 +165,11 @@ export default defineComponent({
       mesSelecionadoProxy,
       anoSelecionadoProxy,
       obterDadosEstacao,
+      opcoesPeriodos,
+      opcoesDias,
+      opcoesMeses,
+      opcoesAnos,
+      periodos,
     };
   },
 });

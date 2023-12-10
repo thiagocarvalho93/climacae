@@ -2,19 +2,14 @@
   <q-page :class="`q-pa-md ${darkMode ? 'bg-dark-page' : 'bg-blue-grey-1'}`">
     <!-- Filtros -->
     <SecaoFiltros
-      v-model:estacaoSelecionada="estacaoSelecionada"
-      v-model:periodoSelecionado="periodoSelecionado"
-      v-model:diaSelecionado="diaSelecionado"
-      v-model:mesSelecionado="mesSelecionado"
-      v-model:anoSelecionado="anoSelecionado"
-      :nomesEstacoes="nomesEstacoes"
-      :opcoesPeriodos="opcoesPeriodos"
-      :opcoesDias="opcoesDias"
-      :opcoesMeses="opcoesMeses"
-      :opcoesAnos="opcoesAnos"
-      :periodos="periodos"
+      v-model:estacao-selecionada="estacaoSelecionada"
+      v-model:periodo-selecionado="periodoSelecionado"
+      v-model:dia-selecionado="diaSelecionado"
+      v-model:mes-selecionado="mesSelecionado"
+      v-model:ano-selecionado="anoSelecionado"
+      :nomes-estacoes="nomesEstacoes"
       :carregando="carregando"
-      @obterDados="obterDadosEstacao"
+      @obter-dados="obterDadosEstacao"
     />
 
     <!-- Gráficos -->
@@ -108,9 +103,6 @@ import { defineComponent } from "vue";
 import {
   STATIONS,
   PERIODOS,
-  OPCOES_DIAS,
-  OPCOES_MESES,
-  OPCOES_ANOS,
   CHART_SERIE_TEMPORAL_OPTIONS,
 } from "../constants/constants";
 import weatherApi from "src/api/weather-api";
@@ -131,21 +123,6 @@ export default defineComponent({
     },
     nomesEstacoes() {
       return Object.values(STATIONS);
-    },
-    periodos() {
-      return PERIODOS;
-    },
-    opcoesPeriodos() {
-      return Object.values(PERIODOS);
-    },
-    opcoesDias() {
-      return OPCOES_DIAS;
-    },
-    opcoesMeses() {
-      return OPCOES_MESES;
-    },
-    opcoesAnos() {
-      return OPCOES_ANOS;
     },
   },
 
