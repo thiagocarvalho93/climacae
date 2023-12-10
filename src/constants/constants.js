@@ -33,6 +33,9 @@ const CORES = {
   INDIGO_ESCURO: "#1a237e",
 };
 
+/**
+ * Opções de períodos do filtro.
+ */
 const PERIODOS = {
   HOJE: "Hoje",
   ULTIMOS_SETE_DIAS: "Últimos 7 dias",
@@ -41,14 +44,21 @@ const PERIODOS = {
   MES_ESPECIFICO: "Mês específico",
 };
 
+// TODO: Essa opção deve ser dinâmica de acordo com o mês selecionado!
 const OPCOES_DIAS = arrayUtils.arrayRange(
   1,
   dataUtils.calcularDiaMesAtual(),
   1
 );
 
+/**
+ * Array de 1 a 12.
+ */
 const OPCOES_MESES = Array.from({ length: 12 }, (_, i) => i + 1);
 
+/**
+ * Array de 2020 até o ano atual.
+ */
 const OPCOES_ANOS = arrayUtils.arrayRange(2020, new Date().getFullYear(), 1);
 
 // GRÁFICOS

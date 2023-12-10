@@ -1,8 +1,15 @@
-const calcularDiasMes = (ano, mes) => new Date(ano, mes + 1, 0).getDate();
-
+/**
+ * Obtem o dia e o mês atual, com horário zerado.
+ */
 const calcularDiaMesAtual = () =>
   new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
 
+/**
+ * Subtrai horas de uma data.
+ * @param {Date} data - data a ser subtraida.
+ * @param {number} horas - horas a se subtrair.
+ * @returns Retorna uma nova data com as horas subtraidas.
+ */
 const subtrairHoras = (data, horas) => {
   const dateCopy = new Date(data);
 
@@ -11,12 +18,24 @@ const subtrairHoras = (data, horas) => {
   return dateCopy;
 };
 
+/**
+ * Formata a data para o formato do parâmetro do endpoint da API.
+ * @param {Date} data -data a ser formatada.
+ * @returns retorna uma string da data no formato YYYYMMDD.
+ */
 const formatDateForQuery = (data) => {
   return `${data.getFullYear()}${data.getMonth() + 1 < 10 ? "0" : ""}${
     data.getMonth() + 1
   }${data.getDate() < 10 ? "0" : ""}${data.getDate()}`;
 };
 
+/**
+ * Define as datas inicial e final dado um mês e ano.
+ * @param {number} mes - mês do ano.
+ * @param {number} ano - ano.
+ * @throws caso o mês do ano seja no futuro.
+ * @returns retorna um objeto contendo dataInicial e dataFinal.
+ */
 const definirDataInicialEFinalMes = (mes, ano) => {
   const hoje = new Date();
   let isFuturo = mes > hoje.getMonth() + 1 && ano >= hoje.getFullYear();
@@ -33,7 +52,6 @@ const definirDataInicialEFinalMes = (mes, ano) => {
 };
 
 export default {
-  calcularDiasMes,
   calcularDiaMesAtual,
   subtrairHoras,
   formatDateForQuery,
