@@ -1,83 +1,19 @@
 <template>
   <q-page :class="`q-pa-md ${darkMode ? 'bg-dark-page' : 'bg-blue-grey-1'}`">
     <!-- Filtros -->
-    <q-card flat class="q-pa-md q-mb-md fade">
-      <div class="row q-col-gutter-md">
-        <div class="col-12 col-sm-4 col-md-2 fade">
-          <q-select
-            dense
-            outlined
-            v-model="periodoSelecionado"
-            :options="opcoesPeriodos"
-            label="Período"
-          />
-        </div>
-        <div
-          v-if="periodoSelecionado === periodos.DIA_ESPECIFICO"
-          class="col-4 col-sm-2 col-md-1 fade"
-        >
-          <q-select
-            dense
-            outlined
-            v-model="diaSelecionado"
-            :options="opcoesDias"
-            label="Dia"
-          />
-        </div>
-        <div
-          v-if="
-            periodoSelecionado === periodos.MES_ESPECIFICO ||
-            periodoSelecionado === periodos.DIA_ESPECIFICO
-          "
-          :class="
-            (periodoSelecionado === periodos.DIA_ESPECIFICO
-              ? 'col-4 '
-              : 'col-6 ') + 'col-sm-2 col-md-1 fade'
-          "
-        >
-          <q-select
-            dense
-            outlined
-            v-model="mesSelecionado"
-            :options="opcoesMeses"
-            label="Mês"
-          />
-        </div>
-        <div
-          v-if="
-            periodoSelecionado === periodos.MES_ESPECIFICO ||
-            periodoSelecionado === periodos.DIA_ESPECIFICO
-          "
-          :class="
-            (periodoSelecionado === periodos.DIA_ESPECIFICO
-              ? 'col-4 '
-              : 'col-6 ') + 'col-sm-2 col-md-1 fade'
-          "
-        >
-          <q-select
-            dense
-            outlined
-            v-model="anoSelecionado"
-            :options="opcoesAnos"
-            label="Ano"
-          />
-        </div>
-        <div class="col-12 col-sm-4 col-md-2 col-lg-1 fade">
-          <q-btn
-            push
-            @click="obterCalcularEAtualizar"
-            style="width: 100%"
-            :loading="carregando"
-            color="primary"
-            >Filtrar
-            <template v-slot:loading>
-              <q-spinner-hourglass class="on-left" />
-              Carregando
-            </template>
-          </q-btn>
-        </div>
-      </div>
-    </q-card>
+    <SecaoFiltros
+      v-model:periodoSelecionado="periodoSelecionado"
+      v-model:diaSelecionado="diaSelecionado"
+      v-model:mesSelecionado="mesSelecionado"
+      v-model:anoSelecionado="anoSelecionado"
+      :opcoesPeriodos="opcoesPeriodos"
+      :opcoesDias="opcoesDias"
+      :opcoesMeses="opcoesMeses"
+      :opcoesAnos="opcoesAnos"
+      :periodos="periodos"
+      :carregando="carregando"
+      @obterDados="obterCalcularEAtualizar"
+    />
 
     <!-- Cards -->
     <div class="row q-col-gutter-md fade">
@@ -258,6 +194,7 @@ import { useObservationStore } from "src/stores/observations";
 import RealTimeObservationsCarousel from "src/components/RealTimeObservationsCarousel.vue";
 import InformacaoCard from "src/components/InformacaoCard.vue";
 import TabelaObservacoes from "src/components/TabelaObservacoes.vue";
+import SecaoFiltros from "src/components/SecaoFiltros.vue";
 
 export default defineComponent({
   name: "IndexPage",
@@ -266,6 +203,7 @@ export default defineComponent({
     RealTimeObservationsCarousel,
     InformacaoCard,
     TabelaObservacoes,
+    SecaoFiltros,
   },
 
   computed: {

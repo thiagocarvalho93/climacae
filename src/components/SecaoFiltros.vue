@@ -1,9 +1,8 @@
 <template>
   <q-card flat class="q-pa-md q-mb-md fade">
     <div class="row q-col-gutter-md">
-      <div class="col-12 col-sm-4 col-md-2 fade">
+      <div v-if="nomesEstacoes" class="col-12 col-sm-4 col-md-2 fade">
         <q-select
-          v-if="nomesEstacoes.length > 0"
           dense
           v-model="estacaoSelecionadaProxy"
           :options="nomesEstacoes"
