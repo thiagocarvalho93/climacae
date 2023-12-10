@@ -1,54 +1,41 @@
 <template>
   <q-page :class="`q-pa-md ${darkMode ? 'bg-dark-page' : 'bg-blue-grey-1'}`">
-    <q-card flat class="q-pa-md q-mb-md fade">
-      <div class="row q-col-gutter-md">
-        <div class="col-12 col-sm-4 col-md-2 fade">
-          <q-select dense v-model="estacaoSelecionada" :options="nomesEstacoes" outlined hide-bottom-space
-            input-style="{ background-color: red }" option-label="NOME" label="Estação" />
-        </div>
-        <div class="col-12 col-sm-4 col-md-2 fade">
-          <q-select dense outlined v-model="periodoSelecionado" :options="opcoesPeriodos" label="Período" />
-        </div>
-        <div v-if="periodoSelecionado === periodos.DIA_ESPECIFICO" class="col-4 col-sm-2 col-md-1 fade">
-          <q-select dense outlined v-model="diaSelecionado" :options="opcoesDias" label="Dia" />
-        </div>
-        <div v-if="periodoSelecionado === periodos.MES_ESPECIFICO ||
-          periodoSelecionado === periodos.DIA_ESPECIFICO
-          " :class="(periodoSelecionado === periodos.DIA_ESPECIFICO
-    ? 'col-4 '
-    : 'col-6 ') + 'col-sm-2 col-md-1 fade'
-    ">
-          <q-select dense outlined v-model="mesSelecionado" :options="opcoesMeses" label="Mês" />
-        </div>
-        <div v-if="periodoSelecionado === periodos.MES_ESPECIFICO ||
-          periodoSelecionado === periodos.DIA_ESPECIFICO
-          " :class="(periodoSelecionado === periodos.DIA_ESPECIFICO
-    ? 'col-4 '
-    : 'col-6 ') + 'col-sm-2 col-md-1 fade'
-    ">
-          <q-select dense outlined v-model="anoSelecionado" :options="opcoesAnos" label="Ano" />
-        </div>
-        <div class="col-12 col-sm-4 col-md-2 col-lg-1 fade">
-          <q-btn push @click="obterDadosEstacao" style="width: 100%" :loading="carregando" color="primary">Filtrar
-            <template v-slot:loading>
-              <q-spinner-hourglass class="on-left" />
-              Carregando
-            </template>
-          </q-btn>
-        </div>
-      </div>
-    </q-card>
+    <!-- Filtros -->
+    <SecaoFiltros
+      v-model:estacaoSelecionada="estacaoSelecionada"
+      v-model:periodoSelecionado="periodoSelecionado"
+      v-model:diaSelecionado="diaSelecionado"
+      v-model:mesSelecionado="mesSelecionado"
+      v-model:anoSelecionado="anoSelecionado"
+      :nomesEstacoes="nomesEstacoes"
+      :opcoesPeriodos="opcoesPeriodos"
+      :opcoesDias="opcoesDias"
+      :opcoesMeses="opcoesMeses"
+      :opcoesAnos="opcoesAnos"
+      :periodos="periodos"
+      :carregando="carregando"
+      @obterDados="obterDadosEstacao"
+    />
 
+    <!-- Gráficos -->
     <div class="row q-col-gutter-md">
       <div class="col-12 col-md-6 flex">
         <q-card flat class="full-width">
           <q-card-section class="text-h6"> Temperatura </q-card-section>
           <q-card-section>
-            <apexchart height="250" :options="chartSerieTemporalOptions" :series="seriesTemperatura"
-              ref="graficoTemporalTemperatura"></apexchart>
+            <apexchart
+              height="250"
+              :options="chartSerieTemporalOptions"
+              :series="seriesTemperatura"
+              ref="graficoTemporalTemperatura"
+            ></apexchart>
           </q-card-section>
-          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
-            label-style="font-size: 1.1em" />
+          <q-inner-loading
+            :showing="carregando"
+            label="Aguarde..."
+            label-class="text-teal"
+            label-style="font-size: 1.1em"
+          />
         </q-card>
       </div>
 
@@ -56,11 +43,19 @@
         <q-card flat class="full-width">
           <q-card-section class="text-h6"> Pressão </q-card-section>
           <q-card-section>
-            <apexchart height="250" :options="chartSerieTemporalOptions" :series="seriesPressao"
-              ref="graficoTemporalPressao"></apexchart>
+            <apexchart
+              height="250"
+              :options="chartSerieTemporalOptions"
+              :series="seriesPressao"
+              ref="graficoTemporalPressao"
+            ></apexchart>
           </q-card-section>
-          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
-            label-style="font-size: 1.1em" />
+          <q-inner-loading
+            :showing="carregando"
+            label="Aguarde..."
+            label-class="text-teal"
+            label-style="font-size: 1.1em"
+          />
         </q-card>
       </div>
 
@@ -68,11 +63,19 @@
         <q-card flat class="full-width">
           <q-card-section class="text-h6"> Precipitação </q-card-section>
           <q-card-section>
-            <apexchart height="250" :options="chartSerieTemporalOptions" :series="seriesPrecipitacao"
-              ref="graficoTemporalPrecipitacao"></apexchart>
+            <apexchart
+              height="250"
+              :options="chartSerieTemporalOptions"
+              :series="seriesPrecipitacao"
+              ref="graficoTemporalPrecipitacao"
+            ></apexchart>
           </q-card-section>
-          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
-            label-style="font-size: 1.1em" />
+          <q-inner-loading
+            :showing="carregando"
+            label="Aguarde..."
+            label-class="text-teal"
+            label-style="font-size: 1.1em"
+          />
         </q-card>
       </div>
 
@@ -80,11 +83,20 @@
         <q-card flat class="full-width">
           <q-card-section class="text-h6"> Vento </q-card-section>
           <q-card-section>
-            <apexchart height="250" :options="chartSerieTemporalOptions" :series="seriesVento" ref="graficoTemporalVento">
+            <apexchart
+              height="250"
+              :options="chartSerieTemporalOptions"
+              :series="seriesVento"
+              ref="graficoTemporalVento"
+            >
             </apexchart>
           </q-card-section>
-          <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal"
-            label-style="font-size: 1.1em" />
+          <q-inner-loading
+            :showing="carregando"
+            label="Aguarde..."
+            label-class="text-teal"
+            label-style="font-size: 1.1em"
+          />
         </q-card>
       </div>
     </div>
@@ -104,10 +116,11 @@ import {
 import weatherApi from "src/api/weather-api";
 import Observation from "src/models/observation-model";
 import dataUtils from "src/utils/data-utils";
+import SecaoFiltros from "src/components/SecaoFiltros.vue";
 
 export default defineComponent({
   name: "EstacaoPage",
-  components: {},
+  components: { SecaoFiltros },
 
   computed: {
     darkMode() {
@@ -188,9 +201,16 @@ export default defineComponent({
           break;
         case PERIODOS.ULTIMOS_SETE_DIAS:
         case PERIODOS.ULTIMOS_TRINTA_DIAS:
-          const daysAgo = this.periodoSelecionado === PERIODOS.ULTIMOS_SETE_DIAS ? 7 : 30;
-          this.setDates(new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000), new Date());
-          await this.obterObservacoesDiariasPeriodo(this.dataInicial, this.dataFinal);
+          const daysAgo =
+            this.periodoSelecionado === PERIODOS.ULTIMOS_SETE_DIAS ? 7 : 30;
+          this.setDates(
+            new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000),
+            new Date()
+          );
+          await this.obterObservacoesDiariasPeriodo(
+            this.dataInicial,
+            this.dataFinal
+          );
           break;
         case PERIODOS.MES_ESPECIFICO:
           await this.filtrarMesEspecifico();
@@ -209,7 +229,10 @@ export default defineComponent({
     },
 
     async filtrarMesEspecifico() {
-      const { dataFinal, dataInicial } = dataUtils.definirDataInicialEFinalMes(this.mesSelecionado, this.anoSelecionado);
+      const { dataFinal, dataInicial } = dataUtils.definirDataInicialEFinalMes(
+        this.mesSelecionado,
+        this.anoSelecionado
+      );
 
       await this.obterObservacoesDiariasPeriodo(dataInicial, dataFinal);
     },
@@ -275,8 +298,9 @@ export default defineComponent({
     },
 
     formatarDataParaQuery(data) {
-      return `${data.getFullYear()}${data.getMonth() + 1 < 10 ? "0" : ""}${data.getMonth() + 1
-        }${data.getDate() < 10 ? "0" : ""}${data.getDate()}`;
+      return `${data.getFullYear()}${data.getMonth() + 1 < 10 ? "0" : ""}${
+        data.getMonth() + 1
+      }${data.getDate() < 10 ? "0" : ""}${data.getDate()}`;
     },
 
     atualizarGraficoTemporal(seriesNames, chartRef) {
@@ -335,7 +359,7 @@ export default defineComponent({
           {
             label: "Fechar",
             color: "white",
-            handler: () => { },
+            handler: () => {},
           },
         ],
       });
@@ -351,7 +375,7 @@ export default defineComponent({
           {
             label: "Fechar",
             color: "white",
-            handler: () => { },
+            handler: () => {},
           },
         ],
       });
