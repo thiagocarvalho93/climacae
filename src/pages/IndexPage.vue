@@ -226,8 +226,6 @@
         <TabelaObservacoes
           :rows="observations"
           :columns="colunasTabela"
-          :pagination="pagination"
-          :filter="filter"
           :loading="carregando"
           :data-final="dataFinal"
           :data-inicial="dataInicial"
@@ -327,22 +325,22 @@ export default defineComponent({
   },
 
   watch: {
-    darkMode(newThemeDark, oldThemeDark) {
+    darkMode(isDark) {
       this.$refs.graficoColunaTemperatura.updateOptions({
         theme: {
-          mode: newThemeDark ? "dark" : "light",
+          mode: isDark ? "dark" : "light",
         },
       });
 
       this.$refs.graficoPrecipitacao.updateOptions({
         theme: {
-          mode: newThemeDark ? "dark" : "light",
+          mode: isDark ? "dark" : "light",
         },
       });
 
       this.$refs.graficoTemporal.updateOptions({
         theme: {
-          mode: newThemeDark ? "dark" : "light",
+          mode: isDark ? "dark" : "light",
         },
       });
     },
@@ -363,7 +361,6 @@ export default defineComponent({
       anoSelecionado: new Date().getFullYear(),
       dataInicial: new Date(),
       dataFinal: new Date(),
-      filter: "",
       //outputs
       metadadosEstacoes: [],
       ultimaAtualizacao: new Date().toLocaleTimeString(navigator.language, {
@@ -382,10 +379,6 @@ export default defineComponent({
       seriesTemperatura: [],
       seriesPrecipitacao: [],
       seriesTemporal: [],
-      //tabela
-      pagination: {
-        rowsPerPage: 12,
-      },
     };
   },
 
@@ -787,9 +780,6 @@ export default defineComponent({
   animation-timing-function: ease
   animation-delay: 0.6s
   background-image: linear-gradient(to right,$indigo-6, $indigo-8)
-
-.dark-grey
-  background-image: linear-gradient(to right,#eef, #eef)
 
 ::-webkit-scrollbar
   width: var(--scrollbar-width-height)

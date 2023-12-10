@@ -57,7 +57,6 @@ export default {
     carregando: Boolean,
     rows: Array,
     columns: Array,
-    pagination: Object,
     periodoSelecionado: String,
     dataInicial: Date,
     dataFinal: Date,
@@ -66,12 +65,15 @@ export default {
     return {
       filter: "",
       mostrarInformacoesCard: true,
+      pagination: {
+        rowsPerPage: 12,
+      },
     };
   },
   methods: {
     striped(props) {
       if (props.rowIndex % 2 != 0) {
-        return "dark-grey";
+        return this.$q.dark.isActive ? "dark-stripe" : "light-stripe";
       }
     },
 
@@ -183,6 +185,10 @@ export default {
 </script>
 
 <style scoped lang="sass">
+.dark-stripe
+  background-image: linear-gradient(to right,#333, #333)
+.light-stripe
+  background-image: linear-gradient(to right,#eef, #eef)
 .my-sticky-header-table
   /* height or max-height is important */
   height: 400px
