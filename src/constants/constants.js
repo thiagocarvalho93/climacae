@@ -23,8 +23,8 @@ const STATIONS = {
   IMACA43: { ID: "IMACA43", NOME: "Aeroporto" },
   // ICAMPO96: { ID: "ICAMPO96", NOME: "" }, desativada
   // ICAMPO223: { ID: "ICAMPO223", NOME: "" },
-  ICABOF4: { ID: "ICABOF4", NOME: "CF - Jardim Flamboyant" },
-  ICABOF8: { ID: "ICABOF8", NOME: "CF - Tamoios" },
+  // ICABOF4: { ID: "ICABOF4", NOME: "CF - Jardim Flamboyant" },
+  // ICABOF8: { ID: "ICABOF8", NOME: "CF - Tamoios" },
 };
 
 const CORES = {
