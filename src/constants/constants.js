@@ -5,10 +5,11 @@ const STATIONS = {
   // IRIODA1: { ID: "IRIODA1", NOME: "RO - Alphaville" },
   // IRIODA5: { ID: "IRIODA5", NOME: "RO - Parque dos Pássaros" },
   // IRIODA6: { ID: "IRIODA6", NOME: "Canta Galo" },
+  IMACA6: { ID: "IMACA6", NOME: "Miramar" },
   IMACA7: { ID: "IMACA7", NOME: "Mirante" },
   IMACA13: { ID: "IMACA13", NOME: "Serra" },
   IMACA15: { ID: "IMACA15", NOME: "Glória" },
-  // IMACA23: { ID: "IMACA23", NOME: "LAMET" },
+  IMACA23: { ID: "IMACA23", NOME: "LAMET" },
   IMACA26: { ID: "IMACA26", NOME: "Granja dos Cavaleiros" },
   IMACA27: { ID: "IMACA27", NOME: "Imbetiba" },
   IMACA28: { ID: "IMACA28", NOME: "Aroeira" },
@@ -22,7 +23,8 @@ const STATIONS = {
   IMACA43: { ID: "IMACA43", NOME: "Aeroporto" },
   // ICAMPO96: { ID: "ICAMPO96", NOME: "" }, desativada
   // ICAMPO223: { ID: "ICAMPO223", NOME: "" },
-  // ICABOF4: { ID: "ICABOF4", NOME: "Cabo Frio" },
+  ICABOF4: { ID: "ICABOF4", NOME: "CF - Jardim Flamboyant" },
+  ICABOF8: { ID: "ICABOF8", NOME: "CF - Tamoios" },
 };
 
 const CORES = {
