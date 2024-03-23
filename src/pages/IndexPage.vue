@@ -443,44 +443,38 @@ export default defineComponent({
       this.metadadosEstacoes = [];
 
       // TODO fazer o método calcularMaximosGlobais nesse mesmo loop
-      this.observations.forEach((obs) => {
-        const obsModel = new Observation(obs);
-        const { metric, stationID } = obsModel;
+      this.metadadosEstacoes = this.observations.reduce((acc, obs) => {
+        const { metric, stationID } = obs;
         const { tempHigh, tempLow, windgustHigh, precipRate, precipTotal } =
           new Metric(metric);
 
-        let indiceMetadadosEstacao = this.metadadosEstacoes.findIndex(
-          (x) => x.id === STATIONS[stationID].NOME
-        );
+        let indice = acc.findIndex((x) => x.id === STATIONS[stationID].NOME);
 
-        if (indiceMetadadosEstacao === -1) {
-          this.metadadosEstacoes.push({
+        if (indice === -1) {
+          acc.push({
             id: STATIONS[stationID].NOME,
-            minima: tempLow,
-            maxima: tempHigh,
-            ventoMaximo: windgustHigh,
-            precipitacaoMaxima: precipRate,
-            precipitacaoAcumulada: precipTotal,
+            minima: Number(tempLow),
+            maxima: Number(tempHigh),
+            ventoMaximo: Number(windgustHigh),
+            precipitacaoMaxima: Number(precipRate),
+            precipitacaoAcumulada: Number(precipRate),
           });
         } else {
-          const {
-            maxima,
-            minima,
-            ventoMaximo,
-            precipitacaoMaxima,
-            precipitacaoAcumulada,
-          } = this.metadadosEstacoes[indiceMetadadosEstacao];
-
-          this.metadadosEstacoes[indiceMetadadosEstacao] = {
-            id: STATIONS[stationID].NOME,
-            maxima: Math.max(tempHigh, maxima),
-            minima: Math.min(tempLow, minima),
-            ventoMaximo: Math.max(windgustHigh, ventoMaximo),
-            precipitacaoMaxima: Math.max(precipTotal, precipitacaoMaxima),
-            precipitacaoAcumulada: precipitacaoAcumulada + precipTotal,
-          };
+          acc[indice].minima = Math.min(acc[indice].minima, tempLow);
+          acc[indice].maxima = Math.max(acc[indice].minima, tempHigh);
+          acc[indice].ventoMaximo = Math.max(
+            acc[indice].ventoMaximo,
+            windgustHigh
+          );
+          acc[indice].precipitacaoMaxima = Math.max(
+            acc[indice].precipitacaoMaxima,
+            precipRate
+          );
+          acc[indice].precipitacaoAcumulada += Number(precipRate);
         }
-      });
+
+        return acc;
+      }, []);
     },
 
     calcularMaximosGlobais() {
