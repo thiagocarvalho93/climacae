@@ -16,7 +16,7 @@
     <div class="row q-col-gutter-md">
       <div class="col-12 col-md-6 flex">
         <q-card flat class="full-width">
-          <q-card-section class="text-h6"> Temperatura </q-card-section>
+          <q-card-section class="text-h6"> Temperatura (°C) </q-card-section>
           <q-card-section>
             <apexchart
               height="250"
@@ -36,7 +36,7 @@
 
       <div class="col-12 col-md-6 flex">
         <q-card flat class="full-width">
-          <q-card-section class="text-h6"> Pressão </q-card-section>
+          <q-card-section class="text-h6"> Pressão (hPa)</q-card-section>
           <q-card-section>
             <apexchart
               height="250"
@@ -56,7 +56,7 @@
 
       <div class="col-12 col-md-6 flex">
         <q-card flat class="full-width">
-          <q-card-section class="text-h6"> Precipitação </q-card-section>
+          <q-card-section class="text-h6"> Precipitação (mm) </q-card-section>
           <q-card-section>
             <apexchart
               height="250"
@@ -76,7 +76,9 @@
 
       <div class="col-12 col-md-6 flex">
         <q-card flat class="full-width">
-          <q-card-section class="text-h6"> Velocidade do vento </q-card-section>
+          <q-card-section class="text-h6">
+            Velocidade do vento (km/h)</q-card-section
+          >
           <q-card-section>
             <apexchart
               height="250"
@@ -330,7 +332,7 @@ export default defineComponent({
 
     atualizarGraficoTemporalPrecipitacao() {
       const precipPropsMap = {
-        precipRate: { desc: "Taxa", color: "yellow" },
+        precipRate: { desc: "Taxa (mm/h)", color: "yellow" },
         precipTotal: { desc: "Total", color: "blue" },
       };
 
