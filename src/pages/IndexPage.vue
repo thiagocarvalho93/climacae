@@ -179,7 +179,6 @@ import {
   COLUNAS_TABELA,
 } from "../constants/constants";
 import dataUtils from "src/utils/data-utils";
-import Observation from "src/models/observation-model";
 import Metric from "src/models/metric-model";
 import { mapActions, mapState } from "pinia";
 import { useObservationStore } from "src/stores/observations";
@@ -468,7 +467,7 @@ export default defineComponent({
           );
           acc[indice].precipitacaoMaxima = Math.max(
             acc[indice].precipitacaoMaxima,
-            precipRate
+            Number(precipRate)
           );
           acc[indice].precipitacaoAcumulada += Number(precipRate);
         }
@@ -599,7 +598,7 @@ export default defineComponent({
 
       if (isDiario) {
         const precMaximas = data.map((x) => x.precipitacaoMaxima);
-        precipitacaoMaxima = Math.max(...precMaximas);
+        precipitacaoMaxima = Math.max(...precMaximas).toFixed(2);
         series.splice(1, 1); // Remove a série "Precipitação restante"
       } else {
         const precMaximas = data.map(
@@ -609,7 +608,7 @@ export default defineComponent({
       }
 
       this.$refs.graficoPrecipitacao.updateOptions({
-        series: series,
+        series,
         xaxis: {
           categories: dadosFiltrados.map((x) =>
             x.id.length > 15 ? `${x.id.substring(0, 15)}...` : x.id

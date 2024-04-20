@@ -93,7 +93,7 @@ const CHART_TEMPERATURA_OPTIONS = {
     categories: Object.keys(STATIONS),
   },
   yaxis: {
-    max: 40,
+    min: 15,
     tickAmount: 5,
   },
 
@@ -151,7 +151,7 @@ const CHART_PRECIPITACAO_OPTIONS = {
   },
 };
 
-const CHART_SERIE_TEMPORAL_OPTIONS = {
+const CHART_SERIE_TEMPORAL_OPTIONS = Object.freeze({
   chart: {
     type: "line",
     zoom: {
@@ -178,10 +178,19 @@ const CHART_SERIE_TEMPORAL_OPTIONS = {
     width: 3,
     curve: "smooth",
   },
+  legend: {
+    show: true,
+  },
   grid: {
     row: {
+      colors: ["#e5e5e5", "transparent"],
       opacity: 0.5,
     },
+    column: {
+      colors: ["#f8f8f8", "transparent"],
+    },
+    borderColor: "#e5e5e5",
+    strokeDashArray: 7,
   },
   xaxis: {
     type: "datetime",
@@ -191,7 +200,7 @@ const CHART_SERIE_TEMPORAL_OPTIONS = {
     min: 5,
     max: 45,
   },
-};
+});
 
 const COLUNAS_TABELA = [
   {

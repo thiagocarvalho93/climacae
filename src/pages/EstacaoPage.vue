@@ -76,7 +76,7 @@
 
       <div class="col-12 col-md-6 flex">
         <q-card flat class="full-width">
-          <q-card-section class="text-h6"> Vento </q-card-section>
+          <q-card-section class="text-h6"> Velocidade do vento </q-card-section>
           <q-card-section>
             <apexchart
               height="250"
@@ -141,6 +141,7 @@ export default defineComponent({
       observacoes: [],
 
       chartSerieTemporalOptions: CHART_SERIE_TEMPORAL_OPTIONS,
+      chartTemperaturaOptions: CHART_SERIE_TEMPORAL_OPTIONS,
       seriesTemperatura: [],
       seriesPressao: [],
       seriesPrecipitacao: [],
@@ -280,13 +281,15 @@ export default defineComponent({
       }${data.getDate() < 10 ? "0" : ""}${data.getDate()}`;
     },
 
-    atualizarGraficoTemporal(seriesNames, chartRef) {
-      const dados = seriesNames.map((name) => {
+    atualizarGraficoTemporal(chartRef, seriesMap, colors) {
+      const dados = Object.keys(seriesMap).map((serie) => {
+        const name = seriesMap[serie].desc;
+
         return {
-          name: name,
+          name,
           data: this.observacoes.map((obs) => [
             dataUtils.subtrairHoras(new Date(obs.obsTimeLocal), 3),
-            obs.metric[name],
+            obs.metric[serie],
           ]),
         };
       });
@@ -294,36 +297,63 @@ export default defineComponent({
       chartRef.updateOptions({
         series: dados,
         yaxis: {},
+        colors,
       });
     },
 
     atualizarGraficoTemporalTemperatura() {
-      const tempProps = ["tempAvg", "tempHigh", "tempLow"];
+      const tempMap = {
+        tempAvg: { desc: "Média", color: "yellow" },
+        tempHigh: { desc: "Máxima", color: "red" },
+        tempLow: { desc: "Mínima", color: "blue" },
+      };
+
       this.atualizarGraficoTemporal(
-        tempProps,
-        this.$refs.graficoTemporalTemperatura
+        this.$refs.graficoTemporalTemperatura,
+        tempMap,
+        ["#FFD700", "#FF5733", "#6495ED"]
       );
     },
 
     atualizarGraficoTemporalPressao() {
-      const pressureProps = ["pressureMin", "pressureMax"];
+      const pressurePropsMap = {
+        pressureMin: { desc: "Mínima", color: "blue" },
+        pressureMax: { desc: "Máxima", color: "red" },
+      };
+
       this.atualizarGraficoTemporal(
-        pressureProps,
-        this.$refs.graficoTemporalPressao
+        this.$refs.graficoTemporalPressao,
+        pressurePropsMap,
+        ["#6495ED", "#FF5733"]
       );
     },
 
     atualizarGraficoTemporalPrecipitacao() {
-      const precipProps = ["precipRate", "precipTotal"];
+      const precipPropsMap = {
+        precipRate: { desc: "Taxa", color: "yellow" },
+        precipTotal: { desc: "Total", color: "blue" },
+      };
+
       this.atualizarGraficoTemporal(
-        precipProps,
-        this.$refs.graficoTemporalPrecipitacao
+        this.$refs.graficoTemporalPrecipitacao,
+        precipPropsMap,
+        ["#FFD700", "#6495ED"]
       );
     },
 
     atualizarGraficoTemporalVento() {
-      const windProps = ["windspeedAvg", "windspeedHigh", "windspeedLow"];
-      this.atualizarGraficoTemporal(windProps, this.$refs.graficoTemporalVento);
+      const windPropsMap = {
+        windspeedAvg: { desc: "Média", color: "yellow" },
+        windspeedHigh: { desc: "Máxima", color: "red" },
+        windspeedLow: { desc: "Mínima", color: "blue" },
+      };
+      colors:;
+
+      this.atualizarGraficoTemporal(
+        this.$refs.graficoTemporalVento,
+        windPropsMap,
+        ["#FFD700", "#FF5733", "#6495ED"]
+      );
     },
 
     mensagemErro(mensagem) {
