@@ -149,6 +149,13 @@ const CHART_PRECIPITACAO_OPTIONS = {
   xaxis: {
     categories: Object.keys(STATIONS),
   },
+  tooltip: {
+    y: {
+      formatter: (texto) => {
+        return `${texto.toFixed(1)} mm`;
+      },
+    },
+  },
 };
 
 const CHART_SERIE_TEMPORAL_OPTIONS = Object.freeze({
