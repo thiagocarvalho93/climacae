@@ -143,7 +143,6 @@ export default defineComponent({
       observacoes: [],
 
       chartSerieTemporalOptions: CHART_SERIE_TEMPORAL_OPTIONS,
-      chartTemperaturaOptions: CHART_SERIE_TEMPORAL_OPTIONS,
       seriesTemperatura: [],
       seriesPressao: [],
       seriesPrecipitacao: [],
@@ -151,11 +150,37 @@ export default defineComponent({
     };
   },
 
-  created() {
-    this.obterDadosEstacao();
+  async created() {
+    await this.obterDadosEstacao();
+    this.$watch(
+      "darkMode",
+      (isDark) => {
+        this.updateDarkMode("graficoTemporalTemperatura", isDark);
+        this.updateDarkMode("graficoTemporalPressao", isDark);
+        this.updateDarkMode("graficoTemporalPrecipitacao", isDark);
+        this.updateDarkMode("graficoTemporalVento", isDark);
+      },
+      {
+        immediate: true,
+      }
+    );
   },
 
   methods: {
+    updateDarkMode(graficoRef, isDark) {
+      this.$refs[graficoRef].updateOptions({
+        theme: {
+          mode: isDark ? "dark" : "light",
+        },
+        grid: {
+          row: {
+            colors: isDark
+              ? ["#333", "transparent"]
+              : ["#e5e5e5", "transparent"],
+          },
+        },
+      });
+    },
     async obterDadosEstacao() {
       this.carregando = true;
       try {

@@ -121,7 +121,7 @@
               <div class="col-12 col-sm-8 col-md-10">
                 <span>Séries temporais</span>
               </div>
-              <div class="col-12 col-sm-4 col-md-2">
+              <!-- <div class="col-12 col-sm-4 col-md-2">
                 <q-select
                   dense
                   v-model="estacaoSelecionada"
@@ -132,7 +132,7 @@
                   option-label="NOME"
                   label="Estação"
                 />
-              </div>
+              </div> -->
             </div>
           </q-card-section>
           <q-card-section>
@@ -295,6 +295,13 @@ export default defineComponent({
         this.$refs.graficoTemporal.updateOptions({
           theme: {
             mode: isDark ? "dark" : "light",
+          },
+          grid: {
+            row: {
+              colors: isDark
+                ? ["#333", "transparent"]
+                : ["#e5e5e5", "transparent"],
+            },
           },
         });
       },
