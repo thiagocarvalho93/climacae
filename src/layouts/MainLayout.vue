@@ -1,14 +1,30 @@
 <template>
   <q-layout view="hHh lpR fff">
-    <q-header :bordered="isDarkMode" reveal :class="`${isDarkMode ? 'bg-dark' : 'bg-white shadow-2'}`">
+    <q-header
+      :bordered="isDarkMode"
+      reveal
+      :class="`${isDarkMode ? 'bg-dark' : 'bg-white shadow-2'}`"
+    >
       <q-toolbar>
+        <q-avatar>
+          <q-img
+            src="../assets/logo-192x192.png"
+            spinner-color="white"
+            style="height: 25px"
+            fit="scale-down"
+          />
+        </q-avatar>
         <q-toolbar-title class="fade">
-          <q-avatar>
-            <q-img src="../assets/logo-192x192.png" spinner-color="white" style="height: 25px" fit="scale-down" />
-          </q-avatar>
+          <span :class="!isDarkMode ? 'text-black' : 'text-white'">Macaé</span>
         </q-toolbar-title>
-        <q-toggle v-model="isDarkMode" color="black" keep-color @update:model-value="toggleDarkMode(isDarkMode)"
-          icon="nightlight" unchecked-icon="light_mode" />
+        <q-toggle
+          v-model="isDarkMode"
+          color="black"
+          keep-color
+          @update:model-value="toggleDarkMode(isDarkMode)"
+          icon="nightlight"
+          unchecked-icon="light_mode"
+        />
       </q-toolbar>
 
       <q-tabs class="text-primary" v-model="tab">
@@ -21,15 +37,34 @@
       <router-view />
     </q-page-container>
 
-    <q-footer bordered :class="`text-white ${isDarkMode ? 'bg-dark' : 'bg-white'}`">
+    <q-footer
+      bordered
+      :class="`text-white ${isDarkMode ? 'bg-dark' : 'bg-white'}`"
+    >
       <q-toolbar class="row justify-center">
         <div class="col-3 col-md-1 fade">
           <q-toolbar-title>
-            <a target="_blank" href="https://www.linkedin.com/in/thiago-paes-de-carvalho/">
-              <q-btn round unelevated :text-color="isDarkMode ? 'white' : 'dark'" icon="ion-logo-linkedin" />
+            <a
+              target="_blank"
+              href="https://www.linkedin.com/in/thiago-paes-de-carvalho/"
+            >
+              <q-btn
+                round
+                unelevated
+                :text-color="isDarkMode ? 'white' : 'dark'"
+                icon="ion-logo-linkedin"
+              />
             </a>
-            <a target="_blank" href="https://github.com/thiagocarvalho93/climacae">
-              <q-btn round unelevated :text-color="isDarkMode ? 'white' : 'dark'" icon="ion-logo-github" />
+            <a
+              target="_blank"
+              href="https://github.com/thiagocarvalho93/climacae"
+            >
+              <q-btn
+                round
+                unelevated
+                :text-color="isDarkMode ? 'white' : 'dark'"
+                icon="ion-logo-github"
+              />
             </a>
           </q-toolbar-title>
         </div>
@@ -60,7 +95,7 @@ export default {
     };
   },
 
-  mounted() { },
+  mounted() {},
 
   methods: {
     toggleDarkMode(val) {
