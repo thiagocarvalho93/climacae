@@ -469,7 +469,7 @@ export default defineComponent({
           acc[indice].minima = !tempLow
             ? acc[indice].minima
             : Math.min(acc[indice].minima, tempLow);
-          acc[indice].maxima = Math.max(acc[indice].minima, tempHigh);
+          acc[indice].maxima = Math.max(acc[indice].maxima, tempHigh);
           acc[indice].ventoMaximo = Math.max(
             acc[indice].ventoMaximo,
             windgustHigh
