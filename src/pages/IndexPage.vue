@@ -571,6 +571,10 @@ export default defineComponent({
             x.id.length > 12 ? `${x.id.substring(0, 12)}...` : x.id
           ),
         },
+        yaxis: {
+          min: this.minima * 0.8,
+          tickAmount: 5,
+        },
       });
     },
 
