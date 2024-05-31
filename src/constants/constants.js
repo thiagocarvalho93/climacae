@@ -93,7 +93,7 @@ const CHART_TEMPERATURA_OPTIONS = {
     categories: Object.keys(STATIONS),
   },
   yaxis: {
-    min: 15,
+    min: 10,
     tickAmount: 5,
   },
 

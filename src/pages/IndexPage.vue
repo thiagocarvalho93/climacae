@@ -466,7 +466,9 @@ export default defineComponent({
             precipitacaoAcumulada: Number(precipRate),
           });
         } else {
-          acc[indice].minima = Math.min(acc[indice].minima, tempLow);
+          acc[indice].minima = !tempLow
+            ? acc[indice].minima
+            : Math.min(acc[indice].minima, tempLow);
           acc[indice].maxima = Math.max(acc[indice].minima, tempHigh);
           acc[indice].ventoMaximo = Math.max(
             acc[indice].ventoMaximo,
