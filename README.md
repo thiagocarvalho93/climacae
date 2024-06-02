@@ -10,11 +10,5 @@
 - Axios
 - Pinia
 
-## Demo
-
+## Domain
 https://climacae.vercel.app
-
-## Deploy
-
-quasar build
-vercel --prod
