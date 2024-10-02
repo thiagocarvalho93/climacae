@@ -21,6 +21,7 @@ const STATIONS = {
   IMACA41: { ID: "IMACA41", NOME: "Lagomar" },
   IMACA42: { ID: "IMACA42", NOME: "Virgem Santa" },
   IMACA43: { ID: "IMACA43", NOME: "Aeroporto" },
+  IMACA43: { ID: "IMACA53", NOME: "Sana" },
   // ICAMPO96: { ID: "ICAMPO96", NOME: "" }, desativada
   // ICAMPO223: { ID: "ICAMPO223", NOME: "" },
   // ICABOF4: { ID: "ICABOF4", NOME: "CF - Jardim Flamboyant" },
