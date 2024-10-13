@@ -321,6 +321,8 @@ export default defineComponent({
       "getSpecificDayObservations",
       "getPeriodDailyObservations",
       "getRealTimeObservations",
+      "setStartDate",
+      "setEndDate",
     ]),
 
     async obterCalcularEAtualizar() {
@@ -377,17 +379,19 @@ export default defineComponent({
     async filtrarDadosPeriodo() {
       switch (this.periodoSelecionado) {
         case PERIODOS.HOJE:
+          this.setStartDate(new Date());
+          this.setEndDate(new Date());
           this.setDates(new Date(), new Date());
           await this.getTodayObservations(this.idsEstacoes);
           break;
         case PERIODOS.ULTIMOS_SETE_DIAS:
         case PERIODOS.ULTIMOS_TRINTA_DIAS:
-          const daysAgo =
+          const diasAtras =
             this.periodoSelecionado === PERIODOS.ULTIMOS_SETE_DIAS ? 7 : 30;
-          this.setDates(
-            new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000),
-            new Date()
-          );
+
+          this.setDates(dataUtils.subtrairDias(diasAtras), new Date());
+          this.setStartDate(dataUtils.subtrairDias(diasAtras));
+          this.setEndDate(new Date());
           await this.getPeriodDailyObservations(
             this.idsEstacoes,
             this.dataInicial,
@@ -419,6 +423,8 @@ export default defineComponent({
         ano
       );
       this.setDates(dataInicial, dataFinal);
+      this.setStartDate(dataInicial);
+      this.setEndDate(dataFinal);
 
       await this.getPeriodDailyObservations(
         this.idsEstacoes,

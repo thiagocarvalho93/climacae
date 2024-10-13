@@ -87,6 +87,21 @@
           </template>
         </q-btn>
       </div>
+      <div class="col-12 col-sm-4 col-md-2 col-lg-1 fade">
+        <q-btn
+          push
+          @click="exportarCsv"
+          style="width: 100%"
+          :loading="carregando"
+          color="primary"
+        >
+          ExportarCsv
+          <template v-slot:loading>
+            <q-spinner-hourglass class="on-left" />
+            Carregando
+          </template>
+        </q-btn>
+      </div>
     </div>
   </q-card>
 </template>
@@ -97,9 +112,11 @@ import {
   OPCOES_DIAS,
   OPCOES_MESES,
   PERIODOS,
-  STATIONS,
 } from "src/constants/constants";
+import csvUtils from "src/utils/csv-utils";
 import { computed, defineComponent } from "vue";
+import { useObservationStore } from "src/stores/observations";
+import { storeToRefs } from "pinia";
 
 export default defineComponent({
   props: {
@@ -112,6 +129,9 @@ export default defineComponent({
     nomesEstacoes: Array,
   },
   setup(props, context) {
+    const store = useObservationStore();
+    const { observations } = storeToRefs(store);
+
     const estacaoSelecionadaProxy = computed({
       get: () => props.estacaoSelecionada,
       set: (value) => {
@@ -147,15 +167,30 @@ export default defineComponent({
       },
     });
 
-    // const nomesEstacoes = computed(() => Object.values(STATIONS));
     const opcoesPeriodos = computed(() => Object.values(PERIODOS));
     const opcoesDias = computed(() => OPCOES_DIAS);
     const opcoesMeses = computed(() => OPCOES_MESES);
     const opcoesAnos = computed(() => OPCOES_ANOS);
     const periodos = computed(() => PERIODOS);
+    const observacoes = computed(() => store.getObservations);
+    const dataInicial = computed(() => store.getStartDate);
+    const dataFinal = computed(() => store.getEndDate);
 
     const obterDadosEstacao = () => {
       context.emit("obterDados");
+    };
+
+    const exportarCsv = () => {
+      context.emit("exportarCsv");
+
+      const nomeCsv = csvUtils.definirNomeCSV(
+        periodoSelecionadoProxy.value,
+        dataInicial.value,
+        dataFinal.value
+      );
+      const csv = csvUtils.montarCsv(observacoes.value);
+
+      csvUtils.baixarCsv(nomeCsv, csv);
     };
 
     return {
@@ -165,11 +200,13 @@ export default defineComponent({
       mesSelecionadoProxy,
       anoSelecionadoProxy,
       obterDadosEstacao,
+      exportarCsv,
       opcoesPeriodos,
       opcoesDias,
       opcoesMeses,
       opcoesAnos,
       periodos,
+      observacoes,
     };
   },
 });

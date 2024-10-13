@@ -51,9 +51,23 @@ const definirDataInicialEFinalMes = (mes, ano) => {
   return { dataInicial, dataFinal };
 };
 
+const formatarDataParaCsv = (data) => {
+  const dia = new Date(data).getDate();
+  const mes = new Date(data).getMonth();
+  const ano = new Date(data).getFullYear();
+
+  return `${dia}_${mes}_${ano}`;
+};
+
+const subtrairDias = (diasAtras) => {
+  return new Date(Date.now() - diasAtras * 24 * 60 * 60 * 1000);
+};
+
 export default {
   calcularDiaMesAtual,
   subtrairHoras,
   formatDateForQuery,
   definirDataInicialEFinalMes,
+  formatarDataParaCsv,
+  subtrairDias,
 };

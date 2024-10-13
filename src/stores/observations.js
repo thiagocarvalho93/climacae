@@ -10,15 +10,29 @@ export const useObservationStore = defineStore("observation", {
     observations: [],
     cachedObservations: new Map(),
     cachedRealTimeObservations: null,
+    startDate: new Date(),
+    endDate: new Date(),
   }),
 
   getters: {
     getObservations(state) {
-      return state.observacoes;
+      return state.observations;
+    },
+    getStartDate(state) {
+      return state.startDate;
+    },
+    getEndDate(state) {
+      return state.endDate;
     },
   },
 
   actions: {
+    setStartDate(date) {
+      this.startDate = date;
+    },
+    setEndDate(date) {
+      this.endDate = date;
+    },
     async getTodayObservations(stationsArray) {
       const cached = this.cachedObservations.get("today");
 
