@@ -95,7 +95,7 @@
           :loading="carregando"
           color="primary"
         >
-          ExportarCsv
+          Exportar Csv
           <template v-slot:loading>
             <q-spinner-hourglass class="on-left" />
             Carregando
