@@ -1,9 +1,9 @@
 <template>
   <q-layout view="hHh lpR fff">
     <q-header
-      :bordered="isDarkMode"
+      bordered
       reveal
-      :class="`${isDarkMode ? 'bg-dark' : 'bg-white shadow-2'}`"
+      :class="`${isDarkMode ? 'bg-dark' : 'bg-white '}`"
     >
       <q-toolbar>
         <q-avatar>

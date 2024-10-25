@@ -2,10 +2,9 @@
   <q-card
     flat
     bordered
-    dark
+    outline
     @click="mostrarInformacoesCard = !mostrarInformacoesCard"
     class="cursor-pointer"
-    :class="classeCard"
   >
     <q-card-section class="grow" v-if="mostrarInformacoesCard">
       <q-item>
@@ -16,7 +15,7 @@
           </q-item-label>
         </q-item-section>
         <q-item-section avatar>
-          <q-icon class="icon" size="lg" :name="icone" />
+          <q-icon class="icon" :color="corIcone" size="lg" :name="icone" />
         </q-item-section>
       </q-item>
     </q-card-section>
@@ -27,7 +26,7 @@
           <q-item-label>
             {{ tituloVerso }}
           </q-item-label>
-          <q-item-label class="text-bold text-h6">
+          <q-item-label class="text-weight-bolder text-h6">
             {{ descricaoVerso }}
           </q-item-label>
         </q-item-section>
@@ -52,7 +51,7 @@ export default {
     icone: String,
     tituloVerso: String,
     descricaoVerso: String,
-    classeCard: String,
+    corIcone: { type: String, requirde: false, default: "primary" },
   },
   data() {
     return {

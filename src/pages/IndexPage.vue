@@ -17,9 +17,9 @@
         titulo="MÁXIMA"
         :descricao="`${maxima}°C`"
         icone="thermostat"
+        cor-icone="red-5"
         :titulo-verso="formatarTituloCard(dadosMaxima)"
         :descricao-verso="formatarDataCard(dadosMaxima)"
-        classe-card="maxima"
       />
     </div>
 
@@ -29,9 +29,9 @@
         titulo="MÍNIMA"
         :descricao="`${minima}°C`"
         icone="thermostat"
+        cor-icone="blue-5"
         :titulo-verso="formatarTituloCard(dadosMinima)"
         :descricao-verso="formatarDataCard(dadosMinima)"
-        classe-card="minima"
       />
     </div>
 
@@ -41,9 +41,9 @@
         titulo="VENTO MÁXIMO"
         :descricao="`${ventoMaximo} km/h`"
         icone="wind_power"
+        cor-icone="green-5"
         :titulo-verso="formatarTituloCard(dadosVentoMaximo)"
         :descricao-verso="formatarDataCard(dadosVentoMaximo)"
-        classe-card="vento"
       />
     </div>
 
@@ -53,9 +53,9 @@
         titulo="PRECIPITAÇÃO MÁXIMA"
         :descricao="`${precipitacaoMaxima}mm`"
         icone="ion-rainy"
+        cor-icone="deep-purple-5"
         :titulo-verso="formatarTituloCard(dadosPrecipitacaoMaxima)"
         :descricao-verso="formatarDataCard(dadosPrecipitacaoMaxima)"
-        classe-card="precipitacao"
       />
     </div>
 
