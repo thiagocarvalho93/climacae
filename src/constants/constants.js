@@ -205,8 +205,8 @@ const CHART_SERIE_TEMPORAL_OPTIONS = Object.freeze({
     tickAmount: 8,
   },
   yaxis: {
-    min: 5,
-    max: 45,
+    min: 15,
+    max: 40,
   },
 });
 
