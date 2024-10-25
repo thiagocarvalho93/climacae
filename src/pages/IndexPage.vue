@@ -1,170 +1,156 @@
 <template>
-  <q-page :class="`q-pa-md ${darkMode ? 'bg-dark-page' : 'bg-blue-grey-1'}`">
-    <!-- Filtros -->
-    <SecaoFiltros
-      v-model:periodo-selecionado="periodoSelecionado"
-      v-model:dia-selecionado="diaSelecionado"
-      v-model:mes-selecionado="mesSelecionado"
-      v-model:ano-selecionado="anoSelecionado"
-      :carregando="carregando"
-      @obterDados="obterCalcularEAtualizar"
-    />
+  <!-- Filtros -->
+  <SecaoFiltros
+    v-model:periodo-selecionado="periodoSelecionado"
+    v-model:dia-selecionado="diaSelecionado"
+    v-model:mes-selecionado="mesSelecionado"
+    v-model:ano-selecionado="anoSelecionado"
+    :carregando="carregando"
+    @obterDados="obterCalcularEAtualizar"
+  />
 
-    <!-- Cards -->
-    <div class="row q-col-gutter-md fade">
-      <div class="col-12 col-sm-6 col-md-3">
-        <InformacaoCard
-          :carregando="carregando"
-          titulo="MÁXIMA"
-          :descricao="`${maxima}°C`"
-          icone="thermostat"
-          :titulo-verso="formatarTituloCard(dadosMaxima)"
-          :descricao-verso="formatarDataCard(dadosMaxima)"
-          classe-card="maxima"
-        />
-      </div>
-
-      <div class="col-12 col-sm-6 col-md-3">
-        <InformacaoCard
-          :carregando="carregando"
-          titulo="MÍNIMA"
-          :descricao="`${minima}°C`"
-          icone="thermostat"
-          :titulo-verso="formatarTituloCard(dadosMinima)"
-          :descricao-verso="formatarDataCard(dadosMinima)"
-          classe-card="minima"
-        />
-      </div>
-
-      <div class="col-12 col-sm-6 col-md-3">
-        <InformacaoCard
-          :carregando="carregando"
-          titulo="VENTO MÁXIMO"
-          :descricao="`${ventoMaximo} km/h`"
-          icone="wind_power"
-          :titulo-verso="formatarTituloCard(dadosVentoMaximo)"
-          :descricao-verso="formatarDataCard(dadosVentoMaximo)"
-          classe-card="vento"
-        />
-      </div>
-
-      <div class="col-12 col-sm-6 col-md-3">
-        <InformacaoCard
-          :carregando="carregando"
-          titulo="PRECIPITAÇÃO MÁXIMA"
-          :descricao="`${precipitacaoMaxima}mm`"
-          icone="ion-rainy"
-          :titulo-verso="formatarTituloCard(dadosPrecipitacaoMaxima)"
-          :descricao-verso="formatarDataCard(dadosPrecipitacaoMaxima)"
-          classe-card="precipitacao"
-        />
-      </div>
-
-      <!-- Carrocel -->
-      <div class="col-12 col-md-4 flex">
-        <RealTimeObservationsCarousel
-          :real-time-observations="realTimeObservations"
-          :estacoes="estacoes"
-          :ultima-atualizacao="ultimaAtualizacao"
-          :dark-mode="darkMode"
-          :carregando-tempo-real="carregandoTempoReal"
-        />
-      </div>
-
-      <!-- Gráficos -->
-      <div class="col-12 col-md-8 flex">
-        <q-card flat class="full-width">
-          <q-card-section class="text-h6"> Máximas e mínimas </q-card-section>
-          <q-card-section>
-            <apexchart
-              type="bar"
-              height="250"
-              :options="chartTemperaturaOptions"
-              :series="seriesTemperatura"
-              ref="graficoColunaTemperatura"
-            ></apexchart>
-          </q-card-section>
-          <q-inner-loading
-            :showing="carregando"
-            label="Aguarde..."
-            label-class="text-teal"
-            label-style="font-size: 1.1em"
-          />
-        </q-card>
-      </div>
-
-      <div class="col-12 col-sm-5 flex">
-        <q-card flat class="full-width">
-          <q-card-section class="text-h6"> Precipitação </q-card-section>
-          <q-card-section>
-            <apexchart
-              type="bar"
-              height="350"
-              :options="chartPrecipitacaoOptions"
-              :series="seriesPrecipitacao"
-              ref="graficoPrecipitacao"
-            ></apexchart>
-          </q-card-section>
-          <q-inner-loading
-            :showing="carregando"
-            label="Aguarde..."
-            label-class="text-teal"
-            label-style="font-size: 1.1em"
-          />
-        </q-card>
-      </div>
-
-      <div class="col-12 col-sm-7 flex">
-        <q-card flat class="full-width">
-          <q-card-section class="text-h6">
-            <div class="row">
-              <div class="col-12 col-sm-8 col-md-10">
-                <span>Séries temporais</span>
-              </div>
-              <!-- <div class="col-12 col-sm-4 col-md-2">
-                <q-select
-                  dense
-                  v-model="estacaoSelecionada"
-                  :options="nomesEstacoes"
-                  outlined
-                  hide-bottom-space
-                  input-style="{ background-color: red }"
-                  option-label="NOME"
-                  label="Estação"
-                />
-              </div> -->
-            </div>
-          </q-card-section>
-          <q-card-section>
-            <apexchart
-              height="350"
-              :options="chartSerieTemporalOptions"
-              :series="seriesTemporal"
-              ref="graficoTemporal"
-            />
-          </q-card-section>
-          <q-inner-loading
-            :showing="carregando"
-            label="Aguarde..."
-            label-class="text-teal"
-            label-style="font-size: 1.1em"
-          />
-        </q-card>
-      </div>
-
-      <!-- Tabela -->
-      <div class="col-12">
-        <TabelaObservacoes
-          :rows="observations"
-          :columns="colunasTabela"
-          :loading="carregando"
-          :data-final="dataFinal"
-          :data-inicial="dataInicial"
-          :periodo-selecionado="periodoSelecionado"
-        />
-      </div>
+  <!-- Cards -->
+  <div class="row q-col-gutter-md fade">
+    <div class="col-12 col-sm-6 col-md-3">
+      <InformacaoCard
+        :carregando="carregando"
+        titulo="MÁXIMA"
+        :descricao="`${maxima}°C`"
+        icone="thermostat"
+        :titulo-verso="formatarTituloCard(dadosMaxima)"
+        :descricao-verso="formatarDataCard(dadosMaxima)"
+        classe-card="maxima"
+      />
     </div>
-  </q-page>
+
+    <div class="col-12 col-sm-6 col-md-3">
+      <InformacaoCard
+        :carregando="carregando"
+        titulo="MÍNIMA"
+        :descricao="`${minima}°C`"
+        icone="thermostat"
+        :titulo-verso="formatarTituloCard(dadosMinima)"
+        :descricao-verso="formatarDataCard(dadosMinima)"
+        classe-card="minima"
+      />
+    </div>
+
+    <div class="col-12 col-sm-6 col-md-3">
+      <InformacaoCard
+        :carregando="carregando"
+        titulo="VENTO MÁXIMO"
+        :descricao="`${ventoMaximo} km/h`"
+        icone="wind_power"
+        :titulo-verso="formatarTituloCard(dadosVentoMaximo)"
+        :descricao-verso="formatarDataCard(dadosVentoMaximo)"
+        classe-card="vento"
+      />
+    </div>
+
+    <div class="col-12 col-sm-6 col-md-3">
+      <InformacaoCard
+        :carregando="carregando"
+        titulo="PRECIPITAÇÃO MÁXIMA"
+        :descricao="`${precipitacaoMaxima}mm`"
+        icone="ion-rainy"
+        :titulo-verso="formatarTituloCard(dadosPrecipitacaoMaxima)"
+        :descricao-verso="formatarDataCard(dadosPrecipitacaoMaxima)"
+        classe-card="precipitacao"
+      />
+    </div>
+
+    <!-- Carrocel -->
+    <div class="col-12 col-md-4 flex">
+      <RealTimeObservationsCarousel
+        :real-time-observations="realTimeObservations"
+        :estacoes="estacoes"
+        :ultima-atualizacao="ultimaAtualizacao"
+        :dark-mode="darkMode"
+        :carregando-tempo-real="carregandoTempoReal"
+      />
+    </div>
+
+    <!-- Gráficos -->
+    <div class="col-12 col-md-8 flex">
+      <q-card flat bordered class="full-width">
+        <q-card-section class="text-h6"> Máximas e mínimas </q-card-section>
+        <q-card-section>
+          <apexchart
+            type="bar"
+            height="250"
+            :options="chartTemperaturaOptions"
+            :series="seriesTemperatura"
+            ref="graficoColunaTemperatura"
+          ></apexchart>
+        </q-card-section>
+        <q-inner-loading
+          :showing="carregando"
+          label="Aguarde..."
+          label-class="text-teal"
+          label-style="font-size: 1.1em"
+        />
+      </q-card>
+    </div>
+
+    <div class="col-12 col-sm-5 flex">
+      <q-card flat bordered class="full-width">
+        <q-card-section class="text-h6"> Precipitação </q-card-section>
+        <q-card-section>
+          <apexchart
+            type="bar"
+            height="350"
+            :options="chartPrecipitacaoOptions"
+            :series="seriesPrecipitacao"
+            ref="graficoPrecipitacao"
+          ></apexchart>
+        </q-card-section>
+        <q-inner-loading
+          :showing="carregando"
+          label="Aguarde..."
+          label-class="text-teal"
+          label-style="font-size: 1.1em"
+        />
+      </q-card>
+    </div>
+
+    <div class="col-12 col-sm-7 flex">
+      <q-card flat bordered class="full-width">
+        <q-card-section class="text-h6">
+          <div class="row">
+            <div class="col-12 col-sm-8 col-md-10">
+              <span>Séries temporais</span>
+            </div>
+          </div>
+        </q-card-section>
+        <q-card-section>
+          <apexchart
+            height="350"
+            :options="chartSerieTemporalOptions"
+            :series="seriesTemporal"
+            ref="graficoTemporal"
+          />
+        </q-card-section>
+        <q-inner-loading
+          :showing="carregando"
+          label="Aguarde..."
+          label-class="text-teal"
+          label-style="font-size: 1.1em"
+        />
+      </q-card>
+    </div>
+
+    <!-- Tabela -->
+    <div class="col-12">
+      <TabelaObservacoes
+        :rows="observations"
+        :columns="colunasTabela"
+        :loading="carregando"
+        :data-final="dataFinal"
+        :data-inicial="dataInicial"
+        :periodo-selecionado="periodoSelecionado"
+      />
+    </div>
+  </div>
 </template>
 
 <script>
@@ -675,7 +661,7 @@ export default defineComponent({
   --scrollbar-thumb               : rgb(204,231,255)
   --scrollbar-thumb-hover         : rgb(33,118,210)
   --scrollbar-track-dark          : $dark
-  --scrollbar-thumb-dark          : #CCC
+  --scrollbar-thumb-dark          : #EEE
   --scrollbar-thumb-hover-dark    : rgb(33,118,210)
 
 .maxima

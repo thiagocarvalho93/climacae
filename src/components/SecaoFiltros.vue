@@ -1,5 +1,5 @@
 <template>
-  <q-card flat class="q-pa-md q-mb-md fade">
+  <q-card flat bordered class="q-pa-md q-mb-md fade">
     <div class="row q-col-gutter-md">
       <div v-if="nomesEstacoes" class="col-12 col-sm-4 col-md-2 fade">
         <q-select
@@ -8,7 +8,6 @@
           :options="nomesEstacoes"
           outlined
           hide-bottom-space
-          input-style="{ background-color: red }"
           option-label="NOME"
           label="Estação"
         />
@@ -74,7 +73,6 @@
       </div>
       <div class="col-12 col-sm-4 col-md-2 col-lg-1 fade">
         <q-btn
-          push
           @click="obterDadosEstacao"
           style="width: 100%"
           :loading="carregando"
@@ -89,7 +87,6 @@
       </div>
       <div class="col-12 col-sm-4 col-md-2 col-lg-1 fade">
         <q-btn
-          push
           @click="exportarCsv"
           style="width: 100%"
           :loading="carregando"

@@ -34,7 +34,9 @@
     </q-header>
 
     <q-page-container>
-      <router-view />
+      <q-page :class="`q-pa-md ${isDarkMode ? 'bg-dark-page' : 'bg-grey-1'}`">
+        <router-view />
+      </q-page>
     </q-page-container>
 
     <q-footer

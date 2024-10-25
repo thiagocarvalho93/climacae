@@ -1,103 +1,101 @@
 <template>
-  <q-page :class="`q-pa-md ${darkMode ? 'bg-dark-page' : 'bg-blue-grey-1'}`">
-    <!-- Filtros -->
-    <SecaoFiltros
-      v-model:estacao-selecionada="estacaoSelecionada"
-      v-model:periodo-selecionado="periodoSelecionado"
-      v-model:dia-selecionado="diaSelecionado"
-      v-model:mes-selecionado="mesSelecionado"
-      v-model:ano-selecionado="anoSelecionado"
-      :nomes-estacoes="nomesEstacoes"
-      :carregando="carregando"
-      @obter-dados="obterDadosEstacao"
-    />
+  <!-- Filtros -->
+  <SecaoFiltros
+    v-model:estacao-selecionada="estacaoSelecionada"
+    v-model:periodo-selecionado="periodoSelecionado"
+    v-model:dia-selecionado="diaSelecionado"
+    v-model:mes-selecionado="mesSelecionado"
+    v-model:ano-selecionado="anoSelecionado"
+    :nomes-estacoes="nomesEstacoes"
+    :carregando="carregando"
+    @obter-dados="obterDadosEstacao"
+  />
 
-    <!-- Gráficos -->
-    <div class="row q-col-gutter-md">
-      <div class="col-12 col-md-6 flex">
-        <q-card flat class="full-width">
-          <q-card-section class="text-h6"> Temperatura (°C) </q-card-section>
-          <q-card-section>
-            <apexchart
-              height="250"
-              :options="chartSerieTemporalOptions"
-              :series="seriesTemperatura"
-              ref="graficoTemporalTemperatura"
-            ></apexchart>
-          </q-card-section>
-          <q-inner-loading
-            :showing="carregando"
-            label="Aguarde..."
-            label-class="text-teal"
-            label-style="font-size: 1.1em"
-          />
-        </q-card>
-      </div>
-
-      <div class="col-12 col-md-6 flex">
-        <q-card flat class="full-width">
-          <q-card-section class="text-h6"> Pressão (hPa)</q-card-section>
-          <q-card-section>
-            <apexchart
-              height="250"
-              :options="chartSerieTemporalOptions"
-              :series="seriesPressao"
-              ref="graficoTemporalPressao"
-            ></apexchart>
-          </q-card-section>
-          <q-inner-loading
-            :showing="carregando"
-            label="Aguarde..."
-            label-class="text-teal"
-            label-style="font-size: 1.1em"
-          />
-        </q-card>
-      </div>
-
-      <div class="col-12 col-md-6 flex">
-        <q-card flat class="full-width">
-          <q-card-section class="text-h6"> Precipitação (mm) </q-card-section>
-          <q-card-section>
-            <apexchart
-              height="250"
-              :options="chartSerieTemporalOptions"
-              :series="seriesPrecipitacao"
-              ref="graficoTemporalPrecipitacao"
-            ></apexchart>
-          </q-card-section>
-          <q-inner-loading
-            :showing="carregando"
-            label="Aguarde..."
-            label-class="text-teal"
-            label-style="font-size: 1.1em"
-          />
-        </q-card>
-      </div>
-
-      <div class="col-12 col-md-6 flex">
-        <q-card flat class="full-width">
-          <q-card-section class="text-h6">
-            Velocidade do vento (km/h)</q-card-section
-          >
-          <q-card-section>
-            <apexchart
-              height="250"
-              :options="chartSerieTemporalOptions"
-              :series="seriesVento"
-              ref="graficoTemporalVento"
-            >
-            </apexchart>
-          </q-card-section>
-          <q-inner-loading
-            :showing="carregando"
-            label="Aguarde..."
-            label-class="text-teal"
-            label-style="font-size: 1.1em"
-          />
-        </q-card>
-      </div>
+  <!-- Gráficos -->
+  <div class="row q-col-gutter-md">
+    <div class="col-12 col-md-6 flex">
+      <q-card flat bordered class="full-width">
+        <q-card-section class="text-h6"> Temperatura (°C) </q-card-section>
+        <q-card-section>
+          <apexchart
+            height="250"
+            :options="chartSerieTemporalOptions"
+            :series="seriesTemperatura"
+            ref="graficoTemporalTemperatura"
+          ></apexchart>
+        </q-card-section>
+        <q-inner-loading
+          :showing="carregando"
+          label="Aguarde..."
+          label-class="text-teal"
+          label-style="font-size: 1.1em"
+        />
+      </q-card>
     </div>
-  </q-page>
+
+    <div class="col-12 col-md-6 flex">
+      <q-card flat bordered class="full-width">
+        <q-card-section class="text-h6"> Pressão (hPa)</q-card-section>
+        <q-card-section>
+          <apexchart
+            height="250"
+            :options="chartSerieTemporalOptions"
+            :series="seriesPressao"
+            ref="graficoTemporalPressao"
+          ></apexchart>
+        </q-card-section>
+        <q-inner-loading
+          :showing="carregando"
+          label="Aguarde..."
+          label-class="text-teal"
+          label-style="font-size: 1.1em"
+        />
+      </q-card>
+    </div>
+
+    <div class="col-12 col-md-6 flex">
+      <q-card flat bordered class="full-width">
+        <q-card-section class="text-h6"> Precipitação (mm) </q-card-section>
+        <q-card-section>
+          <apexchart
+            height="250"
+            :options="chartSerieTemporalOptions"
+            :series="seriesPrecipitacao"
+            ref="graficoTemporalPrecipitacao"
+          ></apexchart>
+        </q-card-section>
+        <q-inner-loading
+          :showing="carregando"
+          label="Aguarde..."
+          label-class="text-teal"
+          label-style="font-size: 1.1em"
+        />
+      </q-card>
+    </div>
+
+    <div class="col-12 col-md-6 flex">
+      <q-card flat bordered class="full-width">
+        <q-card-section class="text-h6">
+          Velocidade do vento (km/h)</q-card-section
+        >
+        <q-card-section>
+          <apexchart
+            height="250"
+            :options="chartSerieTemporalOptions"
+            :series="seriesVento"
+            ref="graficoTemporalVento"
+          >
+          </apexchart>
+        </q-card-section>
+        <q-inner-loading
+          :showing="carregando"
+          label="Aguarde..."
+          label-class="text-teal"
+          label-style="font-size: 1.1em"
+        />
+      </q-card>
+    </div>
+  </div>
 </template>
 
 <script>

@@ -1,5 +1,12 @@
 <template>
-  <q-card flat dark @click="mostrarInformacoesCard = !mostrarInformacoesCard" class="cursor-pointer" :class="classeCard">
+  <q-card
+    flat
+    bordered
+    dark
+    @click="mostrarInformacoesCard = !mostrarInformacoesCard"
+    class="cursor-pointer"
+    :class="classeCard"
+  >
     <q-card-section class="grow" v-if="mostrarInformacoesCard">
       <q-item>
         <q-item-section>
@@ -27,7 +34,12 @@
       </q-item>
     </q-card-section>
 
-    <q-inner-loading :showing="carregando" label="Aguarde..." label-class="text-teal" label-style="font-size: 1.1em" />
+    <q-inner-loading
+      :showing="carregando"
+      label="Aguarde..."
+      label-class="text-teal"
+      label-style="font-size: 1.1em"
+    />
   </q-card>
 </template>
 
@@ -45,7 +57,7 @@ export default {
   data() {
     return {
       mostrarInformacoesCard: true,
-    }
+    };
   },
 };
 </script>

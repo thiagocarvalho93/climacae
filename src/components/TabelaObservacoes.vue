@@ -6,6 +6,7 @@
         : 'my-sticky-header-table'
     "
     flat
+    bordered
     column-sort-order="ad"
     title="Dados das estações"
     :rows="rows"
