@@ -9,7 +9,7 @@
     <q-card-section class="grow" v-if="mostrarInformacoesCard">
       <q-item>
         <q-item-section>
-          <q-item-label> {{ titulo }} </q-item-label>
+          <q-item-label class="text-caption"> {{ titulo }} </q-item-label>
           <q-item-label class="text-bold text-h6">
             {{ descricao }}
           </q-item-label>

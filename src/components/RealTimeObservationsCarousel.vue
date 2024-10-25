@@ -27,37 +27,40 @@
           :name="estacoes[dados.stationID].NOME"
           class="column no-wrap flex-center"
         >
-          <div class="q-mt-md text-center text-h6">
-            {{ estacoes[dados.stationID].NOME }}
-          </div>
-          <div class="justify-start">
-            <div class="q-mt-md text-h6 text-start">
+          <div class="q-pa-md p-2">
+            <div class="q-mt-md text-h6 text-weight-bold">
+              {{ estacoes[dados.stationID].NOME }}
+            </div>
+
+            <div class="justify-start">
+              <div class="q-mt-md text-body1">
+                <q-icon
+                  class="icon"
+                  :color="darkMode ? 'white' : 'primary'"
+                  size="md"
+                  name="ion-thermometer"
+                />
+                {{ dados.metric.temp }}°C
+              </div>
+              <div class="q-mt-md text-body1">
+                <q-icon
+                  class="icon"
+                  :color="darkMode ? 'white' : 'primary'"
+                  size="md"
+                  name="ion-rainy"
+                />
+                {{ dados.metric.precipRate }}mm/h
+              </div>
+            </div>
+            <div class="q-mt-md text-body1">
               <q-icon
                 class="icon"
                 :color="darkMode ? 'white' : 'primary'"
                 size="md"
-                name="ion-thermometer"
+                name="water_drop"
               />
-              {{ dados.metric.temp }}°C
+              {{ dados.humidity }}%
             </div>
-            <div class="q-mt-md text-h6 text-start">
-              <q-icon
-                class="icon"
-                :color="darkMode ? 'white' : 'primary'"
-                size="md"
-                name="ion-rainy"
-              />
-              {{ dados.metric.precipRate }}mm/h
-            </div>
-          </div>
-          <div class="q-mt-md text-h6 text-start">
-            <q-icon
-              class="icon"
-              :color="darkMode ? 'white' : 'primary'"
-              size="md"
-              name="water_drop"
-            />
-            {{ dados.humidity }}%
           </div>
         </q-carousel-slide>
       </q-carousel>
