@@ -66,7 +66,7 @@
       </q-carousel>
     </q-card-section>
     <q-inner-loading
-      :showing="carregandoTempoReal"
+      :showing="carregando"
       label="Aguarde..."
       label-class="text-teal"
       label-style="font-size: 1.1em"
@@ -76,19 +76,54 @@
 
 <script>
 import { STATIONS } from "src/constants/constants";
+import { mapActions } from "pinia";
+import { useObservationStore } from "src/stores/observations";
 
 export default {
   props: {
     realTimeObservations: Array,
     estacoes: Object,
-    ultimaAtualizacao: String,
     darkMode: Boolean,
-    carregandoTempoReal: Boolean,
   },
+
   data() {
     return {
       slide: STATIONS[Object.keys(STATIONS)[0]].NOME,
+      carregando: false,
+      ultimaAtualizacao: new Date().toLocaleTimeString(navigator.language, {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
     };
+  },
+
+  created() {
+    this.atualizarDadosAtuais();
+  },
+
+  beforeUnmount() {
+    clearInterval(this.atualizarDadosAtuais);
+  },
+
+  methods: {
+    ...mapActions(useObservationStore, ["getRealTimeObservations"]),
+
+    atualizarDadosAtuais() {
+      setInterval(async () => {
+        this.carregando = true;
+
+        await this.getRealTimeObservations(this.idsEstacoes);
+
+        this.ultimaAtualizacao = new Date().toLocaleTimeString(
+          navigator.language,
+          {
+            hour: "2-digit",
+            minute: "2-digit",
+          }
+        );
+        this.carregando = false;
+      }, 30000);
+    },
   },
 };
 </script>

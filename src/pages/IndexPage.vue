@@ -64,9 +64,7 @@
       <RealTimeObservationsCarousel
         :real-time-observations="realTimeObservations"
         :estacoes="estacoes"
-        :ultima-atualizacao="ultimaAtualizacao"
         :dark-mode="darkMode"
-        :carregando-tempo-real="carregandoTempoReal"
       />
     </div>
 
@@ -165,7 +163,6 @@ import {
   COLUNAS_TABELA,
 } from "../constants/constants";
 import dataUtils from "src/utils/data-utils";
-import Metric from "src/models/metric-model";
 import { mapActions, mapState } from "pinia";
 import { useObservationStore } from "src/stores/observations";
 import RealTimeObservationsCarousel from "src/components/RealTimeObservationsCarousel.vue";
@@ -230,11 +227,9 @@ export default defineComponent({
     return {
       //estados
       carregando: true,
-      carregandoTempoReal: false,
       mostrarInformacoesCard: [true, true, true, true],
       autoplayCarousel: true,
       //inputs
-      slide: STATIONS[Object.keys(STATIONS)[0]].NOME,
       estacaoSelecionada: Object.values(STATIONS)[0],
       periodoSelecionado: PERIODOS.HOJE,
       diaSelecionado: new Date().getDate(),
@@ -243,10 +238,6 @@ export default defineComponent({
       dataInicial: new Date(),
       dataFinal: new Date(),
       //outputs
-      ultimaAtualizacao: new Date().toLocaleTimeString(navigator.language, {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
       dadosMinima: [],
       dadosMaxima: [],
       dadosVentoMaximo: [],
@@ -265,7 +256,6 @@ export default defineComponent({
   async created() {
     await this.obterCalcularEAtualizar();
     await this.getRealTimeObservations(this.idsEstacoes);
-    this.atualizarDadosAtuais();
     this.$watch(
       "darkMode",
       (isDark) => {
@@ -298,10 +288,6 @@ export default defineComponent({
         immediate: true,
       }
     );
-  },
-
-  beforeUnmount() {
-    clearInterval(this.atualizarDadosAtuais);
   },
 
   methods: {
@@ -479,23 +465,6 @@ export default defineComponent({
           this.dadosPrecipitacaoMaxima = obs;
         }
       }
-    },
-
-    atualizarDadosAtuais() {
-      setInterval(async () => {
-        this.carregandoTempoReal = true;
-
-        await this.getRealTimeObservations(this.idsEstacoes);
-
-        this.ultimaAtualizacao = new Date().toLocaleTimeString(
-          navigator.language,
-          {
-            hour: "2-digit",
-            minute: "2-digit",
-          }
-        );
-        this.carregandoTempoReal = false;
-      }, 30000);
     },
 
     atualizarGraficoTemperatura() {
