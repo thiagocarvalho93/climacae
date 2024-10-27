@@ -622,38 +622,6 @@ export default defineComponent({
   --scrollbar-thumb-dark          : #EEE
   --scrollbar-thumb-hover-dark    : rgb(33,118,210)
 
-.maxima
-  height: 90px
-  animation-name: zoomInOut
-  animation-duration: 0.4s
-  animation-timing-function: ease
-  animation-delay: 0s
-  background-image: linear-gradient(to right,$red-6, $red-8)
-
-.minima
-  height: 90px
-  animation-name: zoomInOut
-  animation-duration: 0.4s
-  animation-timing-function: ease
-  animation-delay: 0.2s
-  background-image: linear-gradient(to right,$blue-6, $blue-8)
-
-.vento
-  height: 90px
-  animation-name: zoomInOut
-  animation-duration: 0.4s
-  animation-timing-function: ease
-  animation-delay: 0.4s
-  background-image: linear-gradient(to right,$teal-6, $teal-8)
-
-.precipitacao
-  height: 90px
-  animation-name: zoomInOut
-  animation-duration: 0.4s
-  animation-timing-function: ease
-  animation-delay: 0.6s
-  background-image: linear-gradient(to right,$indigo-6, $indigo-8)
-
 ::-webkit-scrollbar
   width: var(--scrollbar-width-height)
   height: var(--scrollbar-width-height)

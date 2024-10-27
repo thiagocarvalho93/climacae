@@ -4,6 +4,7 @@ import { STATIONS } from "src/constants/constants";
 import Metric from "src/models/metric-model";
 import ObservationCurrent from "src/models/observation-current-model";
 import Observation from "src/models/observation-model";
+import StationMetrics from "src/models/station-metrics-model";
 import dataUtils from "src/utils/data-utils";
 
 export const useObservationStore = defineStore("observation", {
@@ -151,41 +152,29 @@ export const useObservationStore = defineStore("observation", {
     calcularMetadados() {
       this.metadadosEstacoes = [];
 
-      this.metadadosEstacoes = this.observations.reduce((acc, obs) => {
+      const metadadosMap = this.observations.reduce((acc, obs) => {
         const { metric, stationID } = obs;
         const { tempHigh, tempLow, windgustHigh, precipRate } = new Metric(
           metric
         );
+        const stationName = STATIONS[stationID].NOME;
 
-        let indice = acc.findIndex((x) => x.id === STATIONS[stationID].NOME);
-
-        if (indice === -1) {
-          acc.push({
-            id: STATIONS[stationID].NOME,
-            minima: Number(tempLow),
-            maxima: Number(tempHigh),
-            ventoMaximo: Number(windgustHigh),
-            precipitacaoMaxima: Number(precipRate),
-            precipitacaoAcumulada: Number(precipRate),
-          });
+        if (!acc[stationName]) {
+          acc[stationName] = new StationMetrics(
+            stationName,
+            tempLow,
+            tempHigh,
+            windgustHigh,
+            precipRate
+          );
         } else {
-          acc[indice].minima = !tempLow
-            ? acc[indice].minima
-            : Math.min(acc[indice].minima, tempLow);
-          acc[indice].maxima = Math.max(acc[indice].maxima, tempHigh);
-          acc[indice].ventoMaximo = Math.max(
-            acc[indice].ventoMaximo,
-            windgustHigh
-          );
-          acc[indice].precipitacaoMaxima = Math.max(
-            acc[indice].precipitacaoMaxima,
-            Number(precipRate)
-          );
-          acc[indice].precipitacaoAcumulada += Number(precipRate);
+          acc[stationName].update(tempLow, tempHigh, windgustHigh, precipRate);
         }
 
         return acc;
-      }, []);
+      }, {});
+
+      this.metadadosEstacoes = Object.values(metadadosMap);
     },
   },
 });
