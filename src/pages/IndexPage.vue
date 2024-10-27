@@ -184,7 +184,11 @@ export default defineComponent({
   },
 
   computed: {
-    ...mapState(useObservationStore, ["observations", "realTimeObservations"]),
+    ...mapState(useObservationStore, [
+      "observations",
+      "realTimeObservations",
+      "metadadosEstacoes",
+    ]),
 
     darkMode() {
       return this.$q.dark.isActive;
@@ -239,7 +243,6 @@ export default defineComponent({
       dataInicial: new Date(),
       dataFinal: new Date(),
       //outputs
-      metadadosEstacoes: [],
       ultimaAtualizacao: new Date().toLocaleTimeString(navigator.language, {
         hour: "2-digit",
         minute: "2-digit",
@@ -309,6 +312,7 @@ export default defineComponent({
       "getRealTimeObservations",
       "setStartDate",
       "setEndDate",
+      "calcularMetadados",
     ]),
 
     async obterCalcularEAtualizar() {
@@ -437,46 +441,6 @@ export default defineComponent({
       await this.getSpecificDayObservations(this.idsEstacoes, this.dataInicial);
     },
 
-    calcularMetadados() {
-      this.metadadosEstacoes = [];
-
-      // TODO fazer o método calcularMaximosGlobais nesse mesmo loop
-      this.metadadosEstacoes = this.observations.reduce((acc, obs) => {
-        const { metric, stationID } = obs;
-        const { tempHigh, tempLow, windgustHigh, precipRate, precipTotal } =
-          new Metric(metric);
-
-        let indice = acc.findIndex((x) => x.id === STATIONS[stationID].NOME);
-
-        if (indice === -1) {
-          acc.push({
-            id: STATIONS[stationID].NOME,
-            minima: Number(tempLow),
-            maxima: Number(tempHigh),
-            ventoMaximo: Number(windgustHigh),
-            precipitacaoMaxima: Number(precipRate),
-            precipitacaoAcumulada: Number(precipRate),
-          });
-        } else {
-          acc[indice].minima = !tempLow
-            ? acc[indice].minima
-            : Math.min(acc[indice].minima, tempLow);
-          acc[indice].maxima = Math.max(acc[indice].maxima, tempHigh);
-          acc[indice].ventoMaximo = Math.max(
-            acc[indice].ventoMaximo,
-            windgustHigh
-          );
-          acc[indice].precipitacaoMaxima = Math.max(
-            acc[indice].precipitacaoMaxima,
-            Number(precipRate)
-          );
-          acc[indice].precipitacaoAcumulada += Number(precipRate);
-        }
-
-        return acc;
-      }, []);
-    },
-
     calcularMaximosGlobais() {
       this.maxima = 0;
       this.minima = 0;
@@ -484,14 +448,8 @@ export default defineComponent({
       this.precipitacaoMaxima = 0;
 
       this.metadadosEstacoes.forEach((metadadosEstacao) => {
-        const {
-          id,
-          maxima,
-          minima,
-          ventoMaximo,
-          precipitacaoMaxima,
-          precipitacaoAcumulada,
-        } = metadadosEstacao;
+        const { maxima, minima, ventoMaximo, precipitacaoMaxima } =
+          metadadosEstacao;
 
         if (maxima > this.maxima) {
           this.maxima = maxima;

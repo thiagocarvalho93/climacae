@@ -1,5 +1,7 @@
 import { defineStore } from "pinia";
 import weatherApi from "src/api/weather-api";
+import { STATIONS } from "src/constants/constants";
+import Metric from "src/models/metric-model";
 import ObservationCurrent from "src/models/observation-current-model";
 import Observation from "src/models/observation-model";
 import dataUtils from "src/utils/data-utils";
@@ -12,6 +14,7 @@ export const useObservationStore = defineStore("observation", {
     cachedRealTimeObservations: null,
     startDate: new Date(),
     endDate: new Date(),
+    metadadosEstacoes: [],
   }),
 
   getters: {
@@ -143,6 +146,46 @@ export const useObservationStore = defineStore("observation", {
         observations,
         iat: new Date(),
       };
+    },
+
+    calcularMetadados() {
+      this.metadadosEstacoes = [];
+
+      this.metadadosEstacoes = this.observations.reduce((acc, obs) => {
+        const { metric, stationID } = obs;
+        const { tempHigh, tempLow, windgustHigh, precipRate } = new Metric(
+          metric
+        );
+
+        let indice = acc.findIndex((x) => x.id === STATIONS[stationID].NOME);
+
+        if (indice === -1) {
+          acc.push({
+            id: STATIONS[stationID].NOME,
+            minima: Number(tempLow),
+            maxima: Number(tempHigh),
+            ventoMaximo: Number(windgustHigh),
+            precipitacaoMaxima: Number(precipRate),
+            precipitacaoAcumulada: Number(precipRate),
+          });
+        } else {
+          acc[indice].minima = !tempLow
+            ? acc[indice].minima
+            : Math.min(acc[indice].minima, tempLow);
+          acc[indice].maxima = Math.max(acc[indice].maxima, tempHigh);
+          acc[indice].ventoMaximo = Math.max(
+            acc[indice].ventoMaximo,
+            windgustHigh
+          );
+          acc[indice].precipitacaoMaxima = Math.max(
+            acc[indice].precipitacaoMaxima,
+            Number(precipRate)
+          );
+          acc[indice].precipitacaoAcumulada += Number(precipRate);
+        }
+
+        return acc;
+      }, []);
     },
   },
 });
