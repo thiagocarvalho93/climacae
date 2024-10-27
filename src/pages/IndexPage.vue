@@ -60,7 +60,7 @@
     </div>
 
     <!-- Carrocel -->
-    <div class="col-12 col-md-4 flex">
+    <div class="col-12 col-md-3 flex">
       <RealTimeObservationsCarousel
         :real-time-observations="realTimeObservations"
         :estacoes="estacoes"
@@ -69,7 +69,7 @@
     </div>
 
     <!-- Gráficos -->
-    <div class="col-12 col-md-8 flex">
+    <div class="col-12 col-md-9 flex">
       <q-card flat bordered class="full-width">
         <q-card-section class="text-h6"> Máximas e mínimas </q-card-section>
         <q-card-section>

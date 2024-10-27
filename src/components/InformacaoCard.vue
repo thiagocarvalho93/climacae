@@ -23,10 +23,10 @@
     <q-card-section class="grow" v-else>
       <q-item>
         <q-item-section>
-          <q-item-label>
+          <q-item-label class="text-caption">
             {{ tituloVerso }}
           </q-item-label>
-          <q-item-label class="text-weight-bolder text-h6">
+          <q-item-label class="text-bold text-h6">
             {{ descricaoVerso }}
           </q-item-label>
         </q-item-section>
