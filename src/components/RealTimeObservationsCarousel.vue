@@ -97,6 +97,12 @@ export default {
     };
   },
 
+  computed: {
+    idsEstacoes() {
+      return Object.keys(STATIONS);
+    },
+  },
+
   created() {
     this.atualizarDadosAtuais();
   },
