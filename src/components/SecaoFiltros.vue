@@ -180,14 +180,14 @@ export default defineComponent({
     const exportarCsv = () => {
       context.emit("exportarCsv");
 
-      const nomeCsv = csvUtils.definirNomeCSV(
+      const nomeCsv = csvUtils.getCsvFileName(
         periodoSelecionadoProxy.value,
         dataInicial.value,
         dataFinal.value
       );
-      const csv = csvUtils.montarCsv(observacoes.value);
+      const csv = csvUtils.getCsvString(observacoes.value);
 
-      csvUtils.baixarCsv(nomeCsv, csv);
+      csvUtils.downloadCsv(nomeCsv, csv);
     };
 
     return {

@@ -2,8 +2,14 @@ import { PERIODOS } from "src/constants/constants";
 import dataUtils from "./data-utils";
 import Metric from "src/models/metric-model";
 
-const montarCsv = (linhas) => {
-  let props = [
+/**
+ * Converts an array of data rows to a CSV string.
+ *
+ * @param {Array<Object>} rows - The data rows to be converted to CSV format.
+ * @returns {string} The CSV string.
+ */
+const getCsvString = (rows) => {
+  const props = [
     "obsTimeLocal",
     "stationID",
     "humidityAvg",
@@ -11,34 +17,52 @@ const montarCsv = (linhas) => {
     "humidityLow",
     "winddirAvg",
   ];
+  const metricProps = Object.keys(new Metric());
 
-  let csvString = "";
-  csvString += props.join(",");
-  csvString += ",";
-  csvString += Object.keys(new Metric()).join(",");
-  csvString += "\n";
+  const header = [...props, ...metricProps].join(",");
 
-  for (const linha of linhas) {
-    csvString += props.map((prop) => linha[prop]).join(",");
-    csvString += ",";
-    csvString += Object.values(linha.metric).join(",");
-    csvString += "\n";
-  }
+  const csvRows = rows.map((row) => {
+    const rowValues = [
+      ...props.map((prop) => row[prop] ?? ""),
+      ...metricProps.map((prop) => row.metric[prop] ?? ""),
+    ];
+    return rowValues.join(",");
+  });
 
-  return csvString;
+  return [header, ...csvRows].join("\n");
 };
 
-const definirNomeCSV = (periodoSelecionado, dataInicial, dataFinal) => {
-  const dataInicialFormatada = dataUtils.formatarDataParaCsv(dataInicial);
-  const dataFinalFormatada = dataUtils.formatarDataParaCsv(dataFinal);
+/**
+ * Generates a CSV file name based on the selected period and date range.
+ *
+ * @param {string} selectedPeriod - The selected period identifier (e.g., "HOJE").
+ * @param {Date} startDate - The start date of the period.
+ * @param {Date} endDate - The end date of the period.
+ * @returns {string} - The formatted CSV file name, with dates formatted as `startDate.csv` for single-day periods,
+ *                     or `startDate-endDate.csv` for multi-day periods.
+ */
+const getCsvFileName = (selectedPeriod, startDate, endDate) => {
+  const formatedStartDate = dataUtils.formatarDataComUnderline(startDate);
+  const formatedEndDate = dataUtils.formatarDataComUnderline(endDate);
 
-  if (periodoSelecionado === PERIODOS.HOJE) {
-    return `${dataInicialFormatada}.csv`;
+  if (selectedPeriod === PERIODOS.HOJE) {
+    return `${formatedStartDate}.csv`;
   }
-  return `${dataInicialFormatada}-${dataFinalFormatada}.csv`;
+  return `${formatedStartDate}-${formatedEndDate}.csv`;
 };
 
-const baixarCsv = async (nome, csv) => {
+/**
+ * Downloads a CSV file with the specified filename and content.
+ *
+ * @async
+ * @param {string} fileName - The name to be used for the downloaded CSV file.
+ * @param {string} csvString - The CSV content as a string to be saved in the file.
+ *
+ * @returns {Promise<void>} - A promise that resolves when the download process completes.
+ *
+ * @throws Will log an error if file saving fails.
+ */
+const downloadCsv = async (fileName, csvString) => {
   try {
     const opcoes = {
       types: [
@@ -47,20 +71,20 @@ const baixarCsv = async (nome, csv) => {
           accept: { "text/csv": [".csv"] },
         },
       ],
-      suggestedName: nome,
+      suggestedName: fileName,
     };
 
     if ("showSaveFilePicker" in window) {
       const handle = await window.showSaveFilePicker(opcoes);
       const writable = await handle.createWritable();
-      await writable.write(csv);
+      await writable.write(csvString);
       await writable.close();
     } else {
-      const blob = new Blob([csv], { type: "text/csv" });
+      const blob = new Blob([csvString], { type: "text/csv" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${nome}.csv`;
+      a.download = `${fileName}.csv`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -72,7 +96,7 @@ const baixarCsv = async (nome, csv) => {
 };
 
 export default {
-  baixarCsv,
-  montarCsv,
-  definirNomeCSV,
+  downloadCsv,
+  getCsvString,
+  getCsvFileName,
 };

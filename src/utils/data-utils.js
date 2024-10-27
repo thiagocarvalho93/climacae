@@ -51,9 +51,9 @@ const definirDataInicialEFinalMes = (mes, ano) => {
   return { dataInicial, dataFinal };
 };
 
-const formatarDataParaCsv = (data) => {
+const formatarDataComUnderline = (data) => {
   const dia = new Date(data).getDate();
-  const mes = new Date(data).getMonth();
+  const mes = new Date(data).getMonth() + 1;
   const ano = new Date(data).getFullYear();
 
   return `${dia}_${mes}_${ano}`;
@@ -68,6 +68,6 @@ export default {
   subtrairHoras,
   formatDateForQuery,
   definirDataInicialEFinalMes,
-  formatarDataParaCsv,
+  formatarDataComUnderline,
   subtrairDias,
 };
