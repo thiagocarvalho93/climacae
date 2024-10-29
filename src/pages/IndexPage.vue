@@ -73,24 +73,11 @@
     </div>
 
     <div class="col-12 col-sm-5 flex">
-      <q-card flat bordered class="full-width">
-        <q-card-section class="text-h6"> Precipitação </q-card-section>
-        <q-card-section>
-          <apexchart
-            type="bar"
-            height="350"
-            :options="chartPrecipitacaoOptions"
-            :series="seriesPrecipitacao"
-            ref="graficoPrecipitacao"
-          ></apexchart>
-        </q-card-section>
-        <q-inner-loading
-          :showing="carregando"
-          label="Aguarde..."
-          label-class="text-teal"
-          label-style="font-size: 1.1em"
-        />
-      </q-card>
+      <GraficoPrecipitacaoGeral
+        :loading="carregando"
+        :periodo-selecionado="periodoSelecionado"
+        ref="graficoPrecipitacao"
+      />
     </div>
 
     <div class="col-12 col-sm-7 flex">
@@ -137,10 +124,7 @@
 import { defineComponent } from "vue";
 import {
   STATIONS,
-  CORES,
   PERIODOS,
-  CHART_TEMPERATURA_OPTIONS,
-  CHART_PRECIPITACAO_OPTIONS,
   CHART_SERIE_TEMPORAL_OPTIONS,
   COLUNAS_TABELA,
 } from "../constants/constants";
@@ -153,6 +137,7 @@ import InformacaoCard from "src/components/InformacaoCard.vue";
 import TabelaObservacoes from "src/components/TabelaObservacoes.vue";
 import SecaoFiltros from "src/components/SecaoFiltros.vue";
 import GraficoTemperaturaGeral from "src/components/GraficoTemperaturaGeral.vue";
+import GraficoPrecipitacaoGeral from "src/components/GraficoPrecipitacaoGeral.vue";
 
 export default defineComponent({
   name: "IndexPage",
@@ -163,6 +148,7 @@ export default defineComponent({
     TabelaObservacoes,
     SecaoFiltros,
     GraficoTemperaturaGeral,
+    GraficoPrecipitacaoGeral,
   },
 
   computed: {
@@ -190,10 +176,6 @@ export default defineComponent({
 
     colunasTabela() {
       return COLUNAS_TABELA;
-    },
-
-    chartPrecipitacaoOptions() {
-      return CHART_PRECIPITACAO_OPTIONS;
     },
 
     chartSerieTemporalOptions() {
@@ -224,7 +206,6 @@ export default defineComponent({
       precipitacaoMaxima: 0,
       ventoMaximo: 0,
       //gráficos
-      seriesPrecipitacao: [],
       seriesTemporal: [],
     };
   },
@@ -234,12 +215,6 @@ export default defineComponent({
     this.$watch(
       "darkMode",
       (isDark) => {
-        this.$refs.graficoPrecipitacao.updateOptions({
-          theme: {
-            mode: isDark ? "dark" : "light",
-          },
-        });
-
         this.$refs.graficoTemporal.updateOptions({
           theme: {
             mode: isDark ? "dark" : "light",
@@ -278,7 +253,7 @@ export default defineComponent({
         this.calcularMetadados();
         this.calcularMaximosGlobais();
         this.$refs.graficoTemperatura.atualizar();
-        this.atualizarGraficoPrecipitacao();
+        this.$refs.graficoPrecipitacao.atualizar();
         this.atualizarGraficoTemporal();
       } catch (error) {
         const mensagem = (error && error.message) || "Erro ao obter os dados.";
@@ -445,62 +420,6 @@ export default defineComponent({
           this.dadosPrecipitacaoMaxima = obs;
         }
       }
-    },
-
-    atualizarGraficoPrecipitacao() {
-      const dadosFiltrados = this.metadadosEstacoes.filter(
-        (x) =>
-          x.precipitacaoMaxima !== (-Infinity || Infinity) &&
-          x.precipitacaoAcumulada !== (-Infinity || Infinity)
-      );
-
-      const data = dadosFiltrados.map((x) => ({
-        name: x.NOME,
-        precipitacaoMaxima: x.precipitacaoMaxima,
-        precipitacaoRestante: x.precipitacaoAcumulada - x.precipitacaoMaxima,
-      }));
-
-      const series = [
-        {
-          name: "Máxima em 24h",
-          data: data.map((x) => x.precipitacaoMaxima),
-          color: CORES.INDIGO_ESCURO,
-        },
-        {
-          name: "Precipitação restante",
-          data: data.map((x) => x.precipitacaoRestante),
-          color: CORES.INDIGO,
-        },
-      ];
-
-      let precipitacaoMaxima = 0;
-      let isDiario =
-        this.periodoSelecionado === this.periodos.DIA_ESPECIFICO ||
-        this.periodoSelecionado === this.periodos.HOJE;
-
-      if (isDiario) {
-        const precMaximas = data.map((x) => x.precipitacaoMaxima);
-        precipitacaoMaxima = Math.max(...precMaximas).toFixed(2);
-        series.splice(1, 1); // Remove a série "Precipitação restante"
-      } else {
-        const precMaximas = data.map(
-          (x) => x.precipitacaoMaxima + x.precipitacaoRestante
-        );
-        precipitacaoMaxima = Math.max(...precMaximas);
-      }
-
-      this.$refs.graficoPrecipitacao.updateOptions({
-        series,
-        xaxis: {
-          categories: dadosFiltrados.map((x) =>
-            x.id.length > 15 ? `${x.id.substring(0, 15)}...` : x.id
-          ),
-        },
-        yaxis: {
-          max: precipitacaoMaxima * 1.4,
-          tickAmount: 5,
-        },
-      });
     },
 
     atualizarGraficoTemporal() {
