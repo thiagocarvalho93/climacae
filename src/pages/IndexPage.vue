@@ -360,6 +360,18 @@ export default defineComponent({
           this.setDates(new Date(), new Date());
           await this.getTodayObservations(this.idsEstacoes);
           break;
+        case PERIODOS.ULTIMAS_SETENTA_E_DUAS_HORAS:
+          const dias = 3;
+
+          this.setDates(dataUtils.subtrairDias(dias), new Date());
+          this.setStartDate(dataUtils.subtrairDias(dias));
+          this.setEndDate(new Date());
+          await this.getPeriodDailyObservations(
+            this.idsEstacoes,
+            this.dataInicial,
+            this.dataFinal
+          );
+          break;
         case PERIODOS.ULTIMOS_SETE_DIAS:
         case PERIODOS.ULTIMOS_TRINTA_DIAS:
           const diasAtras =

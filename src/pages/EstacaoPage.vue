@@ -105,16 +105,17 @@ import {
   PERIODOS,
   CHART_SERIE_TEMPORAL_OPTIONS,
 } from "../constants/constants";
-import weatherApi from "src/api/weather-api";
-import Observation from "src/models/observation-model";
 import dataUtils from "src/utils/data-utils";
 import SecaoFiltros from "src/components/SecaoFiltros.vue";
+import { mapActions, mapState } from "pinia";
+import { useObservationStore } from "src/stores/observations";
 
 export default defineComponent({
   name: "EstacaoPage",
   components: { SecaoFiltros },
 
   computed: {
+    ...mapState(useObservationStore, ["stationObservations"]),
     darkMode() {
       return this.$q.dark.isActive;
     },
@@ -138,8 +139,6 @@ export default defineComponent({
       mesSelecionado: new Date().getMonth() + 1,
       anoSelecionado: new Date().getFullYear(),
       //outputs
-      observacoes: [],
-
       chartSerieTemporalOptions: CHART_SERIE_TEMPORAL_OPTIONS,
       seriesTemperatura: [],
       seriesPressao: [],
@@ -165,6 +164,12 @@ export default defineComponent({
   },
 
   methods: {
+    ...mapActions(useObservationStore, [
+      "getStationPeriodDailyObservations",
+      "getStationTodayObservations",
+      "getStationDayObservations",
+    ]),
+
     updateDarkMode(graficoRef, isDark) {
       this.$refs[graficoRef].updateOptions({
         theme: {
@@ -179,6 +184,7 @@ export default defineComponent({
         },
       });
     },
+
     async obterDadosEstacao() {
       this.carregando = true;
       try {
@@ -188,10 +194,10 @@ export default defineComponent({
         this.atualizarGraficoTemporalPrecipitacao();
         this.atualizarGraficoTemporalVento();
       } catch (error) {
+        console.error(error);
         const mensagem = (error && error.message) || "Erro ao obter os dados.";
         this.mensagemErro(mensagem);
       } finally {
-        this.observacoes = this.observacoes.reverse();
         this.carregando = false;
       }
     },
@@ -200,7 +206,7 @@ export default defineComponent({
       switch (this.periodoSelecionado) {
         case PERIODOS.HOJE:
           this.setDates(new Date(), new Date());
-          await this.obterObservacoesDiaAtual();
+          await this.getStationTodayObservations(this.estacaoSelecionada.ID);
           break;
         case PERIODOS.ULTIMOS_SETE_DIAS:
         case PERIODOS.ULTIMOS_TRINTA_DIAS:
@@ -210,7 +216,8 @@ export default defineComponent({
             new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000),
             new Date()
           );
-          await this.obterObservacoesDiariasPeriodo(
+          await this.getStationPeriodDailyObservations(
+            this.estacaoSelecionada.ID,
             this.dataInicial,
             this.dataFinal
           );
@@ -237,7 +244,11 @@ export default defineComponent({
         this.anoSelecionado
       );
 
-      await this.obterObservacoesDiariasPeriodo(dataInicial, dataFinal);
+      await this.getStationPeriodDailyObservations(
+        this.estacaoSelecionada.ID,
+        dataInicial,
+        dataFinal
+      );
     },
 
     async filtrarDiaEspecifico() {
@@ -255,55 +266,10 @@ export default defineComponent({
 
       this.dataInicial = new Date(dataSelecionada);
 
-      await this.obterObservacoesDiaEspecifico(this.dataInicial);
-    },
-
-    async obterObservacoesDiaAtual() {
-      const station = this.estacaoSelecionada.ID;
-
-      const response = await weatherApi.obterObservacoesDiaAtualEstacao(
-        station
+      await this.getStationDayObservations(
+        this.estacaoSelecionada.ID,
+        this.dataInicial
       );
-
-      this.observacoes = response.observations
-        ? response.observations.map((res) => new Observation(res))
-        : [];
-    },
-
-    async obterObservacoesDiariasPeriodo(dataInicial, dataFinal) {
-      const station = this.estacaoSelecionada.ID;
-      const dataInicialFormatada = this.formatarDataParaQuery(dataInicial);
-      const dataFinalFormatada = this.formatarDataParaQuery(dataFinal);
-
-      const response = await weatherApi.obterObservacoesDiariasPeriodo(
-        station,
-        dataInicialFormatada,
-        dataFinalFormatada
-      );
-
-      this.observacoes = response.observations
-        ? response.observations.map((res) => new Observation(res))
-        : [];
-    },
-
-    async obterObservacoesDiaEspecifico(data) {
-      const station = this.estacaoSelecionada.ID;
-      const dataFormatada = this.formatarDataParaQuery(data);
-
-      const response = await weatherApi.obterTodasObservacoesDia(
-        station,
-        dataFormatada
-      );
-
-      this.observacoes = response.observations
-        ? response.observations.map((res) => new Observation(res))
-        : [];
-    },
-
-    formatarDataParaQuery(data) {
-      return `${data.getFullYear()}${data.getMonth() + 1 < 10 ? "0" : ""}${
-        data.getMonth() + 1
-      }${data.getDate() < 10 ? "0" : ""}${data.getDate()}`;
     },
 
     atualizarGraficoTemporal(chartRef, seriesMap, colors) {
@@ -312,7 +278,7 @@ export default defineComponent({
 
         return {
           name,
-          data: this.observacoes.map((obs) => [
+          data: this.stationObservations.map((obs) => [
             dataUtils.subtrairHoras(new Date(obs.obsTimeLocal), 3),
             obs.metric[serie],
           ]),
@@ -372,7 +338,6 @@ export default defineComponent({
         windspeedHigh: { desc: "Máxima", color: "red" },
         windspeedLow: { desc: "Mínima", color: "blue" },
       };
-      colors:;
 
       this.atualizarGraficoTemporal(
         this.$refs.graficoTemporalVento,

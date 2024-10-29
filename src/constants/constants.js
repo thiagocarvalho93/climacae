@@ -35,6 +35,7 @@ const CORES = {
  */
 const PERIODOS = {
   HOJE: "Hoje",
+  ULTIMAS_SETENTA_E_DUAS_HORAS: "Últimas 72h",
   ULTIMOS_SETE_DIAS: "Últimos 7 dias",
   ULTIMOS_TRINTA_DIAS: "Últimos 30 dias",
   DIA_ESPECIFICO: "Dia específico",

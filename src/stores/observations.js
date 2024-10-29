@@ -11,6 +11,7 @@ export const useObservationStore = defineStore("observation", {
   state: () => ({
     realTimeObservations: [],
     observations: [],
+    stationObservations: [],
     cachedObservations: new Map(),
     cachedRealTimeObservations: null,
     startDate: new Date(),
@@ -31,12 +32,14 @@ export const useObservationStore = defineStore("observation", {
   },
 
   actions: {
+    //#region Dates
     setStartDate(date) {
       this.startDate = date;
     },
     setEndDate(date) {
       this.endDate = date;
     },
+    //#region Get observations
     async getTodayObservations(stationsArray) {
       const cached = this.cachedObservations.get("today");
 
@@ -119,6 +122,47 @@ export const useObservationStore = defineStore("observation", {
       this.cachedObservations.set(cacheKey, observations);
     },
 
+    //#region Get by station
+    async getStationTodayObservations(idEstacao) {
+      const response = await weatherApi.obterObservacoesDiaAtualEstacao(
+        idEstacao
+      );
+
+      this.stationObservations = response.observations
+        ? response.observations.map((obs) => new Observation(obs))
+        : [];
+    },
+
+    async getStationPeriodDailyObservations(stationId, startDate, finalDate) {
+      const formatedStartDate = dataUtils.formatDateForQuery(startDate);
+      const formatedFinalDate = dataUtils.formatDateForQuery(finalDate);
+
+      const response = await weatherApi.obterObservacoesDiariasPeriodo(
+        stationId,
+        formatedStartDate,
+        formatedFinalDate
+      );
+
+      this.stationObservations = response.observations
+        ? response.observations.map((res) => new Observation(res))
+        : [];
+    },
+
+    async getStationDayObservations(stationId, date) {
+      const formattedDate = dataUtils.formatDateForQuery(date);
+      // console.log(formattedDate);
+
+      const response = await weatherApi.obterTodasObservacoesDia(
+        stationId,
+        formattedDate
+      );
+
+      this.stationObservations = response.observations
+        ? response.observations.map((res) => new Observation(res))
+        : [];
+    },
+
+    //#region Real time
     async getRealTimeObservations(stationsArray) {
       if (this.cachedRealTimeObservations) {
         const { iat, observations } = this.cachedRealTimeObservations;
@@ -149,6 +193,7 @@ export const useObservationStore = defineStore("observation", {
       };
     },
 
+    //#region Calculations
     calcularMetadados() {
       this.metadadosEstacoes = [];
 
