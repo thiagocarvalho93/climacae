@@ -2,14 +2,11 @@ import arrayUtils from "src/utils/array-utils";
 import dataUtils from "src/utils/data-utils";
 
 const STATIONS = {
-  // IRIODA1: { ID: "IRIODA1", NOME: "RO - Alphaville" },
-  // IRIODA5: { ID: "IRIODA5", NOME: "RO - Parque dos Pássaros" },
-  // IRIODA6: { ID: "IRIODA6", NOME: "Canta Galo" },
   IMACA6: { ID: "IMACA6", NOME: "Miramar" },
   IMACA7: { ID: "IMACA7", NOME: "Mirante" },
   IMACA13: { ID: "IMACA13", NOME: "Serra" },
   IMACA15: { ID: "IMACA15", NOME: "Glória" },
-  IMACA23: { ID: "IMACA23", NOME: "LAMET" },
+  IMACA23: { ID: "IMACA23", NOME: "Imboassica" },
   IMACA26: { ID: "IMACA26", NOME: "Granja dos Cavaleiros" },
   IMACA27: { ID: "IMACA27", NOME: "Imbetiba" },
   IMACA28: { ID: "IMACA28", NOME: "Aroeira" },
@@ -17,15 +14,12 @@ const STATIONS = {
   IMACA31: { ID: "IMACA31", NOME: "Botafogo" },
   IMACA32: { ID: "IMACA32", NOME: "Visconde" },
   IMACA36: { ID: "IMACA36", NOME: "Córrego do Ouro" },
-  // IMACA40: { ID: "IMACA40", NOME: "Granja dos cavaleiros 2" },
   IMACA41: { ID: "IMACA41", NOME: "Lagomar" },
   IMACA42: { ID: "IMACA42", NOME: "Virgem Santa" },
   IMACA43: { ID: "IMACA43", NOME: "Aeroporto" },
-  IMACA43: { ID: "IMACA53", NOME: "Sana" },
-  // ICAMPO96: { ID: "ICAMPO96", NOME: "" }, desativada
-  // ICAMPO223: { ID: "ICAMPO223", NOME: "" },
-  // ICABOF4: { ID: "ICABOF4", NOME: "CF - Jardim Flamboyant" },
-  // ICABOF8: { ID: "ICABOF8", NOME: "CF - Tamoios" },
+  IMACA46: { ID: "IMACA46", NOME: "Cajueiros" },
+  IMACA53: { ID: "IMACA52", NOME: "Barreto" },
+  IMACA53: { ID: "IMACA53", NOME: "Sana" },
 };
 
 const CORES = {
