@@ -62,7 +62,6 @@
     <!-- Carrocel -->
     <div class="col-12 col-md-3 flex">
       <RealTimeObservationsCarousel
-        :real-time-observations="realTimeObservations"
         :estacoes="estacoes"
         :dark-mode="darkMode"
       />
@@ -181,11 +180,7 @@ export default defineComponent({
   },
 
   computed: {
-    ...mapState(useObservationStore, [
-      "observations",
-      "realTimeObservations",
-      "metadadosEstacoes",
-    ]),
+    ...mapState(useObservationStore, ["observations", "metadadosEstacoes"]),
 
     darkMode() {
       return this.$q.dark.isActive;
@@ -255,7 +250,6 @@ export default defineComponent({
 
   async created() {
     await this.obterCalcularEAtualizar();
-    await this.getRealTimeObservations(this.idsEstacoes);
     this.$watch(
       "darkMode",
       (isDark) => {
@@ -295,7 +289,6 @@ export default defineComponent({
       "getTodayObservations",
       "getSpecificDayObservations",
       "getPeriodDailyObservations",
-      "getRealTimeObservations",
       "setStartDate",
       "setEndDate",
       "calcularMetadados",

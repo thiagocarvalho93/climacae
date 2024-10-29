@@ -222,10 +222,7 @@ export default defineComponent({
         case PERIODOS.ULTIMOS_TRINTA_DIAS:
           const daysAgo =
             this.periodoSelecionado === PERIODOS.ULTIMOS_SETE_DIAS ? 7 : 30;
-          this.setDates(
-            new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000),
-            new Date()
-          );
+          this.setDates(dataUtils.subtrairDias(daysAgo), new Date());
           await this.getStationPeriodDailyObservations(
             this.estacaoSelecionada.ID,
             this.dataInicial,

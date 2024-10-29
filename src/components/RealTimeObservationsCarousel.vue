@@ -76,12 +76,11 @@
 
 <script>
 import { STATIONS } from "src/constants/constants";
-import { mapActions } from "pinia";
+import { mapActions, mapState } from "pinia";
 import { useObservationStore } from "src/stores/observations";
 
 export default {
   props: {
-    realTimeObservations: Array,
     estacoes: Object,
     darkMode: Boolean,
   },
@@ -101,9 +100,11 @@ export default {
     idsEstacoes() {
       return Object.keys(STATIONS);
     },
+    ...mapState(useObservationStore, ["realTimeObservations"]),
   },
 
-  created() {
+  async created() {
+    await this.getRealTimeObservations(this.idsEstacoes);
     this.atualizarDadosAtuais();
   },
 
