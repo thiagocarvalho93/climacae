@@ -69,24 +69,7 @@
 
     <!-- Gráficos -->
     <div class="col-12 col-md-9 flex">
-      <q-card flat bordered class="full-width">
-        <q-card-section class="text-h6"> Máximas e mínimas </q-card-section>
-        <q-card-section>
-          <apexchart
-            type="bar"
-            height="250"
-            :options="chartTemperaturaOptions"
-            :series="seriesTemperatura"
-            ref="graficoColunaTemperatura"
-          ></apexchart>
-        </q-card-section>
-        <q-inner-loading
-          :showing="carregando"
-          label="Aguarde..."
-          label-class="text-teal"
-          label-style="font-size: 1.1em"
-        />
-      </q-card>
+      <GraficoTemperaturaGeral :loading="carregando" ref="graficoTemperatura" />
     </div>
 
     <div class="col-12 col-sm-5 flex">
@@ -164,10 +147,12 @@ import {
 import dataUtils from "src/utils/data-utils";
 import { mapActions, mapState } from "pinia";
 import { useObservationStore } from "src/stores/observations";
+
 import RealTimeObservationsCarousel from "src/components/RealTimeObservationsCarousel.vue";
 import InformacaoCard from "src/components/InformacaoCard.vue";
 import TabelaObservacoes from "src/components/TabelaObservacoes.vue";
 import SecaoFiltros from "src/components/SecaoFiltros.vue";
+import GraficoTemperaturaGeral from "src/components/GraficoTemperaturaGeral.vue";
 
 export default defineComponent({
   name: "IndexPage",
@@ -177,6 +162,7 @@ export default defineComponent({
     InformacaoCard,
     TabelaObservacoes,
     SecaoFiltros,
+    GraficoTemperaturaGeral,
   },
 
   computed: {
@@ -204,10 +190,6 @@ export default defineComponent({
 
     colunasTabela() {
       return COLUNAS_TABELA;
-    },
-
-    chartTemperaturaOptions() {
-      return CHART_TEMPERATURA_OPTIONS;
     },
 
     chartPrecipitacaoOptions() {
@@ -242,7 +224,6 @@ export default defineComponent({
       precipitacaoMaxima: 0,
       ventoMaximo: 0,
       //gráficos
-      seriesTemperatura: [],
       seriesPrecipitacao: [],
       seriesTemporal: [],
     };
@@ -253,12 +234,6 @@ export default defineComponent({
     this.$watch(
       "darkMode",
       (isDark) => {
-        this.$refs.graficoColunaTemperatura.updateOptions({
-          theme: {
-            mode: isDark ? "dark" : "light",
-          },
-        });
-
         this.$refs.graficoPrecipitacao.updateOptions({
           theme: {
             mode: isDark ? "dark" : "light",
@@ -302,7 +277,7 @@ export default defineComponent({
 
         this.calcularMetadados();
         this.calcularMaximosGlobais();
-        this.atualizarGraficoTemperatura();
+        this.$refs.graficoTemperatura.atualizar();
         this.atualizarGraficoPrecipitacao();
         this.atualizarGraficoTemporal();
       } catch (error) {
@@ -472,36 +447,6 @@ export default defineComponent({
       }
     },
 
-    atualizarGraficoTemperatura() {
-      const dadosFiltrados = this.metadadosEstacoes.filter(
-        (x) => x.maxima != -Infinity || x.minima != Infinity
-      );
-
-      this.$refs.graficoColunaTemperatura.updateOptions({
-        series: [
-          {
-            name: "Máxima",
-            color: CORES.VERMELHO,
-            data: dadosFiltrados.map((x) => x.maxima),
-          },
-          {
-            name: "Mínima",
-            color: CORES.AZUL,
-            data: dadosFiltrados.map((x) => x.minima),
-          },
-        ],
-        xaxis: {
-          categories: dadosFiltrados.map((x) =>
-            x.id.length > 12 ? `${x.id.substring(0, 12)}...` : x.id
-          ),
-        },
-        yaxis: {
-          min: this.minima * 0.8,
-          tickAmount: 5,
-        },
-      });
-    },
-
     atualizarGraficoPrecipitacao() {
       const dadosFiltrados = this.metadadosEstacoes.filter(
         (x) =>
@@ -585,36 +530,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="sass">
-\:root
-  --scrollbar-width-height        : 10px
-  --scrollbar-track               : #FFF
-  --scrollbar-thumb               : rgb(204,231,255)
-  --scrollbar-thumb-hover         : rgb(33,118,210)
-  --scrollbar-track-dark          : $dark
-  --scrollbar-thumb-dark          : #EEE
-  --scrollbar-thumb-hover-dark    : rgb(33,118,210)
-
-::-webkit-scrollbar
-  width: var(--scrollbar-width-height)
-  height: var(--scrollbar-width-height)
-
-// the track (progress bar) of the scrollbar
-::-webkit-scrollbar-track
-  // border-top: var(--markdown-border)
-  background: var(--scrollbar-track-dark)
-  box-shadow: inset 0 0 4px var(--scrollbar-track-dark)
-
-// the bottom corner of the scrollbar, where both horizontal and vertical scrollbars meet
-::-webkit-scrollbar-corner
-  background: var(--scrollbar-track-dark)
-
-// the draggable scrolling handle
-::-webkit-scrollbar-thumb
-  background: var(--scrollbar-thumb-dark)
-  border-radius: 5px
-
-  &:hover
-    background: var(--scrollbar-thumb-hover-dark)
-</style>

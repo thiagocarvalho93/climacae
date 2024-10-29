@@ -57,3 +57,35 @@ export default defineComponent({
   animation-direction: alternate;
 }
 </style>
+<style lang="sass">
+\:root
+  --scrollbar-width-height        : 10px
+  --scrollbar-track               : #FFF
+  --scrollbar-thumb               : rgb(204,231,255)
+  --scrollbar-thumb-hover         : rgb(33,118,210)
+  --scrollbar-track-dark          : $dark
+  --scrollbar-thumb-dark          : #EEE
+  --scrollbar-thumb-hover-dark    : rgb(33,118,210)
+
+::-webkit-scrollbar
+  width: var(--scrollbar-width-height)
+  height: var(--scrollbar-width-height)
+
+// the track (progress bar) of the scrollbar
+::-webkit-scrollbar-track
+  // border-top: var(--markdown-border)
+  background: var(--scrollbar-track-dark)
+  box-shadow: inset 0 0 4px var(--scrollbar-track-dark)
+
+// the bottom corner of the scrollbar, where both horizontal and vertical scrollbars meet
+::-webkit-scrollbar-corner
+  background: var(--scrollbar-track-dark)
+
+// the draggable scrolling handle
+::-webkit-scrollbar-thumb
+  background: var(--scrollbar-thumb-dark)
+  border-radius: 5px
+
+  &:hover
+    background: var(--scrollbar-thumb-hover-dark)
+</style>
