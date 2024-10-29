@@ -208,6 +208,16 @@ export default defineComponent({
           this.setDates(new Date(), new Date());
           await this.getStationTodayObservations(this.estacaoSelecionada.ID);
           break;
+        case PERIODOS.ULTIMAS_SETENTA_E_DUAS_HORAS:
+          const dias = 3;
+
+          this.setDates(dataUtils.subtrairDias(dias), new Date());
+          await this.getStationPeriodDailyObservations(
+            this.estacaoSelecionada.ID,
+            this.dataInicial,
+            this.dataFinal
+          );
+          break;
         case PERIODOS.ULTIMOS_SETE_DIAS:
         case PERIODOS.ULTIMOS_TRINTA_DIAS:
           const daysAgo =
