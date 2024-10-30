@@ -15,11 +15,11 @@
       <InformacaoCard
         :carregando="carregando"
         titulo="MÁXIMA"
-        :descricao="`${maxima}°C`"
+        :descricao="`${maxValues.maxima}°C`"
         icone="thermostat"
         cor-icone="red-5"
-        :titulo-verso="formatarTituloCard(dadosMaxima)"
-        :descricao-verso="formatarDataCard(dadosMaxima)"
+        :titulo-verso="formatarTituloCard(maxValues.dadosMaxima)"
+        :descricao-verso="formatarDataCard(maxValues.dadosMaxima)"
       />
     </div>
 
@@ -27,11 +27,11 @@
       <InformacaoCard
         :carregando="carregando"
         titulo="MÍNIMA"
-        :descricao="`${minima}°C`"
+        :descricao="`${maxValues.minima}°C`"
         icone="thermostat"
         cor-icone="blue-5"
-        :titulo-verso="formatarTituloCard(dadosMinima)"
-        :descricao-verso="formatarDataCard(dadosMinima)"
+        :titulo-verso="formatarTituloCard(maxValues.dadosMinima)"
+        :descricao-verso="formatarDataCard(maxValues.dadosMinima)"
       />
     </div>
 
@@ -39,11 +39,11 @@
       <InformacaoCard
         :carregando="carregando"
         titulo="VENTO MÁXIMO"
-        :descricao="`${ventoMaximo} km/h`"
+        :descricao="`${maxValues.ventoMaximo} km/h`"
         icone="wind_power"
         cor-icone="green-5"
-        :titulo-verso="formatarTituloCard(dadosVentoMaximo)"
-        :descricao-verso="formatarDataCard(dadosVentoMaximo)"
+        :titulo-verso="formatarTituloCard(maxValues.dadosVentoMaximo)"
+        :descricao-verso="formatarDataCard(maxValues.dadosVentoMaximo)"
       />
     </div>
 
@@ -51,11 +51,11 @@
       <InformacaoCard
         :carregando="carregando"
         titulo="PRECIPITAÇÃO MÁXIMA"
-        :descricao="`${precipitacaoMaxima}mm`"
+        :descricao="`${maxValues.precipitacaoMaxima}mm`"
         icone="ion-rainy"
         cor-icone="deep-purple-5"
-        :titulo-verso="formatarTituloCard(dadosPrecipitacaoMaxima)"
-        :descricao-verso="formatarDataCard(dadosPrecipitacaoMaxima)"
+        :titulo-verso="formatarTituloCard(maxValues.dadosPrecipitacaoMaxima)"
+        :descricao-verso="formatarDataCard(maxValues.dadosPrecipitacaoMaxima)"
       />
     </div>
 
@@ -81,29 +81,10 @@
     </div>
 
     <div class="col-12 col-sm-7 flex">
-      <q-card flat bordered class="full-width">
-        <q-card-section class="text-h6">
-          <div class="row">
-            <div class="col-12 col-sm-8 col-md-10">
-              <span>Séries temporais</span>
-            </div>
-          </div>
-        </q-card-section>
-        <q-card-section>
-          <apexchart
-            height="350"
-            :options="chartSerieTemporalOptions"
-            :series="seriesTemporal"
-            ref="graficoTemporal"
-          />
-        </q-card-section>
-        <q-inner-loading
-          :showing="carregando"
-          label="Aguarde..."
-          label-class="text-teal"
-          label-style="font-size: 1.1em"
-        />
-      </q-card>
+      <GraficoSeriesTemporaisGeral
+        :loading="carregando"
+        ref="graficoTemporal"
+      />
     </div>
 
     <!-- Tabela -->
@@ -138,6 +119,7 @@ import TabelaObservacoes from "src/components/TabelaObservacoes.vue";
 import SecaoFiltros from "src/components/SecaoFiltros.vue";
 import GraficoTemperaturaGeral from "src/components/GraficoTemperaturaGeral.vue";
 import GraficoPrecipitacaoGeral from "src/components/GraficoPrecipitacaoGeral.vue";
+import GraficoSeriesTemporaisGeral from "src/components/GraficoSeriesTemporaisGeral.vue";
 
 export default defineComponent({
   name: "IndexPage",
@@ -149,10 +131,15 @@ export default defineComponent({
     SecaoFiltros,
     GraficoTemperaturaGeral,
     GraficoPrecipitacaoGeral,
+    GraficoSeriesTemporaisGeral,
   },
 
   computed: {
-    ...mapState(useObservationStore, ["observations", "metadadosEstacoes"]),
+    ...mapState(useObservationStore, [
+      "observations",
+      "stationsMetrics",
+      "maxValues",
+    ]),
 
     darkMode() {
       return this.$q.dark.isActive;
@@ -212,26 +199,6 @@ export default defineComponent({
 
   async created() {
     await this.obterCalcularEAtualizar();
-    this.$watch(
-      "darkMode",
-      (isDark) => {
-        this.$refs.graficoTemporal.updateOptions({
-          theme: {
-            mode: isDark ? "dark" : "light",
-          },
-          grid: {
-            row: {
-              colors: isDark
-                ? ["#333", "transparent"]
-                : ["#e5e5e5", "transparent"],
-            },
-          },
-        });
-      },
-      {
-        immediate: true,
-      }
-    );
   },
 
   methods: {
@@ -241,7 +208,8 @@ export default defineComponent({
       "getPeriodDailyObservations",
       "setStartDate",
       "setEndDate",
-      "calcularMetadados",
+      "calculateMetrics",
+      "calculateMaxValues",
     ]),
 
     async obterCalcularEAtualizar() {
@@ -250,11 +218,11 @@ export default defineComponent({
       try {
         await this.filtrarDadosPeriodo();
 
-        this.calcularMetadados();
-        this.calcularMaximosGlobais();
+        this.calculateMetrics();
+        this.calculateMaxValues();
         this.$refs.graficoTemperatura.atualizar();
         this.$refs.graficoPrecipitacao.atualizar();
-        this.atualizarGraficoTemporal();
+        this.$refs.graficoTemporal.atualizar();
       } catch (error) {
         const mensagem = (error && error.message) || "Erro ao obter os dados.";
         this.mensagemErro(mensagem);
@@ -382,67 +350,14 @@ export default defineComponent({
       await this.getSpecificDayObservations(this.idsEstacoes, this.dataInicial);
     },
 
-    calcularMaximosGlobais() {
-      this.maxima = 0;
-      this.minima = 0;
-      this.ventoMaximo = 0;
-      this.precipitacaoMaxima = 0;
-
-      this.metadadosEstacoes.forEach((metadadosEstacao) => {
-        const { maxima, minima, ventoMaximo, precipitacaoMaxima } =
-          metadadosEstacao;
-
-        if (maxima > this.maxima) {
-          this.maxima = maxima;
-        }
-        if (this.minima === 0 || (minima < this.minima && minima != 0)) {
-          this.minima = minima;
-        }
-        if (ventoMaximo > this.ventoMaximo) {
-          this.ventoMaximo = ventoMaximo;
-        }
-        if (precipitacaoMaxima > this.precipitacaoMaxima) {
-          this.precipitacaoMaxima = precipitacaoMaxima;
-        }
-      });
-
-      for (const obs of this.observations) {
-        if (obs.metric.tempHigh == this.maxima) {
-          this.dadosMaxima = obs;
-        }
-        if (obs.metric.tempLow == this.minima) {
-          this.dadosMinima = obs;
-        }
-        if (obs.metric.windgustHigh == this.ventoMaximo) {
-          this.dadosVentoMaximo = obs;
-        }
-        if (obs.metric.precipTotal == this.precipitacaoMaxima) {
-          this.dadosPrecipitacaoMaxima = obs;
-        }
-      }
-    },
-
-    atualizarGraficoTemporal() {
-      const dados = Object.keys(STATIONS).map((estacao) => ({
-        name: STATIONS[estacao].NOME,
-        data: this.observations.reduce((acc, ob) => {
-          if (ob.stationID === estacao && ob.metric.tempAvg) {
-            acc.push([
-              dataUtils.subtrairHoras(new Date(ob.obsTimeLocal), 3),
-              ob.metric.tempAvg,
-            ]);
-          }
-          return acc;
-        }, []),
-      }));
-      this.$refs.graficoTemporal.updateSeries(dados);
-    },
-
-    formatarDataCard({ obsTimeLocal }) {
-      return new Date(obsTimeLocal).toLocaleDateString();
+    formatarDataCard(dados) {
+      if (!dados || !dados.obsTimeLocal) return "N/A";
+      return new Date(dados.obsTimeLocal).toLocaleDateString();
     },
 
     formatarTituloCard(dados) {
+      if (!dados || !dados.stationID) return "Sem dados";
+
       const idEstacao = dados.stationID;
       return `Em ${this.estacoes[idEstacao]?.NOME} (${idEstacao})`;
     },

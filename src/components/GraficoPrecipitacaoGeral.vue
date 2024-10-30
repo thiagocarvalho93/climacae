@@ -40,7 +40,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(useObservationStore, ["metadadosEstacoes"]),
+    ...mapState(useObservationStore, ["stationsMetrics"]),
     chartPrecipitacaoOptions() {
       return CHART_PRECIPITACAO_OPTIONS;
     },
@@ -71,7 +71,7 @@ export default {
   },
   methods: {
     atualizar() {
-      const dadosFiltrados = this.metadadosEstacoes.filter(
+      const dadosFiltrados = this.stationsMetrics.filter(
         (x) =>
           x.precipitacaoMaxima !== (-Infinity || Infinity) &&
           x.precipitacaoAcumulada !== (-Infinity || Infinity)

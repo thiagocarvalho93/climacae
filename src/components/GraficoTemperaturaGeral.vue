@@ -33,7 +33,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(useObservationStore, ["metadadosEstacoes"]),
+    ...mapState(useObservationStore, ["stationsMetrics"]),
     chartTemperaturaOptions() {
       return CHART_TEMPERATURA_OPTIONS;
     },
@@ -61,7 +61,7 @@ export default {
   },
   methods: {
     atualizar() {
-      const dadosFiltrados = this.metadadosEstacoes.filter(
+      const dadosFiltrados = this.stationsMetrics.filter(
         (x) => x.maxima != -Infinity || x.minima != Infinity
       );
 

@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import weatherApi from "src/api/weather-api";
 import { STATIONS } from "src/constants/constants";
+import MaxValues from "src/models/max-values-model";
 import Metric from "src/models/metric-model";
 import ObservationCurrent from "src/models/observation-current-model";
 import Observation from "src/models/observation-model";
@@ -16,7 +17,9 @@ export const useObservationStore = defineStore("observation", {
     cachedRealTimeObservations: null,
     startDate: new Date(),
     endDate: new Date(),
-    metadadosEstacoes: [],
+    stationsMetrics: [],
+
+    maxValues: new MaxValues(),
   }),
 
   getters: {
@@ -194,12 +197,12 @@ export const useObservationStore = defineStore("observation", {
     },
 
     //#region Calculations
-    calcularMetadados() {
-      this.metadadosEstacoes = [];
+    calculateMetrics() {
+      this.stationsMetrics = [];
 
       const metadadosMap = this.observations.reduce((acc, obs) => {
         const { metric, stationID } = obs;
-        const { tempHigh, tempLow, windgustHigh, precipRate } = new Metric(
+        const { tempHigh, tempLow, windgustHigh, precipTotal } = new Metric(
           metric
         );
         const stationName = STATIONS[stationID].NOME;
@@ -210,16 +213,26 @@ export const useObservationStore = defineStore("observation", {
             tempLow,
             tempHigh,
             windgustHigh,
-            precipRate
+            precipTotal
           );
         } else {
-          acc[stationName].update(tempLow, tempHigh, windgustHigh, precipRate);
+          acc[stationName].update(tempLow, tempHigh, windgustHigh, precipTotal);
         }
 
         return acc;
       }, {});
 
-      this.metadadosEstacoes = Object.values(metadadosMap);
+      this.stationsMetrics = Object.values(metadadosMap);
+    },
+
+    calculateMaxValues() {
+      const maxValues = new MaxValues();
+
+      maxValues.updateMaxMinValues(this.stationsMetrics);
+
+      maxValues.updateObservationData(this.observations);
+
+      this.maxValues = maxValues.getResults();
     },
   },
 });
