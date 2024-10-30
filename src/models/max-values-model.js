@@ -36,9 +36,6 @@ export default class MaxValues {
       if (obs.metric.precipTotal === this.precipitacaoMaxima)
         this.dadosPrecipitacaoMaxima = obs;
     });
-
-    console.log(this.precipitacaoMaxima);
-    console.log(this.dadosPrecipitacaoMaxima);
   }
 
   getResults() {

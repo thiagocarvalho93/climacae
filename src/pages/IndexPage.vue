@@ -102,17 +102,11 @@
 </template>
 
 <script>
-import { defineComponent } from "vue";
-import {
-  STATIONS,
-  PERIODOS,
-  CHART_SERIE_TEMPORAL_OPTIONS,
-  COLUNAS_TABELA,
-} from "../constants/constants";
-import dataUtils from "src/utils/data-utils";
-import { mapActions, mapState } from "pinia";
+import { ref, computed, onMounted } from "vue";
 import { useObservationStore } from "src/stores/observations";
-
+import { STATIONS, PERIODOS, COLUNAS_TABELA } from "../constants/constants";
+import dataUtils from "src/utils/data-utils";
+import { useQuasar } from "quasar";
 import RealTimeObservationsCarousel from "src/components/RealTimeObservationsCarousel.vue";
 import InformacaoCard from "src/components/InformacaoCard.vue";
 import TabelaObservacoes from "src/components/TabelaObservacoes.vue";
@@ -121,9 +115,8 @@ import GraficoTemperaturaGeral from "src/components/GraficoTemperaturaGeral.vue"
 import GraficoPrecipitacaoGeral from "src/components/GraficoPrecipitacaoGeral.vue";
 import GraficoSeriesTemporaisGeral from "src/components/GraficoSeriesTemporaisGeral.vue";
 
-export default defineComponent({
+export default {
   name: "IndexPage",
-
   components: {
     RealTimeObservationsCarousel,
     InformacaoCard,
@@ -133,234 +126,176 @@ export default defineComponent({
     GraficoPrecipitacaoGeral,
     GraficoSeriesTemporaisGeral,
   },
+  setup() {
+    const $q = useQuasar();
+    const observationStore = useObservationStore();
 
-  computed: {
-    ...mapState(useObservationStore, [
-      "observations",
-      "stationsMetrics",
-      "maxValues",
-    ]),
+    const carregando = ref(true);
+    const periodoSelecionado = ref(PERIODOS.HOJE);
+    const diaSelecionado = ref(new Date().getDate());
+    const mesSelecionado = ref(new Date().getMonth() + 1);
+    const anoSelecionado = ref(new Date().getFullYear());
+    const dataInicial = ref(new Date());
+    const dataFinal = ref(new Date());
 
-    darkMode() {
-      return this.$q.dark.isActive;
-    },
+    const graficoTemperatura = ref(null);
+    const graficoPrecipitacao = ref(null);
+    const graficoTemporal = ref(null);
 
-    estacoes() {
-      return STATIONS;
-    },
+    const observations = computed(() => observationStore.observations);
+    const stationsMetrics = computed(() => observationStore.stationsMetrics);
+    const maxValues = computed(() => observationStore.maxValues);
+    const darkMode = computed(() => $q.dark.isActive);
+    const estacoes = computed(() => STATIONS);
+    const nomesEstacoes = computed(() => Object.values(STATIONS));
+    const idsEstacoes = computed(() => Object.keys(STATIONS));
+    const periodos = computed(() => PERIODOS);
+    const colunasTabela = computed(() => COLUNAS_TABELA);
 
-    nomesEstacoes() {
-      return Object.values(STATIONS);
-    },
-
-    idsEstacoes() {
-      return Object.keys(STATIONS);
-    },
-
-    periodos() {
-      return PERIODOS;
-    },
-
-    colunasTabela() {
-      return COLUNAS_TABELA;
-    },
-
-    chartSerieTemporalOptions() {
-      return CHART_SERIE_TEMPORAL_OPTIONS;
-    },
-  },
-  data() {
-    return {
-      //estados
-      carregando: true,
-      mostrarInformacoesCard: [true, true, true, true],
-      autoplayCarousel: true,
-      //inputs
-      estacaoSelecionada: Object.values(STATIONS)[0],
-      periodoSelecionado: PERIODOS.HOJE,
-      diaSelecionado: new Date().getDate(),
-      mesSelecionado: new Date().getMonth() + 1,
-      anoSelecionado: new Date().getFullYear(),
-      dataInicial: new Date(),
-      dataFinal: new Date(),
-      //outputs
-      dadosMinima: [],
-      dadosMaxima: [],
-      dadosVentoMaximo: [],
-      dadosPrecipitacaoMaxima: [],
-      minima: 0,
-      maxima: 0,
-      precipitacaoMaxima: 0,
-      ventoMaximo: 0,
-      //gráficos
-      seriesTemporal: [],
-    };
-  },
-
-  async created() {
-    await this.obterCalcularEAtualizar();
-  },
-
-  methods: {
-    ...mapActions(useObservationStore, [
-      "getTodayObservations",
-      "getSpecificDayObservations",
-      "getPeriodDailyObservations",
-      "setStartDate",
-      "setEndDate",
-      "calculateMetrics",
-      "calculateMaxValues",
-    ]),
-
-    async obterCalcularEAtualizar() {
-      this.carregando = true;
+    const obterCalcularEAtualizar = async () => {
+      carregando.value = true;
 
       try {
-        await this.filtrarDadosPeriodo();
-
-        this.calculateMetrics();
-        this.calculateMaxValues();
-        this.$refs.graficoTemperatura.atualizar();
-        this.$refs.graficoPrecipitacao.atualizar();
-        this.$refs.graficoTemporal.atualizar();
+        await filtrarDadosPeriodo();
+        observationStore.calculateMetrics();
+        observationStore.calculateMaxValues();
+        graficoTemperatura.value?.atualizar();
+        graficoPrecipitacao.value?.atualizar();
+        graficoTemporal.value?.atualizar();
       } catch (error) {
-        const mensagem = (error && error.message) || "Erro ao obter os dados.";
-        this.mensagemErro(mensagem);
+        mensagemErro((error && error.message) || "Erro ao obter os dados.");
       } finally {
-        this.carregando = false;
+        carregando.value = false;
       }
-    },
+    };
 
-    mensagemErro(mensagem) {
-      this.$q.notify({
+    const filtrarDadosPeriodo = async () => {
+      try {
+        switch (periodoSelecionado.value) {
+          case PERIODOS.HOJE:
+            setDates(new Date(), new Date());
+            await observationStore.getTodayObservations(idsEstacoes.value);
+            break;
+          case PERIODOS.ULTIMAS_SETENTA_E_DUAS_HORAS:
+            const dias = 3;
+            setDates(dataUtils.subtrairDias(dias), new Date());
+            await observationStore.getPeriodDailyObservations(
+              idsEstacoes.value,
+              dataInicial.value,
+              dataFinal.value
+            );
+            break;
+          case PERIODOS.ULTIMOS_SETE_DIAS:
+          case PERIODOS.ULTIMOS_TRINTA_DIAS:
+            const diasAtras =
+              periodoSelecionado.value === PERIODOS.ULTIMOS_SETE_DIAS ? 7 : 30;
+            setDates(dataUtils.subtrairDias(diasAtras), new Date());
+            await observationStore.getPeriodDailyObservations(
+              idsEstacoes.value,
+              dataInicial.value,
+              dataFinal.value
+            );
+            break;
+          case PERIODOS.MES_ESPECIFICO:
+            await filtrarMesEspecifico(
+              mesSelecionado.value,
+              anoSelecionado.value
+            );
+            break;
+          case PERIODOS.DIA_ESPECIFICO:
+            await filtrarDiaEspecifico();
+            break;
+          default:
+            throw new Error("Período inválido!");
+        }
+      } catch (error) {
+        mensagemErro(error.message);
+      }
+    };
+
+    const setDates = (startDate, endDate) => {
+      dataInicial.value = startDate;
+      dataFinal.value = endDate;
+    };
+
+    const filtrarMesEspecifico = async (mes, ano) => {
+      const { dataInicial: start, dataFinal: end } =
+        dataUtils.definirDataInicialEFinalMes(mes, ano);
+      setDates(start, end);
+      await observationStore.getPeriodDailyObservations(
+        idsEstacoes.value,
+        dataInicial.value,
+        dataFinal.value
+      );
+    };
+
+    const filtrarDiaEspecifico = async () => {
+      const hoje = new Date();
+      const dataSelecionada = new Date(
+        anoSelecionado.value,
+        mesSelecionado.value - 1,
+        diaSelecionado.value
+      );
+      if (dataSelecionada > hoje) {
+        throw new Error("Não é possível obter dados do futuro!");
+      }
+      dataInicial.value = dataSelecionada;
+      await observationStore.getSpecificDayObservations(
+        idsEstacoes.value,
+        dataInicial.value
+      );
+    };
+
+    const mensagemErro = (mensagem) => {
+      $q.notify({
         message: mensagem,
         type: "negative",
         progress: true,
         position: "top",
-        actions: [
-          {
-            label: "Fechar",
-            color: "white",
-            handler: () => {},
-          },
-        ],
+        actions: [{ label: "Fechar", color: "white", handler: () => {} }],
       });
-    },
+    };
 
-    mensagemSucesso(mensagem) {
-      this.$q.notify({
-        message: mensagem,
-        type: "positive",
-        progress: true,
-        position: "top",
-        actions: [
-          {
-            label: "Fechar",
-            color: "white",
-            handler: () => {},
-          },
-        ],
-      });
-    },
-
-    async filtrarDadosPeriodo() {
-      switch (this.periodoSelecionado) {
-        case PERIODOS.HOJE:
-          this.setStartDate(new Date());
-          this.setEndDate(new Date());
-          this.setDates(new Date(), new Date());
-          await this.getTodayObservations(this.idsEstacoes);
-          break;
-        case PERIODOS.ULTIMAS_SETENTA_E_DUAS_HORAS:
-          const dias = 3;
-
-          this.setDates(dataUtils.subtrairDias(dias), new Date());
-          this.setStartDate(dataUtils.subtrairDias(dias));
-          this.setEndDate(new Date());
-          await this.getPeriodDailyObservations(
-            this.idsEstacoes,
-            this.dataInicial,
-            this.dataFinal
-          );
-          break;
-        case PERIODOS.ULTIMOS_SETE_DIAS:
-        case PERIODOS.ULTIMOS_TRINTA_DIAS:
-          const diasAtras =
-            this.periodoSelecionado === PERIODOS.ULTIMOS_SETE_DIAS ? 7 : 30;
-
-          this.setDates(dataUtils.subtrairDias(diasAtras), new Date());
-          this.setStartDate(dataUtils.subtrairDias(diasAtras));
-          this.setEndDate(new Date());
-          await this.getPeriodDailyObservations(
-            this.idsEstacoes,
-            this.dataInicial,
-            this.dataFinal
-          );
-          break;
-        case PERIODOS.MES_ESPECIFICO:
-          await this.filtrarMesEspecifico(
-            this.mesSelecionado,
-            this.anoSelecionado
-          );
-          break;
-        case PERIODOS.DIA_ESPECIFICO:
-          await this.filtrarDiaEspecifico();
-          break;
-        default:
-          throw new Error("Período inválido!");
-      }
-    },
-
-    setDates(startDate, endDate) {
-      this.dataInicial = startDate;
-      this.dataFinal = endDate;
-    },
-
-    async filtrarMesEspecifico(mes, ano) {
-      const { dataInicial, dataFinal } = dataUtils.definirDataInicialEFinalMes(
-        mes,
-        ano
-      );
-      this.setDates(dataInicial, dataFinal);
-      this.setStartDate(dataInicial);
-      this.setEndDate(dataFinal);
-
-      await this.getPeriodDailyObservations(
-        this.idsEstacoes,
-        this.dataInicial,
-        this.dataFinal
-      );
-    },
-
-    async filtrarDiaEspecifico() {
-      const hoje = new Date();
-
-      const dataSelecionada = new Date(
-        this.anoSelecionado,
-        this.mesSelecionado - 1,
-        this.diaSelecionado
-      );
-
-      if (dataSelecionada > hoje) {
-        throw new Error("Não é possivel obter dados do futuro!");
-      }
-
-      this.dataInicial = new Date(dataSelecionada);
-
-      await this.getSpecificDayObservations(this.idsEstacoes, this.dataInicial);
-    },
-
-    formatarDataCard(dados) {
+    const formatarDataCard = (dados) => {
       if (!dados || !dados.obsTimeLocal) return "N/A";
       return new Date(dados.obsTimeLocal).toLocaleDateString();
-    },
+    };
 
-    formatarTituloCard(dados) {
+    const formatarTituloCard = (dados) => {
       if (!dados || !dados.stationID) return "Sem dados";
 
       const idEstacao = dados.stationID;
-      return `Em ${this.estacoes[idEstacao]?.NOME} (${idEstacao})`;
-    },
+      return `Em ${estacoes.value[idEstacao]?.NOME} (${idEstacao})`;
+    };
+
+    onMounted(() => {
+      obterCalcularEAtualizar();
+    });
+
+    return {
+      carregando,
+      periodoSelecionado,
+      diaSelecionado,
+      mesSelecionado,
+      anoSelecionado,
+      dataInicial,
+      dataFinal,
+      observations,
+      stationsMetrics,
+      maxValues,
+      darkMode,
+      estacoes,
+      nomesEstacoes,
+      idsEstacoes,
+      periodos,
+      colunasTabela,
+      obterCalcularEAtualizar,
+      formatarTituloCard,
+      formatarDataCard,
+      graficoTemperatura,
+      graficoPrecipitacao,
+      graficoTemporal,
+    };
   },
-});
+};
 </script>
