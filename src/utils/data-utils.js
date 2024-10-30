@@ -63,6 +63,15 @@ const subtrairDias = (diasAtras) => {
   return new Date(Date.now() - diasAtras * 24 * 60 * 60 * 1000);
 };
 
+function isToday(date) {
+  const today = new Date();
+  return (
+    date.getDate() === today.getDate() &&
+    date.getMonth() === today.getMonth() &&
+    date.getFullYear() === today.getFullYear()
+  );
+}
+
 export default {
   calcularDiaMesAtual,
   subtrairHoras,
@@ -70,4 +79,5 @@ export default {
   definirDataInicialEFinalMes,
   formatarDataComUnderline,
   subtrairDias,
+  isToday,
 };

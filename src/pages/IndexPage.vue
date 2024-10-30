@@ -5,7 +5,7 @@
     v-model:dia-selecionado="diaSelecionado"
     v-model:mes-selecionado="mesSelecionado"
     v-model:ano-selecionado="anoSelecionado"
-    :carregando="carregando"
+    :loading="loading"
     @obterDados="obterCalcularEAtualizar"
   />
 
@@ -13,7 +13,7 @@
   <div class="row q-col-gutter-md fade">
     <div class="col-12 col-sm-6 col-md-3">
       <InformacaoCard
-        :carregando="carregando"
+        :loading="loading"
         titulo="MÁXIMA"
         :descricao="`${maxValues.maxima}°C`"
         icone="thermostat"
@@ -25,7 +25,7 @@
 
     <div class="col-12 col-sm-6 col-md-3">
       <InformacaoCard
-        :carregando="carregando"
+        :loading="loading"
         titulo="MÍNIMA"
         :descricao="`${maxValues.minima}°C`"
         icone="thermostat"
@@ -37,7 +37,7 @@
 
     <div class="col-12 col-sm-6 col-md-3">
       <InformacaoCard
-        :carregando="carregando"
+        :loading="loading"
         titulo="VENTO MÁXIMO"
         :descricao="`${maxValues.ventoMaximo} km/h`"
         icone="wind_power"
@@ -49,7 +49,7 @@
 
     <div class="col-12 col-sm-6 col-md-3">
       <InformacaoCard
-        :carregando="carregando"
+        :loading="loading"
         titulo="PRECIPITAÇÃO MÁXIMA"
         :descricao="`${maxValues.precipitacaoMaxima}mm`"
         icone="ion-rainy"
@@ -69,22 +69,19 @@
 
     <!-- Gráficos -->
     <div class="col-12 col-md-9 flex">
-      <GraficoTemperaturaGeral :loading="carregando" ref="graficoTemperatura" />
+      <GraficoTemperaturaGeral :loading="loading" ref="graficoTemperatura" />
     </div>
 
     <div class="col-12 col-sm-5 flex">
       <GraficoPrecipitacaoGeral
-        :loading="carregando"
+        :loading="loading"
         :periodo-selecionado="periodoSelecionado"
         ref="graficoPrecipitacao"
       />
     </div>
 
     <div class="col-12 col-sm-7 flex">
-      <GraficoSeriesTemporaisGeral
-        :loading="carregando"
-        ref="graficoTemporal"
-      />
+      <GraficoSeriesTemporaisGeral :loading="loading" ref="graficoTemporal" />
     </div>
 
     <!-- Tabela -->
@@ -92,7 +89,7 @@
       <TabelaObservacoes
         :rows="observations"
         :columns="colunasTabela"
-        :loading="carregando"
+        :loading="loading"
         :data-final="dataFinal"
         :data-inicial="dataInicial"
         :periodo-selecionado="periodoSelecionado"
@@ -115,6 +112,7 @@ import GraficoTemperaturaGeral from "src/components/GraficoTemperaturaGeral.vue"
 import GraficoPrecipitacaoGeral from "src/components/GraficoPrecipitacaoGeral.vue";
 import GraficoSeriesTemporaisGeral from "src/components/GraficoSeriesTemporaisGeral.vue";
 import { useNotification } from "src/composables/useNotification";
+import { useDateRangeSetter } from "src/composables/useDateRangeSetter";
 
 export default {
   name: "IndexPage",
@@ -132,13 +130,17 @@ export default {
     const observationStore = useObservationStore();
     const { mensagemErro } = useNotification();
 
-    const carregando = ref(true);
-    const periodoSelecionado = ref(PERIODOS.HOJE);
-    const diaSelecionado = ref(new Date().getDate());
-    const mesSelecionado = ref(new Date().getMonth() + 1);
-    const anoSelecionado = ref(new Date().getFullYear());
-    const dataInicial = ref(new Date());
-    const dataFinal = ref(new Date());
+    const loading = ref(true);
+
+    const {
+      dataFinal,
+      dataInicial,
+      periodoSelecionado,
+      anoSelecionado,
+      diaSelecionado,
+      mesSelecionado,
+      setDatesGivenPeriod,
+    } = useDateRangeSetter();
 
     const graficoTemperatura = ref(null);
     const graficoPrecipitacao = ref(null);
@@ -155,98 +157,47 @@ export default {
     const colunasTabela = computed(() => COLUNAS_TABELA);
 
     const obterCalcularEAtualizar = async () => {
-      carregando.value = true;
+      loading.value = true;
 
       try {
-        await filtrarDadosPeriodo();
-        observationStore.calculateMetrics();
-        observationStore.calculateMaxValues();
-        graficoTemperatura.value?.atualizar();
-        graficoPrecipitacao.value?.atualizar();
-        graficoTemporal.value?.atualizar();
+        setDatesGivenPeriod();
+        await getObservationsData();
+        calculate();
+        updateGraphs();
       } catch (error) {
         mensagemErro((error && error.message) || "Erro ao obter os dados.");
       } finally {
-        carregando.value = false;
+        loading.value = false;
       }
     };
 
-    const filtrarDadosPeriodo = async () => {
-      try {
-        switch (periodoSelecionado.value) {
-          case PERIODOS.HOJE:
-            setDates(new Date(), new Date());
-            await observationStore.getTodayObservations(idsEstacoes.value);
-            break;
-          case PERIODOS.ULTIMAS_SETENTA_E_DUAS_HORAS:
-            const dias = 3;
-            setDates(dataUtils.subtrairDias(dias), new Date());
-            await observationStore.getPeriodDailyObservations(
-              idsEstacoes.value,
-              dataInicial.value,
-              dataFinal.value
-            );
-            break;
-          case PERIODOS.ULTIMOS_SETE_DIAS:
-          case PERIODOS.ULTIMOS_TRINTA_DIAS:
-            const diasAtras =
-              periodoSelecionado.value === PERIODOS.ULTIMOS_SETE_DIAS ? 7 : 30;
-            setDates(dataUtils.subtrairDias(diasAtras), new Date());
-            await observationStore.getPeriodDailyObservations(
-              idsEstacoes.value,
-              dataInicial.value,
-              dataFinal.value
-            );
-            break;
-          case PERIODOS.MES_ESPECIFICO:
-            await filtrarMesEspecifico(
-              mesSelecionado.value,
-              anoSelecionado.value
-            );
-            break;
-          case PERIODOS.DIA_ESPECIFICO:
-            await filtrarDiaEspecifico();
-            break;
-          default:
-            throw new Error("Período inválido!");
-        }
-      } catch (error) {
-        mensagemErro(error.message);
+    const getObservationsData = async () => {
+      if (!dataFinal.value && dataUtils.isToday(dataInicial.value)) {
+        await observationStore.getTodayObservations(idsEstacoes.value);
+      } else if (!dataFinal.value) {
+        await observationStore.getSpecificDayObservations(
+          idsEstacoes.value,
+          dataInicial.value
+        );
+      } else {
+        await observationStore.getPeriodDailyObservations(
+          idsEstacoes.value,
+          dataInicial.value,
+          dataFinal.value
+        );
       }
     };
 
-    const setDates = (startDate, endDate) => {
-      dataInicial.value = startDate;
-      dataFinal.value = endDate;
-    };
+    function calculate() {
+      observationStore.calculateMetrics();
+      observationStore.calculateMaxValues();
+    }
 
-    const filtrarMesEspecifico = async (mes, ano) => {
-      const { dataInicial: start, dataFinal: end } =
-        dataUtils.definirDataInicialEFinalMes(mes, ano);
-      setDates(start, end);
-      await observationStore.getPeriodDailyObservations(
-        idsEstacoes.value,
-        dataInicial.value,
-        dataFinal.value
-      );
-    };
-
-    const filtrarDiaEspecifico = async () => {
-      const hoje = new Date();
-      const dataSelecionada = new Date(
-        anoSelecionado.value,
-        mesSelecionado.value - 1,
-        diaSelecionado.value
-      );
-      if (dataSelecionada > hoje) {
-        throw new Error("Não é possível obter dados do futuro!");
-      }
-      dataInicial.value = dataSelecionada;
-      await observationStore.getSpecificDayObservations(
-        idsEstacoes.value,
-        dataInicial.value
-      );
-    };
+    function updateGraphs() {
+      graficoTemperatura.value?.atualizar();
+      graficoPrecipitacao.value?.atualizar();
+      graficoTemporal.value?.atualizar();
+    }
 
     const formatarDataCard = (dados) => {
       if (!dados || !dados.obsTimeLocal) return "N/A";
@@ -265,7 +216,7 @@ export default {
     });
 
     return {
-      carregando,
+      loading,
       periodoSelecionado,
       diaSelecionado,
       mesSelecionado,
