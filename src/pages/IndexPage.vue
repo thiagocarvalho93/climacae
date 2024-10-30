@@ -161,7 +161,7 @@ export default {
 
       try {
         setDatesGivenPeriod();
-        await getObservationsData();
+        await fetchObservationsData();
         calculate();
         updateGraphs();
       } catch (error) {
@@ -171,7 +171,7 @@ export default {
       }
     };
 
-    const getObservationsData = async () => {
+    const fetchObservationsData = async () => {
       if (!dataFinal.value && dataUtils.isToday(dataInicial.value)) {
         await observationStore.getTodayObservations(idsEstacoes.value);
       } else if (!dataFinal.value) {

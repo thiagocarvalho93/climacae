@@ -7,7 +7,7 @@
     v-model:mes-selecionado="mesSelecionado"
     v-model:ano-selecionado="anoSelecionado"
     :nomes-estacoes="nomesEstacoes"
-    :carregando="carregando"
+    :carregando="loading"
     @obter-dados="obterDadosEstacao"
   />
 
@@ -25,7 +25,7 @@
           ></apexchart>
         </q-card-section>
         <q-inner-loading
-          :showing="carregando"
+          :showing="loading"
           label="Aguarde..."
           label-class="text-teal"
           label-style="font-size: 1.1em"
@@ -45,7 +45,7 @@
           ></apexchart>
         </q-card-section>
         <q-inner-loading
-          :showing="carregando"
+          :showing="loading"
           label="Aguarde..."
           label-class="text-teal"
           label-style="font-size: 1.1em"
@@ -65,7 +65,7 @@
           ></apexchart>
         </q-card-section>
         <q-inner-loading
-          :showing="carregando"
+          :showing="loading"
           label="Aguarde..."
           label-class="text-teal"
           label-style="font-size: 1.1em"
@@ -88,7 +88,7 @@
           </apexchart>
         </q-card-section>
         <q-inner-loading
-          :showing="carregando"
+          :showing="loading"
           label="Aguarde..."
           label-class="text-teal"
           label-style="font-size: 1.1em"
@@ -109,6 +109,7 @@ import dataUtils from "src/utils/data-utils";
 import SecaoFiltros from "src/components/SecaoFiltros.vue";
 import { useObservationStore } from "src/stores/observations";
 import { useNotification } from "src/composables/useNotification";
+import { useDateRangeSetter } from "src/composables/useDateRangeSetter";
 
 export default {
   name: "EstacaoPage",
@@ -129,14 +130,18 @@ export default {
     const graficoTemporalPrecipitacao = ref(null);
     const graficoTemporalVento = ref(null);
 
-    const carregando = ref(false);
-    const dataInicial = ref(new Date());
-    const dataFinal = ref(new Date());
+    const loading = ref(false);
     const estacaoSelecionada = ref(Object.values(STATIONS)[0]);
-    const periodoSelecionado = ref(PERIODOS.HOJE);
-    const diaSelecionado = ref(new Date().getDate());
-    const mesSelecionado = ref(new Date().getMonth() + 1);
-    const anoSelecionado = ref(new Date().getFullYear());
+
+    const {
+      dataFinal,
+      dataInicial,
+      periodoSelecionado,
+      anoSelecionado,
+      diaSelecionado,
+      mesSelecionado,
+      setDatesGivenPeriod,
+    } = useDateRangeSetter();
 
     const chartSerieTemporalOptions = ref(CHART_SERIE_TEMPORAL_OPTIONS);
     const seriesTemperatura = ref([]);
@@ -162,95 +167,43 @@ export default {
     };
 
     const obterDadosEstacao = async () => {
-      carregando.value = true;
+      loading.value = true;
       try {
-        await obterDadosPeriodo();
-        atualizarGraficoTemporalTemperatura();
-        atualizarGraficoTemporalPressao();
-        atualizarGraficoTemporalPrecipitacao();
-        atualizarGraficoTemporalVento();
+        setDatesGivenPeriod();
+        await fetchStationObservationsData();
+
+        updateGraphs();
       } catch (error) {
         console.error(error);
         mensagemErro(error.message || "Erro ao obter os dados.");
       } finally {
-        carregando.value = false;
+        loading.value = false;
       }
     };
 
-    const obterDadosPeriodo = async () => {
-      switch (periodoSelecionado.value) {
-        case PERIODOS.HOJE:
-          setDates(new Date(), new Date());
-          await getStationTodayObservations(estacaoSelecionada.value.ID);
-          break;
-        case PERIODOS.ULTIMAS_SETENTA_E_DUAS_HORAS:
-          setDates(dataUtils.subtrairDias(3), new Date());
-          await getStationPeriodDailyObservations(
-            estacaoSelecionada.value.ID,
-            dataInicial.value,
-            dataFinal.value
-          );
-          break;
-        case PERIODOS.ULTIMOS_SETE_DIAS:
-        case PERIODOS.ULTIMOS_TRINTA_DIAS:
-          const daysAgo =
-            periodoSelecionado.value === PERIODOS.ULTIMOS_SETE_DIAS ? 7 : 30;
-          setDates(dataUtils.subtrairDias(daysAgo), new Date());
-          await getStationPeriodDailyObservations(
-            estacaoSelecionada.value.ID,
-            dataInicial.value,
-            dataFinal.value
-          );
-          break;
-        case PERIODOS.MES_ESPECIFICO:
-          await filtrarMesEspecifico();
-          break;
-        case PERIODOS.DIA_ESPECIFICO:
-          await filtrarDiaEspecifico();
-          break;
-        default:
-          throw new Error("Período inválido!");
+    const fetchStationObservationsData = async () => {
+      if (!dataFinal.value && dataUtils.isToday(dataInicial.value)) {
+        await getStationTodayObservations(estacaoSelecionada.value.ID);
+      } else if (!dataFinal.value) {
+        await getStationDayObservations(
+          estacaoSelecionada.value.ID,
+          dataInicial.value
+        );
+      } else {
+        await getStationPeriodDailyObservations(
+          estacaoSelecionada.value.ID,
+          dataInicial.value,
+          dataFinal.value
+        );
       }
     };
 
-    const filtrarMesEspecifico = async () => {
-      const { dataFinal, dataInicial } = dataUtils.definirDataInicialEFinalMes(
-        mesSelecionado.value,
-        anoSelecionado.value
-      );
-
-      await getStationPeriodDailyObservations(
-        estacaoSelecionada.value.ID,
-        dataInicial,
-        dataFinal
-      );
-    };
-
-    const filtrarDiaEspecifico = async () => {
-      const hoje = new Date();
-
-      const dataSelecionada = new Date(
-        anoSelecionado.value,
-        mesSelecionado.value - 1,
-        diaSelecionado.value
-      );
-
-      if (dataSelecionada > hoje) {
-        throw new Error("Não é possivel obter dados do futuro!");
-      }
-
-      dataInicial.value = new Date(dataSelecionada);
-
-      await getStationDayObservations(
-        estacaoSelecionada.value.ID,
-        dataInicial.value
-      );
-    };
-
-    const setDates = (startDate, endDate) => {
-      dataInicial.value = startDate;
-      dataFinal.value = endDate;
-    };
+    function updateGraphs() {
+      atualizarGraficoTemporalTemperatura();
+      atualizarGraficoTemporalPressao();
+      atualizarGraficoTemporalPrecipitacao();
+      atualizarGraficoTemporalVento();
+    }
 
     const atualizarGraficoTemporal = (chartRef, seriesMap, colors) => {
       const dados = Object.keys(seriesMap).map((serie) => {
@@ -343,7 +296,7 @@ export default {
       graficoTemporalPressao,
       graficoTemporalPrecipitacao,
       graficoTemporalVento,
-      carregando,
+      loading,
       dataInicial,
       dataFinal,
       estacaoSelecionada,
