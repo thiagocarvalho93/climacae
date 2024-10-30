@@ -15,7 +15,11 @@
           />
         </q-avatar>
         <q-toolbar-title class="fade">
-          <span :class="!isDarkMode ? 'text-black' : 'text-white'">Macaé</span>
+          <span
+            :class="!isDarkMode ? 'text-black' : 'text-white'"
+            class="text-weight-light"
+            >Macaé</span
+          >
         </q-toolbar-title>
         <q-toggle
           v-model="isDarkMode"
@@ -83,26 +87,23 @@ a {
 
 <script>
 import { ref } from "vue";
+import { useQuasar } from "quasar";
 
 export default {
   setup() {
-    return {
-      isDarkMode: ref(false),
+    const $q = useQuasar();
+    const isDarkMode = ref(false);
+    const tab = ref("");
+
+    const toggleDarkMode = (val) => {
+      $q.dark.set(val);
     };
-  },
 
-  data() {
     return {
-      tab: "",
+      isDarkMode,
+      tab,
+      toggleDarkMode,
     };
-  },
-
-  mounted() {},
-
-  methods: {
-    toggleDarkMode(val) {
-      this.$q.dark.set(val);
-    },
   },
 };
 </script>

@@ -114,6 +114,7 @@ import SecaoFiltros from "src/components/SecaoFiltros.vue";
 import GraficoTemperaturaGeral from "src/components/GraficoTemperaturaGeral.vue";
 import GraficoPrecipitacaoGeral from "src/components/GraficoPrecipitacaoGeral.vue";
 import GraficoSeriesTemporaisGeral from "src/components/GraficoSeriesTemporaisGeral.vue";
+import { useNotification } from "src/composables/useNotification";
 
 export default {
   name: "IndexPage",
@@ -129,6 +130,7 @@ export default {
   setup() {
     const $q = useQuasar();
     const observationStore = useObservationStore();
+    const { mensagemErro } = useNotification();
 
     const carregando = ref(true);
     const periodoSelecionado = ref(PERIODOS.HOJE);
@@ -244,16 +246,6 @@ export default {
         idsEstacoes.value,
         dataInicial.value
       );
-    };
-
-    const mensagemErro = (mensagem) => {
-      $q.notify({
-        message: mensagem,
-        type: "negative",
-        progress: true,
-        position: "top",
-        actions: [{ label: "Fechar", color: "white", handler: () => {} }],
-      });
     };
 
     const formatarDataCard = (dados) => {

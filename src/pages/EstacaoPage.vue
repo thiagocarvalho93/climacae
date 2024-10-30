@@ -108,15 +108,16 @@ import {
 import dataUtils from "src/utils/data-utils";
 import SecaoFiltros from "src/components/SecaoFiltros.vue";
 import { useObservationStore } from "src/stores/observations";
-import { useQuasar } from "quasar";
+import { useNotification } from "src/composables/useNotification";
 
 export default {
   name: "EstacaoPage",
   components: { SecaoFiltros },
 
   setup() {
-    const $q = useQuasar();
     const store = useObservationStore();
+    const { mensagemErro } = useNotification();
+
     const {
       getStationPeriodDailyObservations,
       getStationTodayObservations,
@@ -319,16 +320,6 @@ export default {
         "#FF5733",
         "#6495ED",
       ]);
-    };
-
-    const mensagemErro = (mensagem) => {
-      $q.notify({
-        message: mensagem,
-        type: "negative",
-        progress: true,
-        position: "top",
-        actions: [{ label: "Fechar", color: "white" }],
-      });
     };
 
     onMounted(async () => {
