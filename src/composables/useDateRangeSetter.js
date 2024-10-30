@@ -19,10 +19,10 @@ export function useDateRangeSetter() {
         _setDates(dataUtils.subtrairDias(3), new Date());
         break;
       case PERIODOS.ULTIMOS_SETE_DIAS:
+        _setDates(dataUtils.subtrairDias(7), new Date());
+        break;
       case PERIODOS.ULTIMOS_TRINTA_DIAS:
-        const daysAgo =
-          periodoSelecionado.value === PERIODOS.ULTIMOS_SETE_DIAS ? 7 : 30;
-        _setDates(dataUtils.subtrairDias(daysAgo), new Date());
+        _setDates(dataUtils.subtrairDias(30), new Date());
         break;
       case PERIODOS.MES_ESPECIFICO:
         setSpecificMonth();

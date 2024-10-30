@@ -6,7 +6,7 @@
     v-model:mes-selecionado="mesSelecionado"
     v-model:ano-selecionado="anoSelecionado"
     :loading="loading"
-    @obterDados="obterCalcularEAtualizar"
+    @obterDados="handleFiltrar"
   />
 
   <!-- Cards -->
@@ -101,7 +101,7 @@
 <script>
 import { ref, computed, onMounted } from "vue";
 import { useObservationStore } from "src/stores/observations";
-import { STATIONS, PERIODOS, COLUNAS_TABELA } from "../constants/constants";
+import { STATIONS, COLUNAS_TABELA } from "../constants/constants";
 import dataUtils from "src/utils/data-utils";
 import { useQuasar } from "quasar";
 import RealTimeObservationsCarousel from "src/components/RealTimeObservationsCarousel.vue";
@@ -147,16 +147,13 @@ export default {
     const graficoTemporal = ref(null);
 
     const observations = computed(() => observationStore.observations);
-    const stationsMetrics = computed(() => observationStore.stationsMetrics);
     const maxValues = computed(() => observationStore.maxValues);
     const darkMode = computed(() => $q.dark.isActive);
     const estacoes = computed(() => STATIONS);
-    const nomesEstacoes = computed(() => Object.values(STATIONS));
     const idsEstacoes = computed(() => Object.keys(STATIONS));
-    const periodos = computed(() => PERIODOS);
     const colunasTabela = computed(() => COLUNAS_TABELA);
 
-    const obterCalcularEAtualizar = async () => {
+    const handleFiltrar = async () => {
       loading.value = true;
 
       try {
@@ -212,7 +209,7 @@ export default {
     };
 
     onMounted(() => {
-      obterCalcularEAtualizar();
+      handleFiltrar();
     });
 
     return {
@@ -224,15 +221,12 @@ export default {
       dataInicial,
       dataFinal,
       observations,
-      stationsMetrics,
       maxValues,
       darkMode,
       estacoes,
-      nomesEstacoes,
       idsEstacoes,
-      periodos,
       colunasTabela,
-      obterCalcularEAtualizar,
+      handleFiltrar,
       formatarTituloCard,
       formatarDataCard,
       graficoTemperatura,

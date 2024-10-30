@@ -8,7 +8,7 @@
     v-model:ano-selecionado="anoSelecionado"
     :nomes-estacoes="nomesEstacoes"
     :carregando="loading"
-    @obter-dados="obterDadosEstacao"
+    @obter-dados="handleFiltrar"
   />
 
   <!-- Gráficos -->
@@ -100,11 +100,7 @@
 
 <script>
 import { ref, computed, onMounted, watch } from "vue";
-import {
-  STATIONS,
-  PERIODOS,
-  CHART_SERIE_TEMPORAL_OPTIONS,
-} from "../constants/constants";
+import { STATIONS, CHART_SERIE_TEMPORAL_OPTIONS } from "../constants/constants";
 import dataUtils from "src/utils/data-utils";
 import SecaoFiltros from "src/components/SecaoFiltros.vue";
 import { useObservationStore } from "src/stores/observations";
@@ -150,7 +146,6 @@ export default {
     const seriesVento = ref([]);
 
     const darkMode = computed(() => store.darkMode);
-    const estacoes = computed(() => STATIONS);
     const nomesEstacoes = computed(() => Object.values(STATIONS));
 
     const updateDarkMode = (graficoRef, isDark) => {
@@ -166,7 +161,7 @@ export default {
       });
     };
 
-    const obterDadosEstacao = async () => {
+    const handleFiltrar = async () => {
       loading.value = true;
       try {
         setDatesGivenPeriod();
@@ -199,13 +194,13 @@ export default {
     };
 
     function updateGraphs() {
-      atualizarGraficoTemporalTemperatura();
-      atualizarGraficoTemporalPressao();
-      atualizarGraficoTemporalPrecipitacao();
-      atualizarGraficoTemporalVento();
+      updateTemperatureGraph();
+      updatePressureGraph();
+      updatePrecipitationGraph();
+      updateWindGraph();
     }
 
-    const atualizarGraficoTemporal = (chartRef, seriesMap, colors) => {
+    const updateGraphOptions = (chartRef, seriesMap, colors) => {
       const dados = Object.keys(seriesMap).map((serie) => {
         const name = seriesMap[serie].desc;
         return {
@@ -224,51 +219,51 @@ export default {
       });
     };
 
-    const atualizarGraficoTemporalTemperatura = () => {
+    const updateTemperatureGraph = () => {
       const tempMap = {
         tempAvg: { desc: "Média", color: "yellow" },
         tempHigh: { desc: "Máxima", color: "red" },
         tempLow: { desc: "Mínima", color: "blue" },
       };
-      atualizarGraficoTemporal(graficoTemporalTemperatura, tempMap, [
+      updateGraphOptions(graficoTemporalTemperatura, tempMap, [
         "#FFD700",
         "#FF5733",
         "#6495ED",
       ]);
     };
 
-    const atualizarGraficoTemporalPressao = () => {
+    const updatePressureGraph = () => {
       const pressurePropsMap = {
         pressureMin: { desc: "Mínima", color: "blue" },
         pressureMax: { desc: "Máxima", color: "red" },
       };
 
-      atualizarGraficoTemporal(graficoTemporalPressao, pressurePropsMap, [
+      updateGraphOptions(graficoTemporalPressao, pressurePropsMap, [
         "#6495ED",
         "#FF5733",
       ]);
     };
 
-    const atualizarGraficoTemporalPrecipitacao = () => {
+    const updatePrecipitationGraph = () => {
       const precipPropsMap = {
         precipRate: { desc: "Taxa (mm/h)", color: "yellow" },
         precipTotal: { desc: "Total", color: "blue" },
       };
 
-      atualizarGraficoTemporal(graficoTemporalPrecipitacao, precipPropsMap, [
+      updateGraphOptions(graficoTemporalPrecipitacao, precipPropsMap, [
         "#FFD700",
         "#6495ED",
       ]);
     };
 
-    const atualizarGraficoTemporalVento = () => {
+    const updateWindGraph = () => {
       const windPropsMap = {
         windspeedAvg: { desc: "Média", color: "yellow" },
         windspeedHigh: { desc: "Máxima", color: "red" },
         windspeedLow: { desc: "Mínima", color: "blue" },
       };
 
-      atualizarGraficoTemporal(graficoTemporalVento, windPropsMap, [
+      updateGraphOptions(graficoTemporalVento, windPropsMap, [
         "#FFD700",
         "#FF5733",
         "#6495ED",
@@ -276,7 +271,7 @@ export default {
     };
 
     onMounted(async () => {
-      await obterDadosEstacao();
+      await handleFiltrar();
     });
 
     // TODO
@@ -297,8 +292,6 @@ export default {
       graficoTemporalPrecipitacao,
       graficoTemporalVento,
       loading,
-      dataInicial,
-      dataFinal,
       estacaoSelecionada,
       periodoSelecionado,
       diaSelecionado,
@@ -310,10 +303,8 @@ export default {
       seriesPrecipitacao,
       seriesVento,
       darkMode,
-      estacoes,
       nomesEstacoes,
-      obterDadosEstacao,
-      atualizarGraficoTemporalTemperatura,
+      handleFiltrar,
     };
   },
 };
