@@ -113,7 +113,6 @@ import {
 import csvUtils from "src/utils/csv-utils";
 import { computed, defineComponent } from "vue";
 import { useObservationStore } from "src/stores/observations";
-import { storeToRefs } from "pinia";
 
 export default defineComponent({
   props: {
@@ -127,7 +126,6 @@ export default defineComponent({
   },
   setup(props, context) {
     const store = useObservationStore();
-    const { observations } = storeToRefs(store);
 
     const estacaoSelecionadaProxy = computed({
       get: () => props.estacaoSelecionada,
