@@ -16,13 +16,13 @@ export function useDateRangeSetter() {
         _setDates(new Date(), null);
         break;
       case PERIODOS.ULTIMAS_SETENTA_E_DUAS_HORAS:
-        _setDates(dataUtils.subtrairDias(3), new Date());
+        _setDates(dataUtils.subtrairDias(3), dataUtils.somarDias(1));
         break;
       case PERIODOS.ULTIMOS_SETE_DIAS:
-        _setDates(dataUtils.subtrairDias(7), new Date());
+        _setDates(dataUtils.subtrairDias(7), dataUtils.somarDias(1));
         break;
       case PERIODOS.ULTIMOS_TRINTA_DIAS:
-        _setDates(dataUtils.subtrairDias(30), new Date());
+        _setDates(dataUtils.subtrairDias(30), dataUtils.somarDias(1));
         break;
       case PERIODOS.MES_ESPECIFICO:
         setSpecificMonth();
