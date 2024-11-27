@@ -22,7 +22,8 @@
 <script>
 import { mapState } from "pinia";
 import { CHART_TEMPERATURA_OPTIONS, CORES } from "src/constants/constants";
-import { useObservationStore } from "src/stores/observations";
+import { useNewObservationStore } from "src/stores/observationsv2";
+import stringUtil from "src/utils/string-util";
 
 export default {
   name: "TemperatureChart",
@@ -33,7 +34,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(useObservationStore, ["stationsMetrics"]),
+    ...mapState(useNewObservationStore, ["stations", "minTemp"]),
     chartTemperaturaOptions() {
       return CHART_TEMPERATURA_OPTIONS;
     },
@@ -61,30 +62,26 @@ export default {
   },
   methods: {
     atualizar() {
-      const dadosFiltrados = this.stationsMetrics.filter(
-        (x) => x.maxima != -Infinity || x.minima != Infinity
-      );
-
       this.$refs.graficoColunaTemperatura.updateOptions({
         series: [
           {
             name: "Máxima",
             color: CORES.VERMELHO,
-            data: dadosFiltrados.map((x) => x.maxima),
+            data: this.stations.map((x) => x.maxTemp),
           },
           {
             name: "Mínima",
             color: CORES.AZUL,
-            data: dadosFiltrados.map((x) => x.minima),
+            data: this.stations.map((x) => x.minTemp),
           },
         ],
         xaxis: {
-          categories: dadosFiltrados.map((x) =>
-            x.id.length > 12 ? `${x.id.substring(0, 12)}...` : x.id
+          categories: this.stations.map((x) =>
+            stringUtil.limitString(x.stationId, 12)
           ),
         },
         yaxis: {
-          // min: this.minima * 0.8,
+          min: this.minTemp.value * 0.8,
           tickAmount: 5,
         },
       });

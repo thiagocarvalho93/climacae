@@ -15,11 +15,11 @@
       <InformacaoCard
         :loading="loading"
         titulo="MÁXIMA"
-        :descricao="`${maxValues.maxima}°C`"
+        :descricao="`${getMaxTemp.value}°C`"
         icone="thermostat"
         cor-icone="red-5"
-        :titulo-verso="formatarTituloCard(maxValues.dadosMaxima)"
-        :descricao-verso="formatarDataCard(maxValues.dadosMaxima)"
+        :titulo-verso="formatarTituloCard(getMaxTemp.station)"
+        :descricao-verso="formatarDataCard(getMaxTemp)"
       />
     </div>
 
@@ -27,11 +27,11 @@
       <InformacaoCard
         :loading="loading"
         titulo="MÍNIMA"
-        :descricao="`${maxValues.minima}°C`"
+        :descricao="`${getMinTemp.value}°C`"
         icone="thermostat"
         cor-icone="blue-5"
-        :titulo-verso="formatarTituloCard(maxValues.dadosMinima)"
-        :descricao-verso="formatarDataCard(maxValues.dadosMinima)"
+        :titulo-verso="formatarTituloCard(getMinTemp.station)"
+        :descricao-verso="formatarDataCard(getMinTemp)"
       />
     </div>
 
@@ -39,11 +39,11 @@
       <InformacaoCard
         :loading="loading"
         titulo="VENTO MÁXIMO"
-        :descricao="`${maxValues.ventoMaximo} km/h`"
+        :descricao="`${getMaxWind.value} km/h`"
         icone="wind_power"
         cor-icone="green-5"
-        :titulo-verso="formatarTituloCard(maxValues.dadosVentoMaximo)"
-        :descricao-verso="formatarDataCard(maxValues.dadosVentoMaximo)"
+        :titulo-verso="formatarTituloCard(getMaxWind.station)"
+        :descricao-verso="formatarDataCard(getMaxWind)"
       />
     </div>
 
@@ -51,21 +51,21 @@
       <InformacaoCard
         :loading="loading"
         titulo="PRECIPITAÇÃO MÁXIMA"
-        :descricao="`${maxValues.precipitacaoMaxima}mm`"
+        :descricao="`${getTotalPrecipitation.value}mm`"
         icone="ion-rainy"
         cor-icone="deep-purple-5"
-        :titulo-verso="formatarTituloCard(maxValues.dadosPrecipitacaoMaxima)"
-        :descricao-verso="formatarDataCard(maxValues.dadosPrecipitacaoMaxima)"
+        :titulo-verso="formatarTituloCard(getTotalPrecipitation.station)"
+        :descricao-verso="formatarDataCard(getTotalPrecipitation)"
       />
     </div>
 
     <!-- Carrocel -->
-    <div class="col-12 col-md-3 flex">
+    <!-- <div class="col-12 col-md-3 flex">
       <RealTimeObservationsCarousel
         :estacoes="estacoes"
         :dark-mode="darkMode"
       />
-    </div>
+    </div> -->
 
     <!-- Gráficos -->
     <div class="col-12 col-md-9 flex">
@@ -80,12 +80,12 @@
       />
     </div>
 
-    <div class="col-12 col-sm-7 flex">
+    <!-- <div class="col-12 col-sm-7 flex">
       <GraficoSeriesTemporaisGeral :loading="loading" ref="graficoTemporal" />
-    </div>
+    </div> -->
 
     <!-- Tabela -->
-    <div class="col-12">
+    <!-- <div class="col-12">
       <TabelaObservacoes
         :rows="observations"
         :columns="colunasTabela"
@@ -94,13 +94,14 @@
         :data-inicial="dataInicial"
         :periodo-selecionado="periodoSelecionado"
       />
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script>
+import { storeToRefs } from "pinia";
 import { ref, computed, onMounted } from "vue";
-import { useObservationStore } from "src/stores/observations";
+import { useNewObservationStore } from "src/stores/observationsv2";
 import { STATIONS, COLUNAS_TABELA } from "../constants/constants";
 import dataUtils from "src/utils/data-utils";
 import { useQuasar } from "quasar";
@@ -117,17 +118,25 @@ import { useDateRangeSetter } from "src/composables/useDateRangeSetter";
 export default {
   name: "IndexPage",
   components: {
-    RealTimeObservationsCarousel,
+    // RealTimeObservationsCarousel,
     InformacaoCard,
-    TabelaObservacoes,
+    // TabelaObservacoes,
     SecaoFiltros,
     GraficoTemperaturaGeral,
     GraficoPrecipitacaoGeral,
-    GraficoSeriesTemporaisGeral,
+    // GraficoSeriesTemporaisGeral,
   },
   setup() {
     const $q = useQuasar();
-    const observationStore = useObservationStore();
+    const observationStore = useNewObservationStore();
+    const {
+      getMaxTemp,
+      getMaxPrecipitation,
+      getMaxWind,
+      getMinTemp,
+      getTotalPrecipitation,
+    } = storeToRefs(observationStore);
+
     const { mensagemErro } = useNotification();
 
     const loading = ref(true);
@@ -146,8 +155,6 @@ export default {
     const graficoPrecipitacao = ref(null);
     const graficoTemporal = ref(null);
 
-    const observations = computed(() => observationStore.observations);
-    const maxValues = computed(() => observationStore.maxValues);
     const darkMode = computed(() => $q.dark.isActive);
     const estacoes = computed(() => STATIONS);
     const idsEstacoes = computed(() => Object.keys(STATIONS));
@@ -170,7 +177,7 @@ export default {
 
     const fetchObservationsData = async () => {
       if (!dataFinal.value && dataUtils.isToday(dataInicial.value)) {
-        await observationStore.getTodayObservations(idsEstacoes.value);
+        await observationStore.getDailyStatistics();
       } else if (!dataFinal.value) {
         await observationStore.getSpecificDayObservations(
           idsEstacoes.value,
@@ -186,8 +193,8 @@ export default {
     };
 
     function calculate() {
-      observationStore.calculateMetrics();
-      observationStore.calculateMaxValues();
+      // observationStore.calculateMetrics();
+      // observationStore.calculatestatistics();
     }
 
     function updateGraphs() {
@@ -201,10 +208,9 @@ export default {
       return new Date(dados.obsTimeLocal).toLocaleDateString();
     };
 
-    const formatarTituloCard = (dados) => {
-      if (!dados || !dados.stationID) return "Sem dados";
+    const formatarTituloCard = (idEstacao) => {
+      if (!idEstacao) return "Sem dados";
 
-      const idEstacao = dados.stationID;
       return `Em ${estacoes.value[idEstacao]?.NOME} (${idEstacao})`;
     };
 
@@ -220,8 +226,11 @@ export default {
       anoSelecionado,
       dataInicial,
       dataFinal,
-      observations,
-      maxValues,
+      getMaxTemp,
+      getMinTemp,
+      getMaxPrecipitation,
+      getTotalPrecipitation,
+      getMaxWind,
       darkMode,
       estacoes,
       idsEstacoes,
