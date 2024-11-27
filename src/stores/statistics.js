@@ -6,7 +6,7 @@ import {
   WeatherStation,
 } from "src/models/statistics";
 
-export const useNewObservationStore = defineStore("observation2", {
+export const useStatisticsStore = defineStore("observation2", {
   state: () => ({
     stations: [new WeatherStation()],
     maxTemp: new WeatherData(),

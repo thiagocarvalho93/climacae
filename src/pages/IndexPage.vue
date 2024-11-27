@@ -101,7 +101,7 @@
 <script>
 import { storeToRefs } from "pinia";
 import { ref, computed, onMounted } from "vue";
-import { useNewObservationStore } from "src/stores/observationsv2";
+import { useStatisticsStore } from "src/stores/statistics";
 import { STATIONS, COLUNAS_TABELA } from "../constants/constants";
 import dataUtils from "src/utils/data-utils";
 import { useQuasar } from "quasar";
@@ -128,7 +128,7 @@ export default {
   },
   setup() {
     const $q = useQuasar();
-    const observationStore = useNewObservationStore();
+    const observationStore = useStatisticsStore();
     const {
       getMaxTemp,
       getMaxPrecipitation,

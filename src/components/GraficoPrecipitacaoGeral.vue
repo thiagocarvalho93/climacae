@@ -25,7 +25,8 @@ import {
   CORES,
   PERIODOS,
 } from "src/constants/constants";
-import { useObservationStore } from "src/stores/observations";
+import { useStatisticsStore } from "src/stores/statistics";
+import stringUtil from "src/utils/string-util";
 
 export default {
   name: "TemperatureChart",
@@ -40,7 +41,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(useObservationStore, ["stationsMetrics"]),
+    ...mapState(useStatisticsStore, ["stations", "maxPrecipitation"]),
     chartPrecipitacaoOptions() {
       return CHART_PRECIPITACAO_OPTIONS;
     },
@@ -71,16 +72,9 @@ export default {
   },
   methods: {
     atualizar() {
-      const dadosFiltrados = this.stationsMetrics.filter(
-        (x) =>
-          x.precipitacaoMaxima !== (-Infinity || Infinity) &&
-          x.precipitacaoAcumulada !== (-Infinity || Infinity)
-      );
-
-      const data = dadosFiltrados.map((x) => ({
+      const data = this.stations.map((x) => ({
         name: x.NOME,
-        precipitacaoMaxima: x.precipitacaoMaxima,
-        precipitacaoRestante: x.precipitacaoAcumulada - x.precipitacaoMaxima,
+        precipitacaoMaxima: x.maxPrecipitation,
       }));
 
       const series = [
@@ -89,38 +83,17 @@ export default {
           data: data.map((x) => x.precipitacaoMaxima),
           color: CORES.INDIGO_ESCURO,
         },
-        {
-          name: "Precipitação restante",
-          data: data.map((x) => x.precipitacaoRestante),
-          color: CORES.INDIGO,
-        },
       ];
-
-      let precipitacaoMaxima = 0;
-      let isDiario =
-        this.periodoSelecionado === this.periodos.DIA_ESPECIFICO ||
-        this.periodoSelecionado === this.periodos.HOJE;
-
-      if (isDiario) {
-        const precMaximas = data.map((x) => x.precipitacaoMaxima);
-        precipitacaoMaxima = Math.max(...precMaximas).toFixed(2);
-        series.splice(1, 1); // Remove a série "Precipitação restante"
-      } else {
-        const precMaximas = data.map(
-          (x) => x.precipitacaoMaxima + x.precipitacaoRestante
-        );
-        precipitacaoMaxima = Math.max(...precMaximas);
-      }
 
       this.$refs.graficoPrecipitacao.updateOptions({
         series,
         xaxis: {
-          categories: dadosFiltrados.map((x) =>
-            x.id.length > 15 ? `${x.id.substring(0, 15)}...` : x.id
+          categories: this.stations.map((x) =>
+            stringUtil.limitString(x.stationId, 15)
           ),
         },
         yaxis: {
-          max: precipitacaoMaxima * 1.4,
+          max: this.maxPrecipitation * 1.4,
           tickAmount: 5,
         },
       });

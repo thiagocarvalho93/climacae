@@ -22,7 +22,7 @@
 <script>
 import { mapState } from "pinia";
 import { CHART_TEMPERATURA_OPTIONS, CORES } from "src/constants/constants";
-import { useNewObservationStore } from "src/stores/observationsv2";
+import { useStatisticsStore } from "src/stores/statistics";
 import stringUtil from "src/utils/string-util";
 
 export default {
@@ -34,7 +34,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(useNewObservationStore, ["stations", "minTemp"]),
+    ...mapState(useStatisticsStore, ["stations", "minTemp"]),
     chartTemperaturaOptions() {
       return CHART_TEMPERATURA_OPTIONS;
     },
