@@ -4,7 +4,7 @@ const group = "/observations";
 
 async function getStationDailyObservations(stationId, data) {
   var params = new URLSearchParams(data);
-  const url = group + `/stations/${stationId}/daily`;
+  const url = group + `/stations/${stationId}/daily?`;
 
   return await api.get(url + params.toString());
 }
@@ -27,7 +27,7 @@ async function getStationMonthlyObservations(stationId, data) {
 async function getDailyStatistics(data) {
   var params = new URLSearchParams(data);
 
-  const url = group + `/statistics/all/daily`;
+  const url = group + `/statistics/all/daily?`;
   return await api.get(url + params.toString());
 }
 

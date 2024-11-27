@@ -5,6 +5,7 @@ import {
   WeatherReport,
   WeatherStation,
 } from "src/models/statistics";
+import dataUtils from "src/utils/data-utils";
 
 export const useStatisticsStore = defineStore("observation2", {
   state: () => ({
@@ -39,9 +40,15 @@ export const useStatisticsStore = defineStore("observation2", {
   },
 
   actions: {
-    async getDailyStatistics() {
-      const response = await weatherv2Api.getDailyStatistics();
+    async getDailyStatistics(date = null) {
+      const response = await weatherv2Api.getDailyStatistics({
+        date: dataUtils.formatDateForQuery(new Date(date)),
+      });
 
+      this._mapResponseToStore(response);
+    },
+
+    _mapResponseToStore(response) {
       const data = WeatherReport.fromJson(response.data);
 
       this.maxTemp = data.maxTemp;

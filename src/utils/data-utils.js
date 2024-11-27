@@ -24,9 +24,9 @@ const subtrairHoras = (data, horas) => {
  * @returns retorna uma string da data no formato YYYYMMDD.
  */
 const formatDateForQuery = (data) => {
-  return `${data.getFullYear()}${data.getMonth() + 1 < 10 ? "0" : ""}${
+  return `${data.getFullYear()}-${data.getMonth() + 1 < 10 ? "0" : ""}${
     data.getMonth() + 1
-  }${data.getDate() < 10 ? "0" : ""}${data.getDate()}`;
+  }-${data.getDate() < 10 ? "0" : ""}${data.getDate()}`;
 };
 
 /**

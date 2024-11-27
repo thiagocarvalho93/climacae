@@ -128,14 +128,14 @@ export default {
   },
   setup() {
     const $q = useQuasar();
-    const observationStore = useStatisticsStore();
+    const statisticsStore = useStatisticsStore();
     const {
       getMaxTemp,
       getMaxPrecipitation,
       getMaxWind,
       getMinTemp,
       getTotalPrecipitation,
-    } = storeToRefs(observationStore);
+    } = storeToRefs(statisticsStore);
 
     const { mensagemErro } = useNotification();
 
@@ -165,8 +165,7 @@ export default {
 
       try {
         setDatesGivenPeriod();
-        await fetchObservationsData();
-        calculate();
+        await fetchStatisticsData();
         updateGraphs();
       } catch (error) {
         mensagemErro((error && error.message) || "Erro ao obter os dados.");
@@ -175,27 +174,21 @@ export default {
       }
     };
 
-    const fetchObservationsData = async () => {
+    const fetchStatisticsData = async () => {
       if (!dataFinal.value && dataUtils.isToday(dataInicial.value)) {
-        await observationStore.getDailyStatistics();
+        await statisticsStore.getDailyStatistics();
       } else if (!dataFinal.value) {
-        await observationStore.getSpecificDayObservations(
-          idsEstacoes.value,
-          dataInicial.value
-        );
+        console.log(dataInicial.value);
+
+        await statisticsStore.getDailyStatistics(dataInicial.value);
       } else {
-        await observationStore.getPeriodDailyObservations(
+        await statisticsStore.getPeriodDailyObservations(
           idsEstacoes.value,
           dataInicial.value,
           dataFinal.value
         );
       }
     };
-
-    function calculate() {
-      // observationStore.calculateMetrics();
-      // observationStore.calculatestatistics();
-    }
 
     function updateGraphs() {
       graficoTemperatura.value?.atualizar();
