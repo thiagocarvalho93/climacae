@@ -13,7 +13,7 @@ const STATIONS = {
   IMACA30: { ID: "IMACA30", NOME: "Imboassica" },
   IMACA31: { ID: "IMACA31", NOME: "Botafogo" },
   IMACA32: { ID: "IMACA32", NOME: "Visconde" },
-  IMACA36: { ID: "IMACA36", NOME: "Córrego do Ouro" },
+  IMACA36: { ID: "IMACA36", NOME: "Cidade Universitária" },
   IMACA41: { ID: "IMACA41", NOME: "Lagomar" },
   IMACA42: { ID: "IMACA42", NOME: "Virgem Santa" },
   IMACA43: { ID: "IMACA43", NOME: "Aeroporto" },
