@@ -4,7 +4,7 @@ import dataUtils from "src/utils/data-utils";
 const STATIONS = {
   IMACA6: { ID: "IMACA6", NOME: "Miramar" },
   IMACA7: { ID: "IMACA7", NOME: "Mirante" },
-  IMACA13: { ID: "IMACA13", NOME: "Serra" },
+  IMACA13: { ID: "IMACA13", NOME: "Trapiche" },
   IMACA15: { ID: "IMACA15", NOME: "Glória" },
   IMACA23: { ID: "IMACA23", NOME: "Imboassica" },
   IMACA26: { ID: "IMACA26", NOME: "Granja dos Cavaleiros" },
