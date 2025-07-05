@@ -18,9 +18,9 @@ const STATIONS = {
   IMACA42: { ID: "IMACA42", NOME: "Virgem Santa" },
   IMACA43: { ID: "IMACA43", NOME: "Aeroporto" },
   IMACA46: { ID: "IMACA46", NOME: "Cajueiros" },
-  IMACA53: { ID: "IMACA52", NOME: "Barreto" },
+  IMACA52: { ID: "IMACA52", NOME: "Barreto" },
   IMACA53: { ID: "IMACA53", NOME: "Sana" },
-  IMACA53: { ID: "IMACA56", NOME: "Praia do Pecado" },
+  IMACA56: { ID: "IMACA56", NOME: "Praia do Pecado" },
 };
 
 const CORES = {
