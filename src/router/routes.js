@@ -21,6 +21,14 @@ const routes = [
         component: () => import("pages/EstacaoPage.vue"),
       },
       {
+        path: "/mapa",
+        title: "Mapa",
+        icon: "bar_chart",
+        name: "Mapa",
+        showMenu: true,
+        component: () => import("pages/MapaPage.vue"),
+      },
+      {
         path: "/:catchAll(.*)*",
         showMenu: false,
         component: () => import("pages/ErrorNotFound.vue"),
