@@ -8,11 +8,16 @@ import Observation from "src/models/observation-model";
 import StationMetrics from "src/models/station-metrics-model";
 import dataUtils from "src/utils/data-utils";
 
+interface CachedObservation {
+  data: Observation[];
+  timestamp: number;
+}
+
 interface ObservationState {
   realTimeObservations: ObservationCurrent[];
   observations: Observation[];
   stationObservations: Observation[];
-  cachedObservations: Map<string, Observation[]>;
+  cachedObservations: Map<string, CachedObservation>;
   cachedRealTimeObservations: {
     observations: ObservationCurrent[];
     iat: Date;
@@ -22,6 +27,8 @@ interface ObservationState {
   stationsMetrics: StationMetrics[];
   maxValues: MaxValues | IMaxValuesResults;
 }
+
+const CACHE_TTL_TODAY = 5 * 60 * 1000; // 5 minutos em milisegundos
 
 export const useObservationStore = defineStore("observation", {
   state: (): ObservationState => ({
@@ -58,10 +65,12 @@ export const useObservationStore = defineStore("observation", {
     },
     //#region Get observations
     async getTodayObservations(stationsArray: string[]) {
-      const cached = this.cachedObservations.get("today");
+      const cacheKey = "today";
+      const cached = this.cachedObservations.get(cacheKey);
+      const now = Date.now();
 
-      if (cached) {
-        this.observations = cached;
+      if (cached && now - cached.timestamp < CACHE_TTL_TODAY) {
+        this.observations = cached.data;
         return;
       }
 
@@ -77,16 +86,25 @@ export const useObservationStore = defineStore("observation", {
         .reverse();
 
       this.observations = observations;
-      this.cachedObservations.set("today", observations);
+      this.cachedObservations.set(cacheKey, {
+        data: observations,
+        timestamp: now,
+      });
     },
 
     async getSpecificDayObservations(stationsArray: string[], date: Date) {
       const cacheKey = date.toLocaleDateString();
       const cached = this.cachedObservations.get(cacheKey);
+      const now = Date.now();
+
+      // Se for hoje, aplica o TTL. Se for passado, cache eterno.
+      const isToday = dataUtils.isToday(date);
 
       if (cached) {
-        this.observations = cached;
-        return;
+        if (!isToday || now - cached.timestamp < CACHE_TTL_TODAY) {
+          this.observations = cached.data;
+          return;
+        }
       }
 
       const dataFormatada = dataUtils.formatDateForQuery(date);
@@ -104,7 +122,10 @@ export const useObservationStore = defineStore("observation", {
         .reverse();
 
       this.observations = observations;
-      this.cachedObservations.set(cacheKey, observations);
+      this.cachedObservations.set(cacheKey, {
+        data: observations,
+        timestamp: now,
+      });
     },
 
     async getPeriodDailyObservations(
@@ -114,10 +135,17 @@ export const useObservationStore = defineStore("observation", {
     ) {
       const cacheKey = `${startDate.toLocaleDateString()}-${finalDate.toLocaleDateString()}`;
       const cached = this.cachedObservations.get(cacheKey);
+      const now = Date.now();
+
+      // Se o período incluir "hoje", podemos querer expirar, mas geralmente períodos históricos não mudam.
+      // Por simplicidade, expiramos se o finalDate for hoje.
+      const endsToday = dataUtils.isToday(finalDate);
 
       if (cached) {
-        this.observations = cached;
-        return;
+        if (!endsToday || now - cached.timestamp < CACHE_TTL_TODAY) {
+          this.observations = cached.data;
+          return;
+        }
       }
 
       const formatedStartDate = dataUtils.formatDateForQuery(startDate);
@@ -140,7 +168,10 @@ export const useObservationStore = defineStore("observation", {
         .reverse();
 
       this.observations = observations;
-      this.cachedObservations.set(cacheKey, observations);
+      this.cachedObservations.set(cacheKey, {
+        data: observations,
+        timestamp: now,
+      });
     },
 
     //#region Get by station
