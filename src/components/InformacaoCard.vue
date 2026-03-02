@@ -42,8 +42,11 @@
   </q-card>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from "vue";
+
+export default defineComponent({
+  name: "InformacaoCard",
   props: {
     carregando: Boolean,
     titulo: String,
@@ -51,12 +54,12 @@ export default {
     icone: String,
     tituloVerso: String,
     descricaoVerso: String,
-    corIcone: { type: String, requirde: false, default: "primary" },
+    corIcone: { type: String, required: false, default: "primary" },
   },
   data() {
     return {
       mostrarInformacoesCard: true,
     };
   },
-};
+});
 </script>

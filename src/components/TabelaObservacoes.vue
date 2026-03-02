@@ -38,33 +38,46 @@
     </template>
   </q-table>
 </template>
-<script>
-export default {
+<script lang="ts">
+import { defineComponent, ref, PropType } from "vue";
+import { QTableColumn } from "quasar";
+
+export default defineComponent({
+  name: "TabelaObservacoes",
   props: {
     carregando: Boolean,
-    rows: Array,
-    columns: Array,
+    rows: {
+      type: Array as PropType<any[]>,
+      default: () => [],
+    },
+    columns: {
+      type: Array as PropType<QTableColumn[]>,
+      default: () => [],
+    },
     periodoSelecionado: String,
-    dataInicial: Date,
-    dataFinal: Date,
+    dataInicial: Date as PropType<Date | null>,
+    dataFinal: Date as PropType<Date | null>,
   },
-  data() {
+  setup() {
+    const filter = ref("");
+    const pagination = ref({
+      rowsPerPage: 12,
+    });
+
     return {
-      filter: "",
-      mostrarInformacoesCard: true,
-      pagination: {
-        rowsPerPage: 12,
-      },
+      filter,
+      pagination,
     };
   },
   methods: {
-    striped(props) {
+    striped(props: any) {
       if (props.rowIndex % 2 != 0) {
         return this.$q.dark.isActive ? "dark-stripe" : "light-stripe";
       }
+      return "";
     },
   },
-};
+});
 </script>
 
 <style scoped lang="sass">

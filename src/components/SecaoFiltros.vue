@@ -103,27 +103,38 @@
   </q-card>
 </template>
 
-<script>
+<script lang="ts">
 import {
   OPCOES_ANOS,
   OPCOES_DIAS,
   OPCOES_MESES,
   PERIODOS,
+  StationInfo,
 } from "src/constants/constants";
 import csvUtils from "src/utils/csv-utils";
-import { computed, defineComponent } from "vue";
+import { computed, defineComponent, PropType } from "vue";
 import { useObservationStore } from "src/stores/observations";
 
 export default defineComponent({
+  name: "SecaoFiltros",
   props: {
     carregando: Boolean,
-    estacaoSelecionada: Object,
+    estacaoSelecionada: Object as PropType<StationInfo>,
     periodoSelecionado: String,
     diaSelecionado: Number,
     mesSelecionado: Number,
     anoSelecionado: Number,
-    nomesEstacoes: Array,
+    nomesEstacoes: Array as PropType<StationInfo[]>,
   },
+  emits: [
+    "update:estacaoSelecionada",
+    "update:periodoSelecionado",
+    "update:diaSelecionado",
+    "update:mesSelecionado",
+    "update:anoSelecionado",
+    "obterDados",
+    "exportarCsv",
+  ],
   setup(props, context) {
     const store = useObservationStore();
 
@@ -179,7 +190,7 @@ export default defineComponent({
       context.emit("exportarCsv");
 
       const nomeCsv = csvUtils.getCsvFileName(
-        periodoSelecionadoProxy.value,
+        periodoSelecionadoProxy.value || "",
         dataInicial.value,
         dataFinal.value
       );

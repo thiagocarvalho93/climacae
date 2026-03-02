@@ -1,16 +1,26 @@
-import { ref } from "vue";
+import { ref, Ref } from "vue";
 import { PERIODOS } from "../constants/constants";
 import dataUtils from "src/utils/data-utils";
 
-export function useDateRangeSetter() {
+export interface DateRangeSetter {
+  dataInicial: Ref<Date>;
+  dataFinal: Ref<Date | null>;
+  periodoSelecionado: Ref<string>;
+  diaSelecionado: Ref<number>;
+  mesSelecionado: Ref<number>;
+  anoSelecionado: Ref<number>;
+  setDatesGivenPeriod: () => void;
+}
+
+export function useDateRangeSetter(): DateRangeSetter {
   const dataInicial = ref(new Date());
-  const dataFinal = ref(new Date());
+  const dataFinal = ref<Date | null>(new Date());
   const periodoSelecionado = ref(PERIODOS.HOJE);
   const diaSelecionado = ref(new Date().getDate());
   const mesSelecionado = ref(new Date().getMonth() + 1);
   const anoSelecionado = ref(new Date().getFullYear());
 
-  const setDatesGivenPeriod = () => {
+  const setDatesGivenPeriod = (): void => {
     switch (periodoSelecionado.value) {
       case PERIODOS.HOJE:
         _setDates(new Date(), null);
@@ -35,7 +45,7 @@ export function useDateRangeSetter() {
     }
   };
 
-  const setSpecificDay = () => {
+  const setSpecificDay = (): void => {
     const hoje = new Date();
     const dataSelecionada = new Date(
       anoSelecionado.value,
@@ -49,20 +59,21 @@ export function useDateRangeSetter() {
     _setDates(dataSelecionada, null);
   };
 
-  const setSpecificMonth = () => {
+  const setSpecificMonth = (): void => {
     const hoje = new Date();
-    const { dataFinal, dataInicial } = dataUtils.definirDataInicialEFinalMes(
-      mesSelecionado.value,
-      anoSelecionado.value
-    );
+    const { dataFinal: dFinal, dataInicial: dInicial } =
+      dataUtils.definirDataInicialEFinalMes(
+        mesSelecionado.value,
+        anoSelecionado.value
+      );
 
-    if (dataInicial > hoje)
+    if (dInicial > hoje)
       throw new Error("Não é possível obter dados do futuro!");
 
-    _setDates(dataInicial, dataFinal);
+    _setDates(dInicial, dFinal);
   };
 
-  const _setDates = (startDate, endDate) => {
+  const _setDates = (startDate: Date, endDate: Date | null): void => {
     dataInicial.value = startDate;
     dataFinal.value = endDate;
   };
