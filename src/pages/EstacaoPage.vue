@@ -99,7 +99,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { STATIONS, CHART_SERIE_TEMPORAL_OPTIONS } from "../constants/constants";
 import dataUtils from "src/utils/data-utils";
 import SecaoFiltros from "src/components/SecaoFiltros.vue";
@@ -145,21 +145,7 @@ export default {
     const seriesPrecipitacao = ref([]);
     const seriesVento = ref([]);
 
-    const darkMode = computed(() => store.darkMode);
     const nomesEstacoes = computed(() => Object.values(STATIONS));
-
-    const updateDarkMode = (graficoRef, isDark) => {
-      graficoRef.value.updateOptions({
-        theme: { mode: isDark ? "dark" : "light" },
-        grid: {
-          row: {
-            colors: isDark
-              ? ["#333", "transparent"]
-              : ["#e5e5e5", "transparent"],
-          },
-        },
-      });
-    };
 
     const handleFiltrar = async () => {
       loading.value = true;
@@ -274,18 +260,6 @@ export default {
       await handleFiltrar();
     });
 
-    // TODO
-    // watch(
-    //   darkMode,
-    //   (isDark) => {
-    //     updateDarkMode(graficoTemporalTemperatura, isDark);
-    //     updateDarkMode(graficoTemporalPressao, isDark);
-    //     updateDarkMode(graficoTemporalPrecipitacao, isDark);
-    //     updateDarkMode(graficoTemporalVento, isDark);
-    //   },
-    //   { immediate: true }
-    // );
-
     return {
       graficoTemporalTemperatura,
       graficoTemporalPressao,
@@ -302,7 +276,6 @@ export default {
       seriesPressao,
       seriesPrecipitacao,
       seriesVento,
-      darkMode,
       nomesEstacoes,
       handleFiltrar,
     };
