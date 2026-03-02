@@ -107,6 +107,7 @@ import { useObservationStore } from "src/stores/observations";
 import { useNotification } from "src/composables/useNotification";
 import { useDateRangeSetter } from "src/composables/useDateRangeSetter";
 import { SeriesConfig } from "src/types/chart-types";
+import { downsampleLTTB, DataPoint } from "src/utils/downsample-utils";
 
 export default defineComponent({
   name: "EstacaoPage",
@@ -194,12 +195,19 @@ export default defineComponent({
     ) => {
       const dados = Object.keys(seriesMap).map((serie) => {
         const name = seriesMap[serie].desc;
+        const rawData: DataPoint[] = store.stationObservations
+          .filter((obs) => obs.metric && (obs.metric as any)[serie] !== undefined && (obs.metric as any)[serie] !== "")
+          .map((obs) => [
+            dataUtils.subtrairHoras(new Date(obs.obsTimeLocal as string), 3),
+            Number((obs.metric as any)[serie]),
+          ]);
+
+        // Downsample if more than 500 points
+        const finalData = downsampleLTTB(rawData, 500);
+
         return {
           name,
-          data: store.stationObservations.map((obs) => [
-            dataUtils.subtrairHoras(new Date(obs.obsTimeLocal), 3),
-            (obs.metric as any)[serie],
-          ]),
+          data: finalData,
         };
       });
 

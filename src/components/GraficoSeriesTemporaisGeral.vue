@@ -29,6 +29,7 @@ import { defineComponent, ref, computed } from "vue";
 import { CHART_SERIE_TEMPORAL_OPTIONS, STATIONS } from "src/constants/constants";
 import { useObservationStore } from "src/stores/observations";
 import dataUtils from "src/utils/data-utils";
+import { downsampleLTTB, DataPoint } from "src/utils/downsample-utils";
 
 export default defineComponent({
   name: "GraficoSeriesTemporaisGeral",
@@ -49,17 +50,22 @@ export default defineComponent({
     const atualizar = () => {
       const dados = Object.keys(STATIONS).map((estacaoId) => {
         const estacao = STATIONS[estacaoId];
+        const rawData: DataPoint[] = observations.value.reduce((acc: DataPoint[], ob) => {
+          if (ob.stationID === estacaoId && ob.metric && ob.metric.tempAvg !== undefined && ob.metric.tempAvg !== "") {
+            acc.push([
+              dataUtils.subtrairHoras(new Date(ob.obsTimeLocal as string), 3),
+              Number(ob.metric.tempAvg),
+            ]);
+          }
+          return acc;
+        }, []);
+
+        // Downsample each station series to 500 points max
+        const finalData = downsampleLTTB(rawData, 500);
+
         return {
           name: estacao.NOME,
-          data: observations.value.reduce((acc: any[], ob) => {
-            if (ob.stationID === estacaoId && ob.metric && ob.metric.tempAvg !== undefined && ob.metric.tempAvg !== "") {
-              acc.push([
-                dataUtils.subtrairHoras(new Date(ob.obsTimeLocal as string), 3),
-                ob.metric.tempAvg,
-              ]);
-            }
-            return acc;
-          }, []),
+          data: finalData,
         };
       });
       graficoTemporal.value?.updateSeries(dados);
