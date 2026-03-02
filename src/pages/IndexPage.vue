@@ -160,7 +160,6 @@ export default defineComponent({
       try {
         setDatesGivenPeriod();
         await fetchObservationsData();
-        calculate();
         updateGraphs();
       } catch (error: any) {
         mensagemErro(error?.message || "Erro ao obter os dados.");
@@ -185,11 +184,6 @@ export default defineComponent({
         );
       }
     };
-
-    function calculate() {
-      observationStore.calculateMetrics();
-      observationStore.calculateMaxValues();
-    }
 
     function updateGraphs() {
       graficoTemperatura.value?.atualizar();

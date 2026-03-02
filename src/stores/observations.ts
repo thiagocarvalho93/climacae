@@ -24,8 +24,6 @@ interface ObservationState {
   } | null;
   startDate: Date;
   endDate: Date;
-  stationsMetrics: StationMetrics[];
-  maxValues: MaxValues | IMaxValuesResults;
 }
 
 const CACHE_TTL_TODAY = 5 * 60 * 1000; // 5 minutos em milisegundos
@@ -39,8 +37,6 @@ export const useObservationStore = defineStore("observation", {
     cachedRealTimeObservations: null,
     startDate: new Date(),
     endDate: new Date(),
-    stationsMetrics: [],
-    maxValues: new MaxValues(),
   }),
 
   getters: {
@@ -52,6 +48,52 @@ export const useObservationStore = defineStore("observation", {
     },
     getEndDate(state): Date {
       return state.endDate;
+    },
+
+    stationsMetrics(state): StationMetrics[] {
+      if (!state.observations.length) return [];
+
+      const metadadosMap = state.observations.reduce((acc, obs) => {
+        const { metric, stationID } = obs;
+        const { tempHigh, tempLow, windgustHigh, precipTotal } = new Metric(
+          metric
+        );
+
+        if (!stationID || !STATIONS[stationID as keyof typeof STATIONS])
+          return acc;
+
+        const stationName = STATIONS[stationID as keyof typeof STATIONS].NOME;
+
+        if (!acc[stationName]) {
+          acc[stationName] = new StationMetrics(
+            stationName,
+            tempLow,
+            tempHigh,
+            windgustHigh,
+            precipTotal
+          );
+        } else {
+          acc[stationName].update(
+            Number(tempLow),
+            Number(tempHigh),
+            Number(windgustHigh),
+            Number(precipTotal)
+          );
+        }
+
+        return acc;
+      }, {} as Record<string, StationMetrics>);
+
+      return Object.values(metadadosMap);
+    },
+
+    maxValues(): IMaxValuesResults {
+      const maxValues = new MaxValues();
+
+      maxValues.updateMaxMinValues(this.stationsMetrics);
+      maxValues.updateObservationData(this.observations);
+
+      return maxValues.getResults();
     },
   },
 
@@ -246,50 +288,6 @@ export const useObservationStore = defineStore("observation", {
         observations,
         iat: new Date(),
       };
-    },
-
-    //#region Calculations
-    calculateMetrics() {
-      this.stationsMetrics = [];
-
-      const metadadosMap = this.observations.reduce((acc, obs) => {
-        const { metric, stationID } = obs;
-        const { tempHigh, tempLow, windgustHigh, precipTotal } = new Metric(
-          metric
-        );
-        const stationName = STATIONS[stationID as keyof typeof STATIONS].NOME;
-
-        if (!acc[stationName]) {
-          acc[stationName] = new StationMetrics(
-            stationName,
-            tempLow,
-            tempHigh,
-            windgustHigh,
-            precipTotal
-          );
-        } else {
-          acc[stationName].update(
-            Number(tempLow),
-            Number(tempHigh),
-            Number(windgustHigh),
-            Number(precipTotal)
-          );
-        }
-
-        return acc;
-      }, {} as Record<string, StationMetrics>);
-
-      this.stationsMetrics = Object.values(metadadosMap);
-    },
-
-    calculateMaxValues() {
-      const maxValues = new MaxValues();
-
-      maxValues.updateMaxMinValues(this.stationsMetrics);
-
-      maxValues.updateObservationData(this.observations);
-
-      this.maxValues = maxValues.getResults();
     },
   },
 });
