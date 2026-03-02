@@ -1,7 +1,16 @@
 import arrayUtils from "src/utils/array-utils";
 import dataUtils from "src/utils/data-utils";
 
-const STATIONS = {
+export interface StationInfo {
+  ID: string;
+  NOME: string;
+}
+
+export interface Stations {
+  [key: string]: StationInfo;
+}
+
+const STATIONS: Stations = {
   IMACA6: { ID: "IMACA6", NOME: "Miramar" },
   IMACA7: { ID: "IMACA7", NOME: "Mirante" },
   IMACA13: { ID: "IMACA13", NOME: "Trapiche" },
@@ -44,7 +53,7 @@ const PERIODOS = {
 };
 
 // TODO: Essa opção deve ser dinâmica de acordo com o mês selecionado!
-const OPCOES_DIAS = arrayUtils.arrayRange(
+const OPCOES_DIAS: number[] = (arrayUtils as any).arrayRange(
   1,
   dataUtils.calcularDiaMesAtual(),
   1
@@ -53,12 +62,16 @@ const OPCOES_DIAS = arrayUtils.arrayRange(
 /**
  * Array de 1 a 12.
  */
-const OPCOES_MESES = Array.from({ length: 12 }, (_, i) => i + 1);
+const OPCOES_MESES: number[] = Array.from({ length: 12 }, (_, i) => i + 1);
 
 /**
  * Array de 2020 até o ano atual.
  */
-const OPCOES_ANOS = arrayUtils.arrayRange(2020, new Date().getFullYear(), 1);
+const OPCOES_ANOS: number[] = (arrayUtils as any).arrayRange(
+  2020,
+  new Date().getFullYear(),
+  1
+);
 
 // GRÁFICOS
 const CHART_TEMPERATURA_OPTIONS = {
@@ -96,7 +109,7 @@ const CHART_TEMPERATURA_OPTIONS = {
 
   tooltip: {
     y: {
-      formatter: function (value) {
+      formatter: function (value: number) {
         return value.toFixed(1) + "°C";
       },
     },
@@ -125,7 +138,7 @@ const CHART_PRECIPITACAO_OPTIONS = {
             fontSize: "12px",
             fontWeight: 800,
           },
-          formatter: function (val) {
+          formatter: function (val: number) {
             return val.toFixed(1) + " mm";
           },
         },
@@ -148,7 +161,7 @@ const CHART_PRECIPITACAO_OPTIONS = {
   },
   tooltip: {
     y: {
-      formatter: (texto) => {
+      formatter: (texto: number) => {
         return `${texto.toFixed(1)} mm`;
       },
     },
@@ -163,7 +176,7 @@ const CHART_SERIE_TEMPORAL_OPTIONS = Object.freeze({
     },
     animations: {
       enabled: true,
-      easing: "easeinout",
+      easing: "easeinout" as const,
       speed: 800,
       animateGradually: {
         enabled: true,
@@ -180,7 +193,7 @@ const CHART_SERIE_TEMPORAL_OPTIONS = Object.freeze({
   },
   stroke: {
     width: 3,
-    curve: "smooth",
+    curve: "smooth" as const,
   },
   legend: {
     show: true,
@@ -197,7 +210,7 @@ const CHART_SERIE_TEMPORAL_OPTIONS = Object.freeze({
     strokeDashArray: 7,
   },
   xaxis: {
-    type: "datetime",
+    type: "datetime" as const,
     tickAmount: 8,
   },
   yaxis: {
@@ -211,79 +224,75 @@ const COLUNAS_TABELA = [
     name: "data",
     required: true,
     label: "Data",
-    align: "left",
-    field: (row) => row.obsTimeLocal,
-    format: (val) => `${new Date(val).toLocaleDateString()}`,
+    align: "left" as const,
+    field: (row: any) => row.obsTimeLocal,
+    format: (val: string) => `${new Date(val).toLocaleDateString()}`,
     sortable: true,
     style: "width: 50px",
-    align: "left",
   },
   {
     name: "hora",
     required: true,
     label: "Hora",
-    align: "left",
-    field: (row) => row.obsTimeLocal,
-    format: (val) =>
+    align: "left" as const,
+    field: (row: any) => row.obsTimeLocal,
+    format: (val: string) =>
       `${new Date(val).toLocaleTimeString(navigator.language, {
         hour: "2-digit",
         minute: "2-digit",
       })}`,
     sortable: true,
     style: "width: 50px",
-    align: "left",
   },
   {
     name: "idEstacao",
-    align: "center",
+    align: "left" as const,
     label: "ID estação",
-    field: (row) => row.stationID,
+    field: (row: any) => row.stationID,
     sortable: true,
     style: "width: 50px",
-    align: "left",
   },
   {
     name: "estacao",
-    align: "center",
+    align: "left" as const,
     label: "Local",
-    field: (row) => STATIONS[row.stationID].NOME,
+    field: (row: any) => STATIONS[row.stationID]?.NOME || "N/A",
     sortable: true,
-    align: "left",
   },
   {
     name: "max",
     label: "Máxima (°C)",
-    field: (row) => row.metric.tempHigh,
+    field: (row: any) => row.metric.tempHigh,
     sortable: true,
-    align: "left",
+    align: "left" as const,
   },
   {
     name: "min",
     label: "Mínima (°C)",
-    field: (row) => row.metric.tempLow,
+    field: (row: any) => row.metric.tempLow,
     sortable: true,
-    align: "left",
+    align: "left" as const,
   },
   {
     name: "humid",
     label: "Umidade (%)",
-    field: (row) => row.humidityAvg,
+    field: (row: any) => row.humidityAvg,
     sortable: true,
-    align: "left",
+    align: "left" as const,
   },
   {
     name: "precipitacao",
     label: "Precipitação (mm)",
-    field: (row) => row.metric.precipTotal,
+    field: (row: any) => row.metric.precipTotal,
     sortable: true,
-    align: "left",
+    align: "left" as const,
   },
   {
     name: "gustHigh",
     label: "Vento máximo (km/h)",
-    field: (row) => row.metric.windgustHigh,
+    field: (row: any) => row.metric.windgustHigh,
     sortable: true,
-    align: "left",
+    align: "left" as const,
   },
 ];
 

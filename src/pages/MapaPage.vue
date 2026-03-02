@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed, onMounted } from "vue";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -10,7 +10,7 @@ const store = useObservationStore();
 const idsEstacoes = computed(() => Object.keys(STATIONS));
 const observations = computed(() => store.realTimeObservations);
 
-const drawMap = () => {
+const drawMap = (): L.Map => {
   const map = L.map("map").setView([-22.3768, -41.7848], 10);
 
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -20,9 +20,11 @@ const drawMap = () => {
   return map;
 };
 
-const addStationMarkers = (map) => {
+const addStationMarkers = (map: L.Map) => {
   observations.value.forEach((x) => {
-    L.marker([x.lat, x.lon]).addTo(map);
+    if (x.lat && x.lon) {
+      L.marker([Number(x.lat), Number(x.lon)]).addTo(map);
+    }
   });
 };
 

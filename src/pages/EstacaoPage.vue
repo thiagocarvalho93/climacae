@@ -98,16 +98,17 @@
   </div>
 </template>
 
-<script>
-import { ref, computed, onMounted } from "vue";
+<script lang="ts">
+import { ref, computed, onMounted, defineComponent } from "vue";
 import { STATIONS, CHART_SERIE_TEMPORAL_OPTIONS } from "../constants/constants";
 import dataUtils from "src/utils/data-utils";
 import SecaoFiltros from "src/components/SecaoFiltros.vue";
 import { useObservationStore } from "src/stores/observations";
 import { useNotification } from "src/composables/useNotification";
 import { useDateRangeSetter } from "src/composables/useDateRangeSetter";
+import { SeriesConfig } from "src/types/chart-types";
 
-export default {
+export default defineComponent({
   name: "EstacaoPage",
   components: { SecaoFiltros },
 
@@ -121,10 +122,10 @@ export default {
       getStationDayObservations,
     } = store;
 
-    const graficoTemporalTemperatura = ref(null);
-    const graficoTemporalPressao = ref(null);
-    const graficoTemporalPrecipitacao = ref(null);
-    const graficoTemporalVento = ref(null);
+    const graficoTemporalTemperatura = ref<any>(null);
+    const graficoTemporalPressao = ref<any>(null);
+    const graficoTemporalPrecipitacao = ref<any>(null);
+    const graficoTemporalVento = ref<any>(null);
 
     const loading = ref(false);
     const estacaoSelecionada = ref(Object.values(STATIONS)[0]);
@@ -154,7 +155,7 @@ export default {
         await fetchStationObservationsData();
 
         updateGraphs();
-      } catch (error) {
+      } catch (error: any) {
         console.error(error);
         mensagemErro(error.message || "Erro ao obter os dados.");
       } finally {
@@ -186,14 +187,18 @@ export default {
       updateWindGraph();
     }
 
-    const updateGraphOptions = (chartRef, seriesMap, colors) => {
+    const updateGraphOptions = (
+      chartRef: any,
+      seriesMap: SeriesConfig,
+      colors: string[]
+    ) => {
       const dados = Object.keys(seriesMap).map((serie) => {
         const name = seriesMap[serie].desc;
         return {
           name,
           data: store.stationObservations.map((obs) => [
             dataUtils.subtrairHoras(new Date(obs.obsTimeLocal), 3),
-            obs.metric[serie],
+            (obs.metric as any)[serie],
           ]),
         };
       });
@@ -206,7 +211,7 @@ export default {
     };
 
     const updateTemperatureGraph = () => {
-      const tempMap = {
+      const tempMap: SeriesConfig = {
         tempAvg: { desc: "Média", color: "yellow" },
         tempHigh: { desc: "Máxima", color: "red" },
         tempLow: { desc: "Mínima", color: "blue" },
@@ -219,7 +224,7 @@ export default {
     };
 
     const updatePressureGraph = () => {
-      const pressurePropsMap = {
+      const pressurePropsMap: SeriesConfig = {
         pressureMin: { desc: "Mínima", color: "blue" },
         pressureMax: { desc: "Máxima", color: "red" },
       };
@@ -231,7 +236,7 @@ export default {
     };
 
     const updatePrecipitationGraph = () => {
-      const precipPropsMap = {
+      const precipPropsMap: SeriesConfig = {
         precipRate: { desc: "Taxa (mm/h)", color: "yellow" },
         precipTotal: { desc: "Total", color: "blue" },
       };
@@ -243,7 +248,7 @@ export default {
     };
 
     const updateWindGraph = () => {
-      const windPropsMap = {
+      const windPropsMap: SeriesConfig = {
         windspeedAvg: { desc: "Média", color: "yellow" },
         windspeedHigh: { desc: "Máxima", color: "red" },
         windspeedLow: { desc: "Mínima", color: "blue" },
@@ -280,5 +285,5 @@ export default {
       handleFiltrar,
     };
   },
-};
+});
 </script>

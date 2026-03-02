@@ -98,8 +98,8 @@
   </div>
 </template>
 
-<script>
-import { ref, computed, onMounted } from "vue";
+<script lang="ts">
+import { ref, computed, onMounted, defineComponent } from "vue";
 import { useObservationStore } from "src/stores/observations";
 import { STATIONS, COLUNAS_TABELA } from "../constants/constants";
 import dataUtils from "src/utils/data-utils";
@@ -113,8 +113,9 @@ import GraficoPrecipitacaoGeral from "src/components/GraficoPrecipitacaoGeral.vu
 import GraficoSeriesTemporaisGeral from "src/components/GraficoSeriesTemporaisGeral.vue";
 import { useNotification } from "src/composables/useNotification";
 import { useDateRangeSetter } from "src/composables/useDateRangeSetter";
+import { IObservation } from "src/models/observation-model";
 
-export default {
+export default defineComponent({
   name: "IndexPage",
   components: {
     RealTimeObservationsCarousel,
@@ -142,9 +143,9 @@ export default {
       setDatesGivenPeriod,
     } = useDateRangeSetter();
 
-    const graficoTemperatura = ref(null);
-    const graficoPrecipitacao = ref(null);
-    const graficoTemporal = ref(null);
+    const graficoTemperatura = ref<any>(null);
+    const graficoPrecipitacao = ref<any>(null);
+    const graficoTemporal = ref<any>(null);
 
     const observations = computed(() => observationStore.observations);
     const maxValues = computed(() => observationStore.maxValues);
@@ -161,8 +162,8 @@ export default {
         await fetchObservationsData();
         calculate();
         updateGraphs();
-      } catch (error) {
-        mensagemErro((error && error.message) || "Erro ao obter os dados.");
+      } catch (error: any) {
+        mensagemErro(error?.message || "Erro ao obter os dados.");
       } finally {
         loading.value = false;
       }
@@ -196,16 +197,17 @@ export default {
       graficoTemporal.value?.atualizar();
     }
 
-    const formatarDataCard = (dados) => {
+    const formatarDataCard = (dados: IObservation | null) => {
       if (!dados || !dados.obsTimeLocal) return "N/A";
       return new Date(dados.obsTimeLocal).toLocaleDateString();
     };
 
-    const formatarTituloCard = (dados) => {
+    const formatarTituloCard = (dados: IObservation | null) => {
       if (!dados || !dados.stationID) return "Sem dados";
 
       const idEstacao = dados.stationID;
-      return `Em ${estacoes.value[idEstacao]?.NOME} (${idEstacao})`;
+      const estacao = (estacoes.value as any)[idEstacao];
+      return `Em ${estacao?.NOME} (${idEstacao})`;
     };
 
     onMounted(() => {
@@ -234,5 +236,5 @@ export default {
       graficoTemporal,
     };
   },
-};
+});
 </script>
