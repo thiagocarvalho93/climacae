@@ -19,53 +19,33 @@
   </q-card>
 </template>
 
-<script>
-import { mapState } from "pinia";
+<script lang="ts">
+import { defineComponent, ref, computed } from "vue";
 import { CHART_TEMPERATURA_OPTIONS, CORES } from "src/constants/constants";
 import { useObservationStore } from "src/stores/observations";
 
-export default {
-  name: "TemperatureChart",
+export default defineComponent({
+  name: "GraficoTemperaturaGeral",
   props: {
     loading: {
       type: Boolean,
       default: false,
     },
   },
-  computed: {
-    ...mapState(useObservationStore, ["stationsMetrics"]),
-    chartTemperaturaOptions() {
-      return CHART_TEMPERATURA_OPTIONS;
-    },
-  },
-  data() {
-    return {
-      chartSeries: [],
-    };
-  },
-  created() {
-    // TODO
-    // this.$watch(
-    //   "$q.dark.isActive",
-    //   (isDark) => {
-    //     this.$refs.graficoColunaTemperatura.updateOptions({
-    //       theme: {
-    //         mode: isDark ? "dark" : "light",
-    //       },
-    //     });
-    //   },
-    //   {
-    //     immediate: true,
-    //   }
-    // );
-  },
-  methods: {
-    atualizar() {
-      const dadosFiltrados = this.stationsMetrics.filter(
-        (x) => x.maxima != -Infinity || x.minima != Infinity
+  setup() {
+    const store = useObservationStore();
+    const graficoColunaTemperatura = ref<any>(null);
+    const chartSeries = ref<any[]>([]);
+
+    const chartTemperaturaOptions = computed(() => CHART_TEMPERATURA_OPTIONS);
+    const stationsMetrics = computed(() => store.stationsMetrics);
+
+    const atualizar = () => {
+      const dadosFiltrados = stationsMetrics.value.filter(
+        (x) => x.maxima !== -Infinity && x.minima !== Infinity
       );
 
-      this.$refs.graficoColunaTemperatura.updateOptions({
+      graficoColunaTemperatura.value?.updateOptions({
         series: [
           {
             name: "Máxima",
@@ -84,11 +64,17 @@ export default {
           ),
         },
         yaxis: {
-          // min: this.minima * 0.8,
           tickAmount: 5,
         },
       });
-    },
+    };
+
+    return {
+      graficoColunaTemperatura,
+      chartSeries,
+      chartTemperaturaOptions,
+      atualizar,
+    };
   },
-};
+});
 </script>

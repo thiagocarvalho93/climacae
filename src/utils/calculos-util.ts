@@ -4,7 +4,10 @@
  * @param {number} temperatura - temperatura em °C
  * @returns {number} Sensação térmica em °C
  */
-const calcularSensacaoTermica = (velocidadeVento, temperatura) => {
+const calcularSensacaoTermica = (
+  velocidadeVento: number,
+  temperatura: number
+): number => {
   return (
     33 +
     ((10 * Math.sqrt(velocidadeVento) + 10.45 - velocidadeVento) *

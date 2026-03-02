@@ -23,77 +23,54 @@
     />
   </q-card>
 </template>
-<script>
-import { mapState } from "pinia";
-import {
-  CHART_SERIE_TEMPORAL_OPTIONS,
-  PERIODOS,
-  STATIONS,
-} from "src/constants/constants";
+
+<script lang="ts">
+import { defineComponent, ref, computed } from "vue";
+import { CHART_SERIE_TEMPORAL_OPTIONS, STATIONS } from "src/constants/constants";
 import { useObservationStore } from "src/stores/observations";
 import dataUtils from "src/utils/data-utils";
 
-export default {
-  name: "TemperatureChart",
+export default defineComponent({
+  name: "GraficoSeriesTemporaisGeral",
   props: {
     loading: {
       type: Boolean,
       default: false,
     },
   },
-  computed: {
-    ...mapState(useObservationStore, ["observations"]),
-    chartOptions() {
-      return CHART_SERIE_TEMPORAL_OPTIONS;
-    },
-    periodos() {
-      return PERIODOS;
-    },
-  },
-  data() {
+  setup() {
+    const store = useObservationStore();
+    const graficoTemporal = ref<any>(null);
+    const chartSeries = ref<any[]>([]);
+
+    const chartOptions = computed(() => CHART_SERIE_TEMPORAL_OPTIONS);
+    const observations = computed(() => store.observations);
+
+    const atualizar = () => {
+      const dados = Object.keys(STATIONS).map((estacaoId) => {
+        const estacao = STATIONS[estacaoId];
+        return {
+          name: estacao.NOME,
+          data: observations.value.reduce((acc: any[], ob) => {
+            if (ob.stationID === estacaoId && ob.metric && ob.metric.tempAvg !== undefined && ob.metric.tempAvg !== "") {
+              acc.push([
+                dataUtils.subtrairHoras(new Date(ob.obsTimeLocal as string), 3),
+                ob.metric.tempAvg,
+              ]);
+            }
+            return acc;
+          }, []),
+        };
+      });
+      graficoTemporal.value?.updateSeries(dados);
+    };
+
     return {
-      chartSeries: [],
+      graficoTemporal,
+      chartSeries,
+      chartOptions,
+      atualizar,
     };
   },
-  created() {
-    // TODO;
-    // this.$watch(
-    //   "$q.dark.isActive",
-    //   (isDark) => {
-    //     this.$refs.graficoTemporal.updateOptions({
-    //       theme: {
-    //         mode: isDark ? "dark" : "light",
-    //       },
-    //       grid: {
-    //         row: {
-    //           colors: isDark
-    //             ? ["#333", "transparent"]
-    //             : ["#e5e5e5", "transparent"],
-    //         },
-    //       },
-    //     });
-    //   },
-    //   {
-    //     immediate: true,
-    //   }
-    // );
-  },
-  methods: {
-    atualizar() {
-      const dados = Object.keys(STATIONS).map((estacao) => ({
-        name: STATIONS[estacao].NOME,
-        data: this.observations.reduce((acc, ob) => {
-          if (ob.stationID === estacao && ob.metric.tempAvg) {
-            acc.push([
-              dataUtils.subtrairHoras(new Date(ob.obsTimeLocal), 3),
-              ob.metric.tempAvg,
-            ]);
-          }
-          return acc;
-        }, []),
-      }));
-      this.$refs.graficoTemporal.updateSeries(dados);
-    },
-  },
-};
+});
 </script>

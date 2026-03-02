@@ -16,7 +16,7 @@
         arrows
         infinite
         height="265px"
-        autoplay
+        v-model:autoplay="autoplay"
         class="bg-transparent"
         @mouseenter="autoplay = false"
         @mouseleave="autoplay = true"
@@ -24,12 +24,12 @@
         <q-carousel-slide
           v-for="dados in realTimeObservations"
           :key="dados.stationID"
-          :name="estacoes[dados.stationID].NOME"
+          :name="estacoes[dados.stationID]?.NOME || ''"
           class="column no-wrap flex-center"
         >
           <div class="q-pa-md p-2">
             <div class="q-mt-md text-h6 text-weight-bold">
-              {{ estacoes[dados.stationID].NOME }}
+              {{ estacoes[dados.stationID]?.NOME }}
             </div>
 
             <div class="justify-start">
@@ -74,63 +74,69 @@
   </q-card>
 </template>
 
-<script>
-import { STATIONS } from "src/constants/constants";
-import { mapActions, mapState } from "pinia";
+<script lang="ts">
+import { defineComponent, ref, computed, onMounted, onUnmounted, PropType } from "vue";
+import { STATIONS, Stations } from "src/constants/constants";
 import { useObservationStore } from "src/stores/observations";
 
-export default {
+export default defineComponent({
+  name: "RealTimeObservationsCarousel",
   props: {
-    estacoes: Object,
+    estacoes: {
+      type: Object as PropType<Stations>,
+      required: true
+    },
     darkMode: Boolean,
   },
 
-  data() {
-    return {
-      slide: STATIONS[Object.keys(STATIONS)[0]].NOME,
-      carregando: false,
-      ultimaAtualizacao: new Date().toLocaleTimeString(navigator.language, {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-    };
-  },
+  setup() {
+    const store = useObservationStore();
+    const slide = ref(STATIONS[Object.keys(STATIONS)[0]].NOME);
+    const carregando = ref(false);
+    const autoplay = ref<boolean | number>(true);
+    const ultimaAtualizacao = ref(new Date().toLocaleTimeString(navigator.language, {
+      hour: "2-digit",
+      minute: "2-digit",
+    }));
 
-  computed: {
-    idsEstacoes() {
-      return Object.keys(STATIONS);
-    },
-    ...mapState(useObservationStore, ["realTimeObservations"]),
-  },
+    const realTimeObservations = computed(() => store.realTimeObservations);
+    const idsEstacoes = computed(() => Object.keys(STATIONS));
 
-  async created() {
-    await this.getRealTimeObservations(this.idsEstacoes);
-    this.atualizarDadosAtuais();
-  },
+    let intervalId: any = null;
 
-  beforeUnmount() {
-    clearInterval(this.atualizarDadosAtuais);
-  },
-
-  methods: {
-    ...mapActions(useObservationStore, ["getRealTimeObservations"]),
-
-    atualizarDadosAtuais() {
-      setInterval(async () => {
-        this.carregando = true;
-
-        await this.getRealTimeObservations(this.idsEstacoes);
-
-        this.ultimaAtualizacao = new Date().toLocaleTimeString(
+    const fetchRealTime = async () => {
+      carregando.value = true;
+      try {
+        await store.getRealTimeObservations(idsEstacoes.value);
+        ultimaAtualizacao.value = new Date().toLocaleTimeString(
           navigator.language,
           {
             hour: "2-digit",
             minute: "2-digit",
           }
         );
-        this.carregando = false;
-      }, 30000);
-    },
+      } finally {
+        carregando.value = false;
+      }
+    };
+
+    onMounted(async () => {
+      await fetchRealTime();
+      intervalId = setInterval(fetchRealTime, 30000);
+    });
+
+    onUnmounted(() => {
+      if (intervalId) clearInterval(intervalId);
+    });
+
+    return {
+      slide,
+      carregando,
+      autoplay,
+      ultimaAtualizacao,
+      realTimeObservations,
+      fetchRealTime
+    };
   },
-};
+});
 </script>

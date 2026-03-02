@@ -18,8 +18,9 @@
     />
   </q-card>
 </template>
-<script>
-import { mapState } from "pinia";
+
+<script lang="ts">
+import { defineComponent, ref, computed } from "vue";
 import {
   CHART_PRECIPITACAO_OPTIONS,
   CORES,
@@ -27,8 +28,8 @@ import {
 } from "src/constants/constants";
 import { useObservationStore } from "src/stores/observations";
 
-export default {
-  name: "TemperatureChart",
+export default defineComponent({
+  name: "GraficoPrecipitacaoGeral",
   props: {
     loading: {
       type: Boolean,
@@ -39,51 +40,30 @@ export default {
       required: true,
     },
   },
-  computed: {
-    ...mapState(useObservationStore, ["stationsMetrics"]),
-    chartPrecipitacaoOptions() {
-      return CHART_PRECIPITACAO_OPTIONS;
-    },
-    periodos() {
-      return PERIODOS;
-    },
-  },
-  data() {
-    return {
-      chartSeries: [],
-    };
-  },
-  created() {
-    // TODO;
-    // this.$watch(
-    //   "$q.dark.isActive",
-    //   (isDark) => {
-    //     this.$refs.graficoPrecipitacao.updateOptions({
-    //       theme: {
-    //         mode: isDark ? "dark" : "light",
-    //       },
-    //     });
-    //   },
-    //   {
-    //     immediate: true,
-    //   }
-    // );
-  },
-  methods: {
-    atualizar() {
-      const dadosFiltrados = this.stationsMetrics.filter(
+  setup(props) {
+    const store = useObservationStore();
+    const graficoPrecipitacao = ref<any>(null);
+    const chartSeries = ref<any[]>([]);
+
+    const chartPrecipitacaoOptions = computed(() => CHART_PRECIPITACAO_OPTIONS);
+    const stationsMetrics = computed(() => store.stationsMetrics);
+
+    const atualizar = () => {
+      const dadosFiltrados = stationsMetrics.value.filter(
         (x) =>
-          x.precipitacaoMaxima !== (-Infinity || Infinity) &&
-          x.precipitacaoAcumulada !== (-Infinity || Infinity)
+          x.precipitacaoMaxima !== -Infinity &&
+          x.precipitacaoMaxima !== Infinity &&
+          x.precipitacaoAcumulada !== -Infinity &&
+          x.precipitacaoAcumulada !== Infinity
       );
 
       const data = dadosFiltrados.map((x) => ({
-        name: x.NOME,
+        name: x.id,
         precipitacaoMaxima: x.precipitacaoMaxima,
         precipitacaoRestante: x.precipitacaoAcumulada - x.precipitacaoMaxima,
       }));
 
-      const series = [
+      const series: any[] = [
         {
           name: "Máxima em 24h",
           data: data.map((x) => x.precipitacaoMaxima),
@@ -96,23 +76,23 @@ export default {
         },
       ];
 
-      let precipitacaoMaxima = 0;
-      let isDiario =
-        this.periodoSelecionado === this.periodos.DIA_ESPECIFICO ||
-        this.periodoSelecionado === this.periodos.HOJE;
+      let maxVal = 0;
+      const isDiario =
+        props.periodoSelecionado === PERIODOS.DIA_ESPECIFICO ||
+        props.periodoSelecionado === PERIODOS.HOJE;
 
       if (isDiario) {
         const precMaximas = data.map((x) => x.precipitacaoMaxima);
-        precipitacaoMaxima = Math.max(...precMaximas).toFixed(2);
-        series.splice(1, 1); // Remove a série "Precipitação restante"
+        maxVal = precMaximas.length > 0 ? Math.max(...precMaximas) : 0;
+        series.splice(1, 1); // Remove "Precipitação restante"
       } else {
         const precMaximas = data.map(
           (x) => x.precipitacaoMaxima + x.precipitacaoRestante
         );
-        precipitacaoMaxima = Math.max(...precMaximas);
+        maxVal = precMaximas.length > 0 ? Math.max(...precMaximas) : 0;
       }
 
-      this.$refs.graficoPrecipitacao.updateOptions({
+      graficoPrecipitacao.value?.updateOptions({
         series,
         xaxis: {
           categories: dadosFiltrados.map((x) =>
@@ -120,11 +100,18 @@ export default {
           ),
         },
         yaxis: {
-          max: precipitacaoMaxima * 1.4,
+          max: maxVal > 0 ? maxVal * 1.4 : undefined,
           tickAmount: 5,
         },
       });
-    },
+    };
+
+    return {
+      graficoPrecipitacao,
+      chartSeries,
+      chartPrecipitacaoOptions,
+      atualizar,
+    };
   },
-};
+});
 </script>
