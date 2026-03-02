@@ -1,15 +1,30 @@
 import { defineStore } from "pinia";
 import weatherApi from "src/api/weather-api";
 import { STATIONS } from "src/constants/constants";
-import MaxValues from "src/models/max-values-model";
+import MaxValues, { IMaxValuesResults } from "src/models/max-values-model";
 import Metric from "src/models/metric-model";
 import ObservationCurrent from "src/models/observation-current-model";
 import Observation from "src/models/observation-model";
 import StationMetrics from "src/models/station-metrics-model";
 import dataUtils from "src/utils/data-utils";
 
+interface ObservationState {
+  realTimeObservations: ObservationCurrent[];
+  observations: Observation[];
+  stationObservations: Observation[];
+  cachedObservations: Map<string, Observation[]>;
+  cachedRealTimeObservations: {
+    observations: ObservationCurrent[];
+    iat: Date;
+  } | null;
+  startDate: Date;
+  endDate: Date;
+  stationsMetrics: StationMetrics[];
+  maxValues: MaxValues | IMaxValuesResults;
+}
+
 export const useObservationStore = defineStore("observation", {
-  state: () => ({
+  state: (): ObservationState => ({
     realTimeObservations: [],
     observations: [],
     stationObservations: [],
@@ -18,32 +33,31 @@ export const useObservationStore = defineStore("observation", {
     startDate: new Date(),
     endDate: new Date(),
     stationsMetrics: [],
-
     maxValues: new MaxValues(),
   }),
 
   getters: {
-    getObservations(state) {
+    getObservations(state): Observation[] {
       return state.observations;
     },
-    getStartDate(state) {
+    getStartDate(state): Date {
       return state.startDate;
     },
-    getEndDate(state) {
+    getEndDate(state): Date {
       return state.endDate;
     },
   },
 
   actions: {
     //#region Dates
-    setStartDate(date) {
+    setStartDate(date: Date) {
       this.startDate = date;
     },
-    setEndDate(date) {
+    setEndDate(date: Date) {
       this.endDate = date;
     },
     //#region Get observations
-    async getTodayObservations(stationsArray) {
+    async getTodayObservations(stationsArray: string[]) {
       const cached = this.cachedObservations.get("today");
 
       if (cached) {
@@ -66,7 +80,7 @@ export const useObservationStore = defineStore("observation", {
       this.cachedObservations.set("today", observations);
     },
 
-    async getSpecificDayObservations(stationsArray, date) {
+    async getSpecificDayObservations(stationsArray: string[], date: Date) {
       const cacheKey = date.toLocaleDateString();
       const cached = this.cachedObservations.get(cacheKey);
 
@@ -93,7 +107,11 @@ export const useObservationStore = defineStore("observation", {
       this.cachedObservations.set(cacheKey, observations);
     },
 
-    async getPeriodDailyObservations(stationsArray, startDate, finalDate) {
+    async getPeriodDailyObservations(
+      stationsArray: string[],
+      startDate: Date,
+      finalDate: Date
+    ) {
       const cacheKey = `${startDate.toLocaleDateString()}-${finalDate.toLocaleDateString()}`;
       const cached = this.cachedObservations.get(cacheKey);
 
@@ -126,7 +144,7 @@ export const useObservationStore = defineStore("observation", {
     },
 
     //#region Get by station
-    async getStationTodayObservations(idEstacao) {
+    async getStationTodayObservations(idEstacao: string) {
       const response = await weatherApi.obterObservacoesDiaAtualEstacao(
         idEstacao
       );
@@ -136,7 +154,11 @@ export const useObservationStore = defineStore("observation", {
         : [];
     },
 
-    async getStationPeriodDailyObservations(stationId, startDate, finalDate) {
+    async getStationPeriodDailyObservations(
+      stationId: string,
+      startDate: Date,
+      finalDate: Date
+    ) {
       const formatedStartDate = dataUtils.formatDateForQuery(startDate);
       const formatedFinalDate = dataUtils.formatDateForQuery(finalDate);
 
@@ -151,9 +173,8 @@ export const useObservationStore = defineStore("observation", {
         : [];
     },
 
-    async getStationDayObservations(stationId, date) {
+    async getStationDayObservations(stationId: string, date: Date) {
       const formattedDate = dataUtils.formatDateForQuery(date);
-      // console.log(formattedDate);
 
       const response = await weatherApi.obterTodasObservacoesDia(
         stationId,
@@ -166,7 +187,7 @@ export const useObservationStore = defineStore("observation", {
     },
 
     //#region Real time
-    async getRealTimeObservations(stationsArray) {
+    async getRealTimeObservations(stationsArray: string[]) {
       if (this.cachedRealTimeObservations) {
         const { iat, observations } = this.cachedRealTimeObservations;
         const thirtySecondsAgo = new Date(Date.now() - 30000);
@@ -205,7 +226,7 @@ export const useObservationStore = defineStore("observation", {
         const { tempHigh, tempLow, windgustHigh, precipTotal } = new Metric(
           metric
         );
-        const stationName = STATIONS[stationID].NOME;
+        const stationName = STATIONS[stationID as keyof typeof STATIONS].NOME;
 
         if (!acc[stationName]) {
           acc[stationName] = new StationMetrics(
@@ -216,11 +237,16 @@ export const useObservationStore = defineStore("observation", {
             precipTotal
           );
         } else {
-          acc[stationName].update(tempLow, tempHigh, windgustHigh, precipTotal);
+          acc[stationName].update(
+            Number(tempLow),
+            Number(tempHigh),
+            Number(windgustHigh),
+            Number(precipTotal)
+          );
         }
 
         return acc;
-      }, {});
+      }, {} as Record<string, StationMetrics>);
 
       this.stationsMetrics = Object.values(metadadosMap);
     },

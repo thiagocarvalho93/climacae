@@ -1,4 +1,27 @@
+import Observation from "./observation-model";
+import StationMetrics from "./station-metrics-model";
+
+export interface IMaxValuesResults {
+  maxima: number;
+  minima: number;
+  ventoMaximo: number;
+  precipitacaoMaxima: number;
+  dadosMaxima: Observation | null;
+  dadosMinima: Observation | null;
+  dadosVentoMaximo: Observation | null;
+  dadosPrecipitacaoMaxima: Observation | null;
+}
+
 export default class MaxValues {
+  maxima: number;
+  minima: number;
+  ventoMaximo: number;
+  precipitacaoMaxima: number;
+  dadosMaxima: Observation | null;
+  dadosMinima: Observation | null;
+  dadosVentoMaximo: Observation | null;
+  dadosPrecipitacaoMaxima: Observation | null;
+
   constructor() {
     this.maxima = 0;
     this.minima = Infinity;
@@ -10,7 +33,7 @@ export default class MaxValues {
     this.dadosPrecipitacaoMaxima = null;
   }
 
-  updateMaxMinValues(stationsMetrics) {
+  updateMaxMinValues(stationsMetrics: StationMetrics[]): void {
     stationsMetrics.forEach(
       ({ maxima, minima, ventoMaximo, precipitacaoMaxima }) => {
         this.maxima = Math.max(this.maxima, maxima);
@@ -27,18 +50,19 @@ export default class MaxValues {
     );
   }
 
-  updateObservationData(observations) {
+  updateObservationData(observations: Observation[]): void {
     observations.forEach((obs) => {
-      if (obs.metric.tempHigh === this.maxima) this.dadosMaxima = obs;
-      if (obs.metric.tempLow === this.minima) this.dadosMinima = obs;
-      if (obs.metric.windgustHigh === this.ventoMaximo)
+      // Usando double equal ou cast aqui porque o metric pode conter strings da API
+      if (Number(obs.metric.tempHigh) === this.maxima) this.dadosMaxima = obs;
+      if (Number(obs.metric.tempLow) === this.minima) this.dadosMinima = obs;
+      if (Number(obs.metric.windgustHigh) === this.ventoMaximo)
         this.dadosVentoMaximo = obs;
-      if (obs.metric.precipTotal === this.precipitacaoMaxima)
+      if (Number(obs.metric.precipTotal) === this.precipitacaoMaxima)
         this.dadosPrecipitacaoMaxima = obs;
     });
   }
 
-  getResults() {
+  getResults(): IMaxValuesResults {
     return {
       maxima: this.maxima,
       minima: this.minima,
