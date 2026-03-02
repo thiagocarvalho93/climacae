@@ -81,7 +81,7 @@
     </div>
 
     <div class="col-12 col-sm-7 flex">
-      <GraficoSeriesTemporaisGeral :loading="loading" ref="graficoTemporal" />
+      <MapaEstacoes />
     </div>
 
     <!-- Tabela -->
@@ -110,7 +110,7 @@ import TabelaObservacoes from "src/components/TabelaObservacoes.vue";
 import SecaoFiltros from "src/components/SecaoFiltros.vue";
 import GraficoTemperaturaGeral from "src/components/GraficoTemperaturaGeral.vue";
 import GraficoPrecipitacaoGeral from "src/components/GraficoPrecipitacaoGeral.vue";
-import GraficoSeriesTemporaisGeral from "src/components/GraficoSeriesTemporaisGeral.vue";
+import MapaEstacoes from "src/components/MapaEstacoes.vue";
 import { useNotification } from "src/composables/useNotification";
 import { useDateRangeSetter } from "src/composables/useDateRangeSetter";
 import { IObservation } from "src/models/observation-model";
@@ -124,7 +124,7 @@ export default defineComponent({
     SecaoFiltros,
     GraficoTemperaturaGeral,
     GraficoPrecipitacaoGeral,
-    GraficoSeriesTemporaisGeral,
+    MapaEstacoes,
   },
   setup() {
     const $q = useQuasar();
@@ -145,7 +145,6 @@ export default defineComponent({
 
     const graficoTemperatura = ref<any>(null);
     const graficoPrecipitacao = ref<any>(null);
-    const graficoTemporal = ref<any>(null);
 
     const observations = computed(() => observationStore.observations);
     const maxValues = computed(() => observationStore.maxValues);
@@ -188,7 +187,6 @@ export default defineComponent({
     function updateGraphs() {
       graficoTemperatura.value?.atualizar();
       graficoPrecipitacao.value?.atualizar();
-      graficoTemporal.value?.atualizar();
     }
 
     const formatarDataCard = (dados: IObservation | null) => {
@@ -227,7 +225,6 @@ export default defineComponent({
       formatarDataCard,
       graficoTemperatura,
       graficoPrecipitacao,
-      graficoTemporal,
     };
   },
 });

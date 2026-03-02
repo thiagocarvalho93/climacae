@@ -34,7 +34,6 @@
       <q-tabs class="text-primary" v-model="tab">
         <q-route-tab to="/" label="Geral" />
         <q-route-tab to="/estacao" label="Estação" />
-        <q-route-tab to="/mapa" label="Mapa" />
       </q-tabs>
     </q-header>
 

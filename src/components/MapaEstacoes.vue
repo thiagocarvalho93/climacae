@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, computed, onMounted, watch, markRaw } from "vue";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useObservationStore } from "src/stores/observations";
@@ -49,13 +49,13 @@ const getColorForVariable = (value: number, range: [number, number]): string => 
 };
 
 const drawMap = (): L.Map => {
-  const map = L.map("map").setView([-22.3768, -41.7848], 11);
+  const map = L.map("map-container").setView([-22.3768, -41.7848], 11);
 
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "&copy; OpenStreetMap",
   }).addTo(map);
 
-  return map;
+  return markRaw(map);
 };
 
 const updateMarkers = () => {
@@ -64,7 +64,7 @@ const updateMarkers = () => {
   if (markersLayer.value) {
     markersLayer.value.clearLayers();
   } else {
-    markersLayer.value = L.layerGroup().addTo(mapInstance.value);
+    markersLayer.value = markRaw(L.layerGroup().addTo(mapInstance.value as any));
   }
 
   observations.value.forEach((obs: IObservationCurrent) => {
@@ -88,19 +88,20 @@ const updateMarkers = () => {
           <div style="
             background-color: ${color};
             color: white;
-            padding: 4px 8px;
-            border-radius: 12px;
+            padding: 2px 6px;
+            border-radius: 10px;
             font-weight: bold;
-            border: 2px solid white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            border: 1.5px solid white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
             white-space: nowrap;
             display: inline-block;
+            font-size: 11px;
           ">
             ${displayValue}
           </div>
         `,
-        iconSize: [40, 24],
-        iconAnchor: [20, 12],
+        iconSize: [35, 20],
+        iconAnchor: [17, 10],
       });
 
       const marker = L.marker([Number(obs.lat), Number(obs.lon)], { icon });
@@ -113,7 +114,7 @@ const updateMarkers = () => {
         <div><small>Atualizado em: ${obs.obsTimeLocal}</small></div>
       `);
       
-      marker.addTo(markersLayer.value!);
+      marker.addTo(markersLayer.value as any);
     }
   });
 };
@@ -134,33 +135,27 @@ onMounted(async () => {
 </script>
 
 <template>
-  <q-page padding>
-    <div class="row q-col-gutter-md">
-      <div class="col-12">
-        <q-card flat bordered>
-          <q-card-section class="row items-center q-pb-none">
-            <div class="text-h6">Mapa de Estações</div>
-            <q-space />
-            <q-select
-              v-model="selectedVariable"
-              :options="variables"
-              label="Variável"
-              outlined
-              dense
-              style="min-width: 200px"
-            />
-          </q-card-section>
+  <q-card flat bordered class="full-width">
+    <q-card-section class="row items-center q-pb-none">
+      <div class="text-h6">Mapa em Tempo Real</div>
+      <q-space />
+      <q-select
+        v-model="selectedVariable"
+        :options="variables"
+        label="Variável"
+        outlined
+        dense
+        style="min-width: 150px"
+      />
+    </q-card-section>
 
-          <q-card-section>
-            <div id="map" style="height: 600px; border-radius: 8px;"></div>
-            <q-inner-loading :showing="loading">
-              <q-spinner-gears size="50px" color="primary" />
-            </q-inner-loading>
-          </q-card-section>
-        </q-card>
-      </div>
-    </div>
-  </q-page>
+    <q-card-section>
+      <div id="map-container" style="height: 350px; border-radius: 4px;"></div>
+      <q-inner-loading :showing="loading">
+        <q-spinner-gears size="50px" color="primary" />
+      </q-inner-loading>
+    </q-card-section>
+  </q-card>
 </template>
 
 <style>
