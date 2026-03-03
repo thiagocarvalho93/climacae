@@ -116,7 +116,7 @@ import { computed, defineComponent, PropType } from "vue";
 import { useObservationStore } from "src/stores/observations";
 
 export default defineComponent({
-  name: "SecaoFiltros",
+  name: "FilterSection",
   props: {
     loading: Boolean,
     selectedStation: Object as PropType<StationInfo>,

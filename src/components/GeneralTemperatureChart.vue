@@ -25,7 +25,7 @@ import { TEMPERATURE_CHART_OPTIONS, COLORS } from "src/constants/constants";
 import { useObservationStore } from "src/stores/observations";
 
 export default defineComponent({
-  name: "GraficoTemperaturaGeral",
+  name: "GeneralTemperatureChart",
   props: {
     loading: {
       type: Boolean,

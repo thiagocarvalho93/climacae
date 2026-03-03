@@ -46,7 +46,7 @@
 import { defineComponent } from "vue";
 
 export default defineComponent({
-  name: "InformacaoCard",
+  name: "InfoCard",
   props: {
     loading: Boolean,
     title: String,

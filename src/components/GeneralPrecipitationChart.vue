@@ -29,7 +29,7 @@ import {
 import { useObservationStore } from "src/stores/observations";
 
 export default defineComponent({
-  name: "GraficoPrecipitacaoGeral",
+  name: "GeneralPrecipitationChart",
   props: {
     loading: {
       type: Boolean,

@@ -43,7 +43,7 @@ import { defineComponent, ref, PropType } from "vue";
 import { QTableColumn } from "quasar";
 
 export default defineComponent({
-  name: "TabelaObservacoes",
+  name: "ObservationsTable",
   props: {
     loading: Boolean,
     rows: {
