@@ -51,27 +51,36 @@
             </div>
           </div>
 
-          <div class="row q-col-gutter-sm text-center">
-            <div class="col-4">
+          <div class="row q-col-gutter-xs text-center">
+            <div class="col-3">
               <div class="metric-item">
                 <q-icon name="water_drop" color="blue-5" size="xs" />
-                <div class="text-caption text-grey-7">Umidade</div>
+                <div class="text-caption-custom text-grey-7">Umidade</div>
                 <div class="text-weight-bold">{{ data.humidity }}%</div>
               </div>
             </div>
-            <div class="col-4">
+            <div class="col-3">
               <div class="metric-item">
                 <q-icon name="air" color="teal-5" size="xs" />
-                <div class="text-caption text-grey-7">Vento</div>
+                <div class="text-caption-custom text-grey-7">Vento</div>
                 <div class="text-weight-bold">
                   {{ data.metric.windSpeed }} <small>km/h</small>
                 </div>
               </div>
             </div>
-            <div class="col-4">
+            <div class="col-3">
+              <div class="metric-item">
+                <q-icon name="thermostat" color="orange-8" size="xs" />
+                <div class="text-caption-custom text-grey-7">Sensação</div>
+                <div class="text-weight-bold">
+                  {{ getThermalSensation(data) }}°C
+                </div>
+              </div>
+            </div>
+            <div class="col-3">
               <div class="metric-item">
                 <q-icon name="ion-rainy" color="indigo-5" size="xs" />
-                <div class="text-caption text-grey-7">Chuva</div>
+                <div class="text-caption-custom text-grey-7">Chuva</div>
                 <div class="text-weight-bold">
                   {{ data.metric.precipRate }} <small>mm/h</small>
                 </div>
@@ -102,6 +111,8 @@ import {
 } from "vue";
 import { STATIONS, Stations } from "src/constants/constants";
 import { useObservationStore } from "src/stores/observations";
+import calculationUtils from "src/utils/calculation-utils";
+import { IObservationCurrent } from "src/models/observation-current-model";
 
 export default defineComponent({
   name: "RealTimeObservationsCarousel",
@@ -143,6 +154,22 @@ export default defineComponent({
       }
     };
 
+    const getThermalSensation = (data: IObservationCurrent): string => {
+      const temp = Number(data.metric?.temp);
+      const windSpeed = Number(data.metric?.windSpeed);
+      const humidity = Number(data.humidity);
+
+      if (isNaN(temp)) return "N/A";
+
+      // Pass humidity even if 0, but ensure it's a number
+      const safeHumidity = isNaN(humidity) ? 50 : humidity;
+      const safeWind = isNaN(windSpeed) ? 0 : windSpeed;
+
+      return calculationUtils
+        .calculateThermalSensation(temp, safeHumidity, safeWind)
+        .toFixed(1);
+    };
+
     onMounted(async () => {
       await fetchRealTime();
       intervalId = setInterval(fetchRealTime, 30000);
@@ -159,6 +186,7 @@ export default defineComponent({
       lastUpdate,
       realTimeObservations,
       fetchRealTime,
+      getThermalSensation,
     };
   },
 });
@@ -225,7 +253,7 @@ export default defineComponent({
 }
 
 .metric-item {
-  padding: 8px;
+  padding: 6px 2px;
   background: rgba(0, 0, 0, 0.03);
   border-radius: 8px;
   height: 100%;
@@ -237,6 +265,14 @@ export default defineComponent({
   .body--dark & {
     background: rgba(255, 255, 255, 0.05);
   }
+}
+
+.text-caption-custom {
+  font-size: 0.65rem;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
 }
 
 .truncate-text {
@@ -252,7 +288,7 @@ export default defineComponent({
 // Fixed arrow styling
 :deep(.q-carousel__prev-arrow),
 :deep(.q-carousel__next-arrow) {
-  background: transparent !important; // Remove the background
+  background: transparent !important;
   padding: 0;
   margin: 0;
 
@@ -260,7 +296,6 @@ export default defineComponent({
     background: transparent !important;
     box-shadow: none !important;
 
-    // Optional: add a slight hover effect instead
     &:hover {
       background: rgba(0, 0, 0, 0.05) !important;
       .body--dark & {
