@@ -195,12 +195,6 @@ export default defineComponent({
 <style scoped lang="scss">
 .realtime-card {
   min-height: 340px;
-  background: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 1) 0%,
-    rgba(248, 249, 250, 1) 100%
-  );
-  border-radius: 12px;
   transition: all 0.3s ease;
 
   .body--dark & {
