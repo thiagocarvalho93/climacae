@@ -8,7 +8,7 @@
           :options="stationNames"
           outlined
           hide-bottom-space
-          option-label="NOME"
+          option-label="NAME"
           label="Estação"
         />
       </div>
@@ -22,7 +22,7 @@
         />
       </div>
       <div
-        v-if="selectedPeriodProxy === periods.DIA_ESPECIFICO"
+        v-if="selectedPeriodProxy === periods.SPECIFIC_DAY"
         class="col-4 col-sm-2 col-md-1 fade"
       >
         <q-select
@@ -35,11 +35,11 @@
       </div>
       <div
         v-if="
-          selectedPeriodProxy === periods.MES_ESPECIFICO ||
-          selectedPeriodProxy === periods.DIA_ESPECIFICO
+          selectedPeriodProxy === periods.SPECIFIC_MONTH ||
+          selectedPeriodProxy === periods.SPECIFIC_DAY
         "
         :class="
-          (selectedPeriodProxy === periods.DIA_ESPECIFICO
+          (selectedPeriodProxy === periods.SPECIFIC_DAY
             ? 'col-4 '
             : 'col-6 ') + 'col-sm-2 col-md-1 fade'
         "
@@ -54,11 +54,11 @@
       </div>
       <div
         v-if="
-          selectedPeriodProxy === periods.MES_ESPECIFICO ||
-          selectedPeriodProxy === periods.DIA_ESPECIFICO
+          selectedPeriodProxy === periods.SPECIFIC_MONTH ||
+          selectedPeriodProxy === periods.SPECIFIC_DAY
         "
         :class="
-          (selectedPeriodProxy === periods.DIA_ESPECIFICO
+          (selectedPeriodProxy === periods.SPECIFIC_DAY
             ? 'col-4 '
             : 'col-6 ') + 'col-sm-2 col-md-1 fade'
         "
@@ -105,10 +105,10 @@
 
 <script lang="ts">
 import {
-  OPCOES_ANOS,
-  OPCOES_DIAS,
-  OPCOES_MESES,
-  PERIODOS,
+  YEAR_OPTIONS,
+  DAY_OPTIONS,
+  MONTH_OPTIONS,
+  PERIODS,
   StationInfo,
 } from "src/constants/constants";
 import csvUtils from "src/utils/csv-utils";
@@ -173,11 +173,11 @@ export default defineComponent({
       },
     });
 
-    const periodOptions = computed(() => Object.values(PERIODOS));
-    const dayOptions = computed(() => OPCOES_DIAS);
-    const monthOptions = computed(() => OPCOES_MESES);
-    const yearOptions = computed(() => OPCOES_ANOS);
-    const periods = computed(() => PERIODOS);
+    const periodOptions = computed(() => Object.values(PERIODS));
+    const dayOptions = computed(() => DAY_OPTIONS);
+    const monthOptions = computed(() => MONTH_OPTIONS);
+    const yearOptions = computed(() => YEAR_OPTIONS);
+    const periods = computed(() => PERIODS);
     const observations = computed(() => store.getObservations);
     const startDate = computed(() => store.getStartDate);
     const endDate = computed(() => store.getEndDate);

@@ -1,4 +1,4 @@
-import { PERIODOS } from "src/constants/constants";
+import { PERIODS } from "src/constants/constants";
 import dataUtils from "./data-utils";
 import Metric from "src/models/metric-model";
 import { IObservation } from "src/models/observation-model";
@@ -39,7 +39,7 @@ const getCsvString = (rows: IObservation[]): string => {
 /**
  * Generates a CSV file name based on the selected period and date range.
  *
- * @param {string} selectedPeriod - The selected period identifier (e.g., "HOJE").
+ * @param {string} selectedPeriod - The selected period identifier (e.g., "TODAY").
  * @param {Date | null} startDate - The start date of the period.
  * @param {Date | null} endDate - The end date of the period.
  * @returns {string} - The formatted CSV file name.
@@ -56,7 +56,7 @@ const getCsvFileName = (
     ? dataUtils.formatDateWithUnderline(endDate)
     : "end_date";
 
-  if (selectedPeriod === PERIODOS.HOJE) {
+  if (selectedPeriod === PERIODS.TODAY) {
     return `${formattedStartDate}.csv`;
   }
   return `${formattedStartDate}-${formattedEndDate}.csv`;

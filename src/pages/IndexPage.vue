@@ -75,7 +75,7 @@
     <div class="col-12 col-sm-5 flex">
       <GraficoPrecipitacaoGeral
         :loading="loading"
-        :periodo-selecionado="selectedPeriod"
+        :selected-period="selectedPeriod"
         ref="precipitationChart"
       />
     </div>
@@ -101,7 +101,7 @@
 <script lang="ts">
 import { ref, computed, onMounted, defineComponent } from "vue";
 import { useObservationStore } from "src/stores/observations";
-import { STATIONS, COLUNAS_TABELA } from "../constants/constants";
+import { STATIONS, TABLE_COLUMNS } from "../constants/constants";
 import dataUtils from "src/utils/data-utils";
 import { useQuasar } from "quasar";
 import RealTimeObservationsCarousel from "src/components/RealTimeObservationsCarousel.vue";
@@ -151,7 +151,7 @@ export default defineComponent({
     const darkMode = computed(() => $q.dark.isActive);
     const stations = computed(() => STATIONS);
     const stationIds = computed(() => Object.keys(STATIONS));
-    const tableColumns = computed(() => COLUNAS_TABELA);
+    const tableColumns = computed(() => TABLE_COLUMNS);
 
     const handleFilter = async () => {
       loading.value = true;
@@ -199,7 +199,7 @@ export default defineComponent({
 
       const idEstacao = dados.stationID;
       const estacao = (stations.value as any)[idEstacao];
-      return `Em ${estacao?.NOME} (${idEstacao})`;
+      return `Em ${estacao?.NAME} (${idEstacao})`;
     };
 
     onMounted(() => {

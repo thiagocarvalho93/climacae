@@ -22,9 +22,9 @@
 <script lang="ts">
 import { defineComponent, ref, computed } from "vue";
 import {
-  CHART_PRECIPITACAO_OPTIONS,
-  CORES,
-  PERIODOS,
+  PRECIPITATION_CHART_OPTIONS,
+  COLORS,
+  PERIODS,
 } from "src/constants/constants";
 import { useObservationStore } from "src/stores/observations";
 
@@ -35,7 +35,7 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
-    periodoSelecionado: {
+    selectedPeriod: {
       type: String,
       required: true,
     },
@@ -45,7 +45,7 @@ export default defineComponent({
     const graficoPrecipitacao = ref<any>(null);
     const chartSeries = ref<any[]>([]);
 
-    const chartPrecipitacaoOptions = computed(() => CHART_PRECIPITACAO_OPTIONS);
+    const chartPrecipitacaoOptions = computed(() => PRECIPITATION_CHART_OPTIONS);
     const stationsMetrics = computed(() => store.stationsMetrics);
 
     const update = () => {
@@ -67,19 +67,19 @@ export default defineComponent({
         {
           name: "Máxima em 24h",
           data: data.map((x) => x.precipitacaoMaxima),
-          color: CORES.INDIGO_ESCURO,
+          color: COLORS.INDIGO_DARK,
         },
         {
           name: "Precipitação restante",
           data: data.map((x) => x.precipitacaoRestante),
-          color: CORES.INDIGO,
+          color: COLORS.INDIGO,
         },
       ];
 
       let maxVal = 0;
       const isDiario =
-        props.periodoSelecionado === PERIODOS.DIA_ESPECIFICO ||
-        props.periodoSelecionado === PERIODOS.HOJE;
+        props.selectedPeriod === PERIODS.SPECIFIC_DAY ||
+        props.selectedPeriod === PERIODS.TODAY;
 
       if (isDiario) {
         const precMaximas = data.map((x) => x.precipitacaoMaxima);

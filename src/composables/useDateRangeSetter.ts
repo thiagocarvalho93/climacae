@@ -1,5 +1,5 @@
 import { ref, Ref } from "vue";
-import { PERIODOS } from "../constants/constants";
+import { PERIODS } from "../constants/constants";
 import dataUtils from "src/utils/data-utils";
 
 export interface DateRangeSetter {
@@ -15,29 +15,29 @@ export interface DateRangeSetter {
 export function useDateRangeSetter(): DateRangeSetter {
   const startDate = ref(new Date());
   const endDate = ref<Date | null>(new Date());
-  const selectedPeriod = ref(PERIODOS.HOJE);
+  const selectedPeriod = ref(PERIODS.TODAY);
   const selectedDay = ref(new Date().getDate());
   const selectedMonth = ref(new Date().getMonth() + 1);
   const selectedYear = ref(new Date().getFullYear());
 
   const setDatesGivenPeriod = (): void => {
     switch (selectedPeriod.value) {
-      case PERIODOS.HOJE:
+      case PERIODS.TODAY:
         _setDates(new Date(), null);
         break;
-      case PERIODOS.ULTIMAS_SETENTA_E_DUAS_HORAS:
+      case PERIODS.LAST_72_HOURS:
         _setDates(dataUtils.subtractDays(3), dataUtils.addDays(1));
         break;
-      case PERIODOS.ULTIMOS_SETE_DIAS:
+      case PERIODS.LAST_7_DAYS:
         _setDates(dataUtils.subtractDays(7), dataUtils.addDays(1));
         break;
-      case PERIODOS.ULTIMOS_TRINTA_DIAS:
+      case PERIODS.LAST_30_DAYS:
         _setDates(dataUtils.subtractDays(30), dataUtils.addDays(1));
         break;
-      case PERIODOS.MES_ESPECIFICO:
+      case PERIODS.SPECIFIC_MONTH:
         setSpecificMonth();
         break;
-      case PERIODOS.DIA_ESPECIFICO:
+      case PERIODS.SPECIFIC_DAY:
         setSpecificDay();
         break;
       default:

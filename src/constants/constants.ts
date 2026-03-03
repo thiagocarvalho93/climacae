@@ -3,7 +3,7 @@ import dataUtils from "src/utils/data-utils";
 
 export interface StationInfo {
   ID: string;
-  NOME: string;
+  NAME: string;
 }
 
 export interface Stations {
@@ -11,70 +11,70 @@ export interface Stations {
 }
 
 const STATIONS: Stations = {
-  IMACA6: { ID: "IMACA6", NOME: "Miramar" },
-  IMACA7: { ID: "IMACA7", NOME: "Mirante" },
-  IMACA13: { ID: "IMACA13", NOME: "Trapiche" },
-  IMACA15: { ID: "IMACA15", NOME: "Glória" },
-  IMACA23: { ID: "IMACA23", NOME: "Imboassica" },
-  IMACA26: { ID: "IMACA26", NOME: "Granja dos Cavaleiros" },
-  IMACA27: { ID: "IMACA27", NOME: "Imbetiba" },
-  IMACA28: { ID: "IMACA28", NOME: "Aroeira" },
-  IMACA30: { ID: "IMACA30", NOME: "Imboassica" },
-  IMACA31: { ID: "IMACA31", NOME: "Botafogo" },
-  IMACA32: { ID: "IMACA32", NOME: "Visconde" },
-  IMACA36: { ID: "IMACA36", NOME: "Cidade Universitária" },
-  IMACA41: { ID: "IMACA41", NOME: "Lagomar" },
-  IMACA42: { ID: "IMACA42", NOME: "Virgem Santa" },
-  IMACA43: { ID: "IMACA43", NOME: "Aeroporto" },
-  IMACA46: { ID: "IMACA46", NOME: "Cajueiros" },
-  IMACA52: { ID: "IMACA52", NOME: "Barreto" },
-  IMACA53: { ID: "IMACA53", NOME: "Sana" },
-  IMACA56: { ID: "IMACA56", NOME: "Praia do Pecado" },
+  IMACA6: { ID: "IMACA6", NAME: "Mirante 1" },
+  IMACA7: { ID: "IMACA7", NAME: "Mirante 2" },
+  IMACA13: { ID: "IMACA13", NAME: "Glicério" },
+  // IMACA15: { ID: "IMACA15", NAME: "Glória" },
+  // IMACA23: { ID: "IMACA23", NAME: "Imboassica" },
+  // IMACA26: { ID: "IMACA26", NAME: "Granja dos Cavaleiros" },
+  // IMACA27: { ID: "IMACA27", NAME: "Imbetiba" },
+  // IMACA28: { ID: "IMACA28", NAME: "Aroeira" },
+  IMACA30: { ID: "IMACA30", NAME: "Imboassica" },
+  IMACA31: { ID: "IMACA31", NAME: "Botafogo" },
+  IMACA32: { ID: "IMACA32", NAME: "Visconde" },
+  IMACA36: { ID: "IMACA36", NAME: "Córrego do Ouro" },
+  // IMACA41: { ID: "IMACA41", NAME: "Lagomar" },
+  IMACA42: { ID: "IMACA42", NAME: "Virgem Santa" },
+  IMACA43: { ID: "IMACA43", NAME: "Aeroporto" },
+  // IMACA46: { ID: "IMACA46", NAME: "Cajueiros" },
+  IMACA52: { ID: "IMACA52", NAME: "Barreto" },
+  IMACA53: { ID: "IMACA53", NAME: "Sana" },
+  IMACA56: { ID: "IMACA56", NAME: "Praia do Pecado" },
 };
 
-const CORES = {
-  AZUL: "#1565c0",
-  VERMELHO: "#f44336",
+const COLORS = {
+  BLUE: "#1565c0",
+  RED: "#f44336",
   INDIGO: "#3f51b5",
-  INDIGO_CLARO: "#7986CB",
-  INDIGO_ESCURO: "#1a237e",
+  INDIGO_LIGHT: "#7986CB",
+  INDIGO_DARK: "#1a237e",
 };
 
 /**
- * Opções de períodos do filtro.
+ * Filter period options.
  */
-const PERIODOS = {
-  HOJE: "Hoje",
-  ULTIMAS_SETENTA_E_DUAS_HORAS: "Últimas 72h",
-  ULTIMOS_SETE_DIAS: "Últimos 7 dias",
-  ULTIMOS_TRINTA_DIAS: "Últimos 30 dias",
-  DIA_ESPECIFICO: "Dia específico",
-  MES_ESPECIFICO: "Mês específico",
+const PERIODS = {
+  TODAY: "Hoje",
+  LAST_72_HOURS: "Últimas 72h",
+  LAST_7_DAYS: "Últimos 7 dias",
+  LAST_30_DAYS: "Últimos 30 dias",
+  SPECIFIC_DAY: "Dia específico",
+  SPECIFIC_MONTH: "Mês específico",
 };
 
-// TODO: Essa opção deve ser dinâmica de acordo com o mês selecionado!
-const OPCOES_DIAS: number[] = (arrayUtils as any).arrayRange(
+// TODO: This option should be dynamic based on the selected month!
+const DAY_OPTIONS: number[] = (arrayUtils as any).arrayRange(
   1,
   dataUtils.calculateCurrentMonthDay(),
   1
 );
 
 /**
- * Array de 1 a 12.
+ * Array from 1 to 12.
  */
-const OPCOES_MESES: number[] = Array.from({ length: 12 }, (_, i) => i + 1);
+const MONTH_OPTIONS: number[] = Array.from({ length: 12 }, (_, i) => i + 1);
 
 /**
- * Array de 2020 até o ano atual.
+ * Array from 2020 to current year.
  */
-const OPCOES_ANOS: number[] = (arrayUtils as any).arrayRange(
+const YEAR_OPTIONS: number[] = (arrayUtils as any).arrayRange(
   2020,
   new Date().getFullYear(),
   1
 );
 
-// GRÁFICOS
-const CHART_TEMPERATURA_OPTIONS = {
+// CHARTS
+const TEMPERATURE_CHART_OPTIONS = {
   chart: {
     type: "bar",
     height: 350,
@@ -116,7 +116,7 @@ const CHART_TEMPERATURA_OPTIONS = {
   },
 };
 
-const CHART_PRECIPITACAO_OPTIONS = {
+const PRECIPITATION_CHART_OPTIONS = {
   chart: {
     type: "bar",
     stacked: true,
@@ -168,7 +168,7 @@ const CHART_PRECIPITACAO_OPTIONS = {
   },
 };
 
-const CHART_SERIE_TEMPORAL_OPTIONS = Object.freeze({
+const TIME_SERIES_CHART_OPTIONS = Object.freeze({
   chart: {
     type: "line",
     zoom: {
@@ -219,7 +219,7 @@ const CHART_SERIE_TEMPORAL_OPTIONS = Object.freeze({
   },
 });
 
-const COLUNAS_TABELA = [
+const TABLE_COLUMNS = [
   {
     name: "data",
     required: true,
@@ -256,7 +256,7 @@ const COLUNAS_TABELA = [
     name: "estacao",
     align: "left" as const,
     label: "Local",
-    field: (row: any) => STATIONS[row.stationID]?.NOME || "N/A",
+    field: (row: any) => STATIONS[row.stationID]?.NAME || "N/A",
     sortable: true,
   },
   {
@@ -298,13 +298,13 @@ const COLUNAS_TABELA = [
 
 export {
   STATIONS,
-  CORES,
-  PERIODOS,
-  OPCOES_DIAS,
-  OPCOES_MESES,
-  OPCOES_ANOS,
-  CHART_TEMPERATURA_OPTIONS,
-  CHART_PRECIPITACAO_OPTIONS,
-  CHART_SERIE_TEMPORAL_OPTIONS,
-  COLUNAS_TABELA,
+  COLORS,
+  PERIODS,
+  DAY_OPTIONS,
+  MONTH_OPTIONS,
+  YEAR_OPTIONS,
+  TEMPERATURE_CHART_OPTIONS,
+  PRECIPITATION_CHART_OPTIONS,
+  TIME_SERIES_CHART_OPTIONS,
+  TABLE_COLUMNS,
 };

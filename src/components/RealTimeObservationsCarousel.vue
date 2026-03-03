@@ -24,12 +24,12 @@
         <q-carousel-slide
           v-for="data in realTimeObservations"
           :key="data.stationID"
-          :name="stations[data.stationID]?.NOME || ''"
+          :name="stations[data.stationID]?.NAME || ''"
           class="column no-wrap flex-center"
         >
           <div class="q-pa-md p-2">
             <div class="q-mt-md text-h6 text-weight-bold">
-              {{ stations[data.stationID]?.NOME }}
+              {{ stations[data.stationID]?.NAME }}
             </div>
 
             <div class="justify-start">
@@ -91,7 +91,7 @@ export default defineComponent({
 
   setup() {
     const store = useObservationStore();
-    const slide = ref(STATIONS[Object.keys(STATIONS)[0]].NOME);
+    const slide = ref(STATIONS[Object.keys(STATIONS)[0]].NAME);
     const loading = ref(false);
     const autoplay = ref<boolean | number>(true);
     const lastUpdate = ref(new Date().toLocaleTimeString(navigator.language, {

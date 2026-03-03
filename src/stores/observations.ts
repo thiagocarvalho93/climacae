@@ -26,7 +26,7 @@ interface ObservationState {
   endDate: Date;
 }
 
-const CACHE_TTL_TODAY = 5 * 60 * 1000; // 5 minutos em milisegundos
+const TODAY_CACHE_TTL = 5 * 60 * 1000; // 5 minutes in milliseconds
 
 export const useObservationStore = defineStore("observation", {
   state: (): ObservationState => ({
@@ -62,7 +62,7 @@ export const useObservationStore = defineStore("observation", {
         if (!stationID || !STATIONS[stationID as keyof typeof STATIONS])
           return acc;
 
-        const stationName = STATIONS[stationID as keyof typeof STATIONS].NOME;
+        const stationName = STATIONS[stationID as keyof typeof STATIONS].NAME;
 
         if (!acc[stationName]) {
           acc[stationName] = new StationMetrics(
@@ -111,7 +111,7 @@ export const useObservationStore = defineStore("observation", {
       const cached = this.cachedObservations.get(cacheKey);
       const now = Date.now();
 
-      if (cached && now - cached.timestamp < CACHE_TTL_TODAY) {
+      if (cached && now - cached.timestamp < TODAY_CACHE_TTL) {
         this.observations = cached.data;
         return;
       }
@@ -139,11 +139,11 @@ export const useObservationStore = defineStore("observation", {
       const cached = this.cachedObservations.get(cacheKey);
       const now = Date.now();
 
-      // Se for hoje, aplica o TTL. Se for passado, cache eterno.
+      // If it's today, apply TTL. If it's past, eternal cache.
       const isToday = dataUtils.isToday(date);
 
       if (cached) {
-        if (!isToday || now - cached.timestamp < CACHE_TTL_TODAY) {
+        if (!isToday || now - cached.timestamp < TODAY_CACHE_TTL) {
           this.observations = cached.data;
           return;
         }
@@ -179,12 +179,12 @@ export const useObservationStore = defineStore("observation", {
       const cached = this.cachedObservations.get(cacheKey);
       const now = Date.now();
 
-      // Se o período incluir "hoje", podemos querer expirar, mas geralmente períodos históricos não mudam.
-      // Por simplicidade, expiramos se o finalDate for hoje.
+      // If the period includes "today", we might want to expire, but usually historical periods don't change.
+      // For simplicity, expire if finalDate is today.
       const endsToday = dataUtils.isToday(finalDate);
 
       if (cached) {
-        if (!endsToday || now - cached.timestamp < CACHE_TTL_TODAY) {
+        if (!endsToday || now - cached.timestamp < TODAY_CACHE_TTL) {
           this.observations = cached.data;
           return;
         }

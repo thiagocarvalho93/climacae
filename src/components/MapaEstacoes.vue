@@ -79,7 +79,7 @@ const updateMarkers = () => {
       const color = isNaN(value) ? "#999" : getColorForVariable(value, selectedVariable.value.colorRange);
       const displayValue = isNaN(value) ? "N/A" : `${value}${selectedVariable.value.unit}`;
       
-      const stationName = STATIONS[obs.stationID as keyof typeof STATIONS]?.NOME || obs.stationID;
+      const stationName = STATIONS[obs.stationID as keyof typeof STATIONS]?.NAME || obs.stationID;
 
       // Custom HTML marker
       const icon = L.divIcon({

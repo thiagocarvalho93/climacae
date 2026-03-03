@@ -100,7 +100,7 @@
 
 <script lang="ts">
 import { ref, computed, onMounted, defineComponent } from "vue";
-import { STATIONS, CHART_SERIE_TEMPORAL_OPTIONS } from "../constants/constants";
+import { STATIONS, TIME_SERIES_CHART_OPTIONS } from "../constants/constants";
 import dataUtils from "src/utils/data-utils";
 import SecaoFiltros from "src/components/SecaoFiltros.vue";
 import { useObservationStore } from "src/stores/observations";
@@ -141,7 +141,7 @@ export default defineComponent({
       setDatesGivenPeriod,
     } = useDateRangeSetter();
 
-    const chartTimeSerieOptions = ref(CHART_SERIE_TEMPORAL_OPTIONS);
+    const chartTimeSerieOptions = ref(TIME_SERIES_CHART_OPTIONS);
     const temperatureSeries = ref([]);
     const pressureSeries = ref([]);
     const precipitationSeries = ref([]);

@@ -21,7 +21,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed } from "vue";
-import { CHART_TEMPERATURA_OPTIONS, CORES } from "src/constants/constants";
+import { TEMPERATURE_CHART_OPTIONS, COLORS } from "src/constants/constants";
 import { useObservationStore } from "src/stores/observations";
 
 export default defineComponent({
@@ -37,7 +37,7 @@ export default defineComponent({
     const graficoColunaTemperatura = ref<any>(null);
     const chartSeries = ref<any[]>([]);
 
-    const chartTemperaturaOptions = computed(() => CHART_TEMPERATURA_OPTIONS);
+    const chartTemperaturaOptions = computed(() => TEMPERATURE_CHART_OPTIONS);
     const stationsMetrics = computed(() => store.stationsMetrics);
 
     const update = () => {
@@ -49,12 +49,12 @@ export default defineComponent({
         series: [
           {
             name: "Máxima",
-            color: CORES.VERMELHO,
+            color: COLORS.RED,
             data: dadosFiltrados.map((x) => x.maxima),
           },
           {
             name: "Mínima",
-            color: CORES.AZUL,
+            color: COLORS.BLUE,
             data: dadosFiltrados.map((x) => x.minima),
           },
         ],
