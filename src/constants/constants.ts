@@ -26,10 +26,13 @@ const STATIONS: Stations = {
   // IMACA41: { ID: "IMACA41", NAME: "Lagomar" },
   IMACA42: { ID: "IMACA42", NAME: "Virgem Santa" },
   IMACA43: { ID: "IMACA43", NAME: "Aeroporto" },
+  IMACA44: { ID: "IMACA44", NAME: "Cavaleiros" },
   // IMACA46: { ID: "IMACA46", NAME: "Cajueiros" },
   IMACA52: { ID: "IMACA52", NAME: "Barreto" },
   IMACA53: { ID: "IMACA53", NAME: "Sana" },
+  IMACA54: { ID: "IMACA54", NAME: "Cabiúnas" },
   IMACA56: { ID: "IMACA56", NAME: "Praia do Pecado" },
+  IMACA58: { ID: "IMACA58", NAME: "Barra" },
 };
 
 const COLORS = {
