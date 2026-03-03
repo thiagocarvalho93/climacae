@@ -14,11 +14,11 @@ const routes = [
       },
       {
         path: "/estacao",
-        title: "Estacao",
+        title: "Station",
         icon: "bar_chart",
-        name: "Estacao",
+        name: "Station",
         showMenu: true,
-        component: () => import("pages/EstacaoPage.vue"),
+        component: () => import("pages/StationPage.vue"),
       },
       {
         path: "/:catchAll(.*)*",

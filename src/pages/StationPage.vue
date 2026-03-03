@@ -1,6 +1,6 @@
 <template>
   <!-- Filtros -->
-  <SecaoFiltros
+  <FilterSection
     v-model:selected-station="selectedStation"
     v-model:selected-period="selectedPeriod"
     v-model:selected-day="selectedDay"
@@ -102,7 +102,7 @@
 import { ref, computed, onMounted, defineComponent } from "vue";
 import { STATIONS, TIME_SERIES_CHART_OPTIONS } from "../constants/constants";
 import dataUtils from "src/utils/data-utils";
-import SecaoFiltros from "src/components/SecaoFiltros.vue";
+import FilterSection from "src/components/FilterSection.vue";
 import { useObservationStore } from "src/stores/observations";
 import { useNotification } from "src/composables/useNotification";
 import { useDateRangeSetter } from "src/composables/useDateRangeSetter";
@@ -110,8 +110,8 @@ import { SeriesConfig } from "src/types/chart-types";
 import { downsampleLTTB, DataPoint } from "src/utils/downsample-utils";
 
 export default defineComponent({
-  name: "EstacaoPage",
-  components: { SecaoFiltros },
+  name: "StationPage",
+  components: { FilterSection },
 
   setup() {
     const store = useObservationStore();

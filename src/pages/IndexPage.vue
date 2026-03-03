@@ -1,6 +1,6 @@
 <template>
   <!-- Filtros -->
-  <SecaoFiltros
+  <FilterSection
     v-model:selected-period="selectedPeriod"
     v-model:selected-day="selectedDay"
     v-model:selected-month="selectedMonth"
@@ -12,7 +12,7 @@
   <!-- Cards -->
   <div class="row q-col-gutter-md fade">
     <div class="col-12 col-sm-6 col-md-3">
-      <InformacaoCard
+      <InfoCard
         :loading="loading"
         title="MÁXIMA"
         :description="`${maxValues.maxima}°C`"
@@ -24,7 +24,7 @@
     </div>
 
     <div class="col-12 col-sm-6 col-md-3">
-      <InformacaoCard
+      <InfoCard
         :loading="loading"
         title="MÍNIMA"
         :description="`${maxValues.minima}°C`"
@@ -36,7 +36,7 @@
     </div>
 
     <div class="col-12 col-sm-6 col-md-3">
-      <InformacaoCard
+      <InfoCard
         :loading="loading"
         title="VENTO MÁXIMO"
         :description="`${maxValues.ventoMaximo} km/h`"
@@ -48,7 +48,7 @@
     </div>
 
     <div class="col-12 col-sm-6 col-md-3">
-      <InformacaoCard
+      <InfoCard
         :loading="loading"
         title="PRECIPITAÇÃO MÁXIMA"
         :description="`${maxValues.precipitacaoMaxima}mm`"
@@ -69,11 +69,11 @@
 
     <!-- Gráficos -->
     <div class="col-12 col-md-9 flex">
-      <GraficoTemperaturaGeral :loading="loading" ref="temperatureChart" />
+      <GeneralTemperatureChart :loading="loading" ref="temperatureChart" />
     </div>
 
     <div class="col-12 col-sm-5 flex">
-      <GraficoPrecipitacaoGeral
+      <GeneralPrecipitationChart
         :loading="loading"
         :selected-period="selectedPeriod"
         ref="precipitationChart"
@@ -81,12 +81,12 @@
     </div>
 
     <div class="col-12 col-sm-7 flex">
-      <MapaEstacoes />
+      <StationsMap />
     </div>
 
     <!-- Tabela -->
     <div class="col-12">
-      <TabelaObservacoes
+      <ObservationsTable
         :rows="observations"
         :columns="tableColumns"
         :loading="loading"
@@ -105,12 +105,12 @@ import { STATIONS, TABLE_COLUMNS } from "../constants/constants";
 import dataUtils from "src/utils/data-utils";
 import { useQuasar } from "quasar";
 import RealTimeObservationsCarousel from "src/components/RealTimeObservationsCarousel.vue";
-import InformacaoCard from "src/components/InformacaoCard.vue";
-import TabelaObservacoes from "src/components/TabelaObservacoes.vue";
-import SecaoFiltros from "src/components/SecaoFiltros.vue";
-import GraficoTemperaturaGeral from "src/components/GraficoTemperaturaGeral.vue";
-import GraficoPrecipitacaoGeral from "src/components/GraficoPrecipitacaoGeral.vue";
-import MapaEstacoes from "src/components/MapaEstacoes.vue";
+import InfoCard from "src/components/InfoCard.vue";
+import ObservationsTable from "src/components/ObservationsTable.vue";
+import FilterSection from "src/components/FilterSection.vue";
+import GeneralTemperatureChart from "src/components/GeneralTemperatureChart.vue";
+import GeneralPrecipitationChart from "src/components/GeneralPrecipitationChart.vue";
+import StationsMap from "src/components/StationsMap.vue";
 import { useNotification } from "src/composables/useNotification";
 import { useDateRangeSetter } from "src/composables/useDateRangeSetter";
 import { IObservation } from "src/models/observation-model";
@@ -119,12 +119,12 @@ export default defineComponent({
   name: "IndexPage",
   components: {
     RealTimeObservationsCarousel,
-    InformacaoCard,
-    TabelaObservacoes,
-    SecaoFiltros,
-    GraficoTemperaturaGeral,
-    GraficoPrecipitacaoGeral,
-    MapaEstacoes,
+    InfoCard,
+    ObservationsTable,
+    FilterSection,
+    GeneralTemperatureChart,
+    GeneralPrecipitationChart,
+    StationsMap,
   },
   setup() {
     const $q = useQuasar();
