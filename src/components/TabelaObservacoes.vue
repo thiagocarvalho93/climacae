@@ -15,7 +15,7 @@
     :filter="filter"
     :rows-per-page-options="[6, 12, 24, 48, 96]"
     row-key="name"
-    :loading="carregando"
+    :loading="loading"
   >
     <template v-slot:top-right>
       <q-input
@@ -45,7 +45,7 @@ import { QTableColumn } from "quasar";
 export default defineComponent({
   name: "TabelaObservacoes",
   props: {
-    carregando: Boolean,
+    loading: Boolean,
     rows: {
       type: Array as PropType<any[]>,
       default: () => [],
@@ -54,9 +54,9 @@ export default defineComponent({
       type: Array as PropType<QTableColumn[]>,
       default: () => [],
     },
-    periodoSelecionado: String,
-    dataInicial: Date as PropType<Date | null>,
-    dataFinal: Date as PropType<Date | null>,
+    selectedPeriod: String,
+    startDate: Date as PropType<Date | null>,
+    endDate: Date as PropType<Date | null>,
   },
   setup() {
     const filter = ref("");

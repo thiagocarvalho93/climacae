@@ -3,9 +3,9 @@ import { useQuasar } from "quasar";
 export function useNotification() {
   const $q = useQuasar();
 
-  const mensagemErro = (mensagem: string): void => {
+  const showErrorNotification = (message: string): void => {
     $q.notify({
-      message: mensagem,
+      message: message,
       type: "negative",
       progress: true,
       position: "top",
@@ -13,5 +13,5 @@ export function useNotification() {
     });
   };
 
-  return { mensagemErro };
+  return { showErrorNotification };
 }

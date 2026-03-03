@@ -1,14 +1,14 @@
 <template>
   <!-- Filtros -->
   <SecaoFiltros
-    v-model:estacao-selecionada="estacaoSelecionada"
-    v-model:periodo-selecionado="periodoSelecionado"
-    v-model:dia-selecionado="diaSelecionado"
-    v-model:mes-selecionado="mesSelecionado"
-    v-model:ano-selecionado="anoSelecionado"
-    :nomes-estacoes="nomesEstacoes"
-    :carregando="loading"
-    @obter-dados="handleFiltrar"
+    v-model:selected-station="selectedStation"
+    v-model:selected-period="selectedPeriod"
+    v-model:selected-day="selectedDay"
+    v-model:selected-month="selectedMonth"
+    v-model:selected-year="selectedYear"
+    :station-names="stationNames"
+    :loading="loading"
+    @fetch-data="handleFilter"
   />
 
   <!-- Gráficos -->
@@ -19,9 +19,9 @@
         <q-card-section>
           <apexchart
             height="250"
-            :options="chartSerieTemporalOptions"
-            :series="seriesTemperatura"
-            ref="graficoTemporalTemperatura"
+            :options="chartTimeSerieOptions"
+            :series="temperatureSeries"
+            ref="temperatureTimeChart"
           ></apexchart>
         </q-card-section>
         <q-inner-loading
@@ -39,9 +39,9 @@
         <q-card-section>
           <apexchart
             height="250"
-            :options="chartSerieTemporalOptions"
-            :series="seriesPressao"
-            ref="graficoTemporalPressao"
+            :options="chartTimeSerieOptions"
+            :series="pressureSeries"
+            ref="pressureTimeChart"
           ></apexchart>
         </q-card-section>
         <q-inner-loading
@@ -59,9 +59,9 @@
         <q-card-section>
           <apexchart
             height="250"
-            :options="chartSerieTemporalOptions"
-            :series="seriesPrecipitacao"
-            ref="graficoTemporalPrecipitacao"
+            :options="chartTimeSerieOptions"
+            :series="precipitationSeries"
+            ref="precipitationTimeChart"
           ></apexchart>
         </q-card-section>
         <q-inner-loading
@@ -81,9 +81,9 @@
         <q-card-section>
           <apexchart
             height="250"
-            :options="chartSerieTemporalOptions"
-            :series="seriesVento"
-            ref="graficoTemporalVento"
+            :options="chartTimeSerieOptions"
+            :series="windSeries"
+            ref="windTimeChart"
           >
           </apexchart>
         </q-card-section>
@@ -115,7 +115,7 @@ export default defineComponent({
 
   setup() {
     const store = useObservationStore();
-    const { mensagemErro } = useNotification();
+    const { showErrorNotification } = useNotification();
 
     const {
       getStationPeriodDailyObservations,
@@ -123,33 +123,33 @@ export default defineComponent({
       getStationDayObservations,
     } = store;
 
-    const graficoTemporalTemperatura = ref<any>(null);
-    const graficoTemporalPressao = ref<any>(null);
-    const graficoTemporalPrecipitacao = ref<any>(null);
-    const graficoTemporalVento = ref<any>(null);
+    const temperatureTimeChart = ref<any>(null);
+    const pressureTimeChart = ref<any>(null);
+    const precipitationTimeChart = ref<any>(null);
+    const windTimeChart = ref<any>(null);
 
     const loading = ref(false);
-    const estacaoSelecionada = ref(Object.values(STATIONS)[0]);
+    const selectedStation = ref(Object.values(STATIONS)[0]);
 
     const {
-      dataFinal,
-      dataInicial,
-      periodoSelecionado,
-      anoSelecionado,
-      diaSelecionado,
-      mesSelecionado,
+      endDate,
+      startDate,
+      selectedPeriod,
+      selectedYear,
+      selectedDay,
+      selectedMonth,
       setDatesGivenPeriod,
     } = useDateRangeSetter();
 
-    const chartSerieTemporalOptions = ref(CHART_SERIE_TEMPORAL_OPTIONS);
-    const seriesTemperatura = ref([]);
-    const seriesPressao = ref([]);
-    const seriesPrecipitacao = ref([]);
-    const seriesVento = ref([]);
+    const chartTimeSerieOptions = ref(CHART_SERIE_TEMPORAL_OPTIONS);
+    const temperatureSeries = ref([]);
+    const pressureSeries = ref([]);
+    const precipitationSeries = ref([]);
+    const windSeries = ref([]);
 
-    const nomesEstacoes = computed(() => Object.values(STATIONS));
+    const stationNames = computed(() => Object.values(STATIONS));
 
-    const handleFiltrar = async () => {
+    const handleFilter = async () => {
       loading.value = true;
       try {
         setDatesGivenPeriod();
@@ -158,25 +158,25 @@ export default defineComponent({
         updateGraphs();
       } catch (error: any) {
         console.error(error);
-        mensagemErro(error.message || "Erro ao obter os dados.");
+        showErrorNotification(error.message || "Erro ao obter os dados.");
       } finally {
         loading.value = false;
       }
     };
 
     const fetchStationObservationsData = async () => {
-      if (!dataFinal.value && dataUtils.isToday(dataInicial.value)) {
-        await getStationTodayObservations(estacaoSelecionada.value.ID);
-      } else if (!dataFinal.value) {
+      if (!endDate.value && dataUtils.isToday(startDate.value)) {
+        await getStationTodayObservations(selectedStation.value.ID);
+      } else if (!endDate.value) {
         await getStationDayObservations(
-          estacaoSelecionada.value.ID,
-          dataInicial.value
+          selectedStation.value.ID,
+          startDate.value
         );
       } else {
         await getStationPeriodDailyObservations(
-          estacaoSelecionada.value.ID,
-          dataInicial.value,
-          dataFinal.value
+          selectedStation.value.ID,
+          startDate.value,
+          endDate.value
         );
       }
     };
@@ -193,12 +193,12 @@ export default defineComponent({
       seriesMap: SeriesConfig,
       colors: string[]
     ) => {
-      const dados = Object.keys(seriesMap).map((serie) => {
+      const data = Object.keys(seriesMap).map((serie) => {
         const name = seriesMap[serie].desc;
         const rawData: DataPoint[] = store.stationObservations
           .filter((obs) => obs.metric && (obs.metric as any)[serie] !== undefined && (obs.metric as any)[serie] !== "")
           .map((obs) => [
-            dataUtils.subtrairHoras(new Date(obs.obsTimeLocal as string), 3),
+            dataUtils.subtractHours(new Date(obs.obsTimeLocal as string), 3),
             Number((obs.metric as any)[serie]),
           ]);
 
@@ -212,7 +212,7 @@ export default defineComponent({
       });
 
       chartRef.value.updateOptions({
-        series: dados,
+        series: data,
         yaxis: {},
         colors,
       });
@@ -224,7 +224,7 @@ export default defineComponent({
         tempHigh: { desc: "Máxima", color: "red" },
         tempLow: { desc: "Mínima", color: "blue" },
       };
-      updateGraphOptions(graficoTemporalTemperatura, tempMap, [
+      updateGraphOptions(temperatureTimeChart, tempMap, [
         "#FFD700",
         "#FF5733",
         "#6495ED",
@@ -237,7 +237,7 @@ export default defineComponent({
         pressureMax: { desc: "Máxima", color: "red" },
       };
 
-      updateGraphOptions(graficoTemporalPressao, pressurePropsMap, [
+      updateGraphOptions(pressureTimeChart, pressurePropsMap, [
         "#6495ED",
         "#FF5733",
       ]);
@@ -249,7 +249,7 @@ export default defineComponent({
         precipTotal: { desc: "Total", color: "blue" },
       };
 
-      updateGraphOptions(graficoTemporalPrecipitacao, precipPropsMap, [
+      updateGraphOptions(precipitationTimeChart, precipPropsMap, [
         "#FFD700",
         "#6495ED",
       ]);
@@ -262,7 +262,7 @@ export default defineComponent({
         windspeedLow: { desc: "Mínima", color: "blue" },
       };
 
-      updateGraphOptions(graficoTemporalVento, windPropsMap, [
+      updateGraphOptions(windTimeChart, windPropsMap, [
         "#FFD700",
         "#FF5733",
         "#6495ED",
@@ -270,27 +270,27 @@ export default defineComponent({
     };
 
     onMounted(async () => {
-      await handleFiltrar();
+      await handleFilter();
     });
 
     return {
-      graficoTemporalTemperatura,
-      graficoTemporalPressao,
-      graficoTemporalPrecipitacao,
-      graficoTemporalVento,
+      temperatureTimeChart,
+      pressureTimeChart,
+      precipitationTimeChart,
+      windTimeChart,
       loading,
-      estacaoSelecionada,
-      periodoSelecionado,
-      diaSelecionado,
-      mesSelecionado,
-      anoSelecionado,
-      chartSerieTemporalOptions,
-      seriesTemperatura,
-      seriesPressao,
-      seriesPrecipitacao,
-      seriesVento,
-      nomesEstacoes,
-      handleFiltrar,
+      selectedStation,
+      selectedPeriod,
+      selectedDay,
+      selectedMonth,
+      selectedYear,
+      chartTimeSerieOptions,
+      temperatureSeries,
+      pressureSeries,
+      precipitationSeries,
+      windSeries,
+      stationNames,
+      handleFilter,
     };
   },
 });

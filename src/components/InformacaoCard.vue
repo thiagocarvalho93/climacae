@@ -3,19 +3,19 @@
     flat
     bordered
     outline
-    @click="mostrarInformacoesCard = !mostrarInformacoesCard"
+    @click="showCardInfo = !showCardInfo"
     class="cursor-pointer"
   >
-    <q-card-section class="grow" v-if="mostrarInformacoesCard">
+    <q-card-section class="grow" v-if="showCardInfo">
       <q-item>
         <q-item-section>
-          <q-item-label class="text-caption"> {{ titulo }} </q-item-label>
+          <q-item-label class="text-caption"> {{ title }} </q-item-label>
           <q-item-label class="text-bold text-h6">
-            {{ descricao }}
+            {{ description }}
           </q-item-label>
         </q-item-section>
         <q-item-section avatar>
-          <q-icon class="icon" :color="corIcone" size="lg" :name="icone" />
+          <q-icon class="icon" :color="iconColor" size="lg" :name="icon" />
         </q-item-section>
       </q-item>
     </q-card-section>
@@ -24,17 +24,17 @@
       <q-item>
         <q-item-section>
           <q-item-label class="text-caption">
-            {{ tituloVerso }}
+            {{ backTitle }}
           </q-item-label>
           <q-item-label class="text-bold text-h6">
-            {{ descricaoVerso }}
+            {{ backDescription }}
           </q-item-label>
         </q-item-section>
       </q-item>
     </q-card-section>
 
     <q-inner-loading
-      :showing="carregando"
+      :showing="loading"
       label="Aguarde..."
       label-class="text-teal"
       label-style="font-size: 1.1em"
@@ -48,17 +48,17 @@ import { defineComponent } from "vue";
 export default defineComponent({
   name: "InformacaoCard",
   props: {
-    carregando: Boolean,
-    titulo: String,
-    descricao: String,
-    icone: String,
-    tituloVerso: String,
-    descricaoVerso: String,
-    corIcone: { type: String, required: false, default: "primary" },
+    loading: Boolean,
+    title: String,
+    description: String,
+    icon: String,
+    backTitle: String,
+    backDescription: String,
+    iconColor: { type: String, required: false, default: "primary" },
   },
   data() {
     return {
-      mostrarInformacoesCard: true,
+      showCardInfo: true,
     };
   },
 });

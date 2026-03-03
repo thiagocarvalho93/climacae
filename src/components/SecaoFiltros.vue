@@ -1,11 +1,11 @@
 <template>
   <q-card flat bordered class="q-pa-md q-mb-md fade">
     <div class="row q-col-gutter-md">
-      <div v-if="nomesEstacoes" class="col-12 col-sm-4 col-md-2 fade">
+      <div v-if="stationNames" class="col-12 col-sm-4 col-md-2 fade">
         <q-select
           dense
-          v-model="estacaoSelecionadaProxy"
-          :options="nomesEstacoes"
+          v-model="selectedStationProxy"
+          :options="stationNames"
           outlined
           hide-bottom-space
           option-label="NOME"
@@ -16,30 +16,30 @@
         <q-select
           dense
           outlined
-          v-model="periodoSelecionadoProxy"
-          :options="opcoesPeriodos"
+          v-model="selectedPeriodProxy"
+          :options="periodOptions"
           label="Período"
         />
       </div>
       <div
-        v-if="periodoSelecionadoProxy === periodos.DIA_ESPECIFICO"
+        v-if="selectedPeriodProxy === periods.DIA_ESPECIFICO"
         class="col-4 col-sm-2 col-md-1 fade"
       >
         <q-select
           dense
           outlined
-          v-model="diaSelecionadoProxy"
-          :options="opcoesDias"
+          v-model="selectedDayProxy"
+          :options="dayOptions"
           label="Dia"
         />
       </div>
       <div
         v-if="
-          periodoSelecionadoProxy === periodos.MES_ESPECIFICO ||
-          periodoSelecionadoProxy === periodos.DIA_ESPECIFICO
+          selectedPeriodProxy === periods.MES_ESPECIFICO ||
+          selectedPeriodProxy === periods.DIA_ESPECIFICO
         "
         :class="
-          (periodoSelecionadoProxy === periodos.DIA_ESPECIFICO
+          (selectedPeriodProxy === periods.DIA_ESPECIFICO
             ? 'col-4 '
             : 'col-6 ') + 'col-sm-2 col-md-1 fade'
         "
@@ -47,18 +47,18 @@
         <q-select
           dense
           outlined
-          v-model="mesSelecionadoProxy"
-          :options="opcoesMeses"
+          v-model="selectedMonthProxy"
+          :options="monthOptions"
           label="Mês"
         />
       </div>
       <div
         v-if="
-          periodoSelecionadoProxy === periodos.MES_ESPECIFICO ||
-          periodoSelecionadoProxy === periodos.DIA_ESPECIFICO
+          selectedPeriodProxy === periods.MES_ESPECIFICO ||
+          selectedPeriodProxy === periods.DIA_ESPECIFICO
         "
         :class="
-          (periodoSelecionadoProxy === periodos.DIA_ESPECIFICO
+          (selectedPeriodProxy === periods.DIA_ESPECIFICO
             ? 'col-4 '
             : 'col-6 ') + 'col-sm-2 col-md-1 fade'
         "
@@ -66,16 +66,16 @@
         <q-select
           dense
           outlined
-          v-model="anoSelecionadoProxy"
-          :options="opcoesAnos"
+          v-model="selectedYearProxy"
+          :options="yearOptions"
           label="Ano"
         />
       </div>
       <div class="col-12 col-sm-4 col-md-2 col-lg-1 fade">
         <q-btn
-          @click="obterDadosEstacao"
+          @click="fetchData"
           style="width: 100%"
-          :loading="carregando"
+          :loading="loading"
           color="primary"
         >
           Filtrar
@@ -87,9 +87,9 @@
       </div>
       <div class="col-12 col-sm-4 col-md-2 col-lg-1 fade">
         <q-btn
-          @click="exportarCsv"
+          @click="exportCsv"
           style="width: 100%"
-          :loading="carregando"
+          :loading="loading"
           color="primary"
         >
           Exportar Csv
@@ -118,101 +118,101 @@ import { useObservationStore } from "src/stores/observations";
 export default defineComponent({
   name: "SecaoFiltros",
   props: {
-    carregando: Boolean,
-    estacaoSelecionada: Object as PropType<StationInfo>,
-    periodoSelecionado: String,
-    diaSelecionado: Number,
-    mesSelecionado: Number,
-    anoSelecionado: Number,
-    nomesEstacoes: Array as PropType<StationInfo[]>,
+    loading: Boolean,
+    selectedStation: Object as PropType<StationInfo>,
+    selectedPeriod: String,
+    selectedDay: Number,
+    selectedMonth: Number,
+    selectedYear: Number,
+    stationNames: Array as PropType<StationInfo[]>,
   },
   emits: [
-    "update:estacaoSelecionada",
-    "update:periodoSelecionado",
-    "update:diaSelecionado",
-    "update:mesSelecionado",
-    "update:anoSelecionado",
-    "obterDados",
-    "exportarCsv",
+    "update:selectedStation",
+    "update:selectedPeriod",
+    "update:selectedDay",
+    "update:selectedMonth",
+    "update:selectedYear",
+    "fetchData",
+    "exportCsv",
   ],
   setup(props, context) {
     const store = useObservationStore();
 
-    const estacaoSelecionadaProxy = computed({
-      get: () => props.estacaoSelecionada,
+    const selectedStationProxy = computed({
+      get: () => props.selectedStation,
       set: (value) => {
-        context.emit("update:estacaoSelecionada", value);
+        context.emit("update:selectedStation", value);
       },
     });
 
-    const periodoSelecionadoProxy = computed({
-      get: () => props.periodoSelecionado,
+    const selectedPeriodProxy = computed({
+      get: () => props.selectedPeriod,
       set: (value) => {
-        context.emit("update:periodoSelecionado", value);
+        context.emit("update:selectedPeriod", value);
       },
     });
 
-    const diaSelecionadoProxy = computed({
-      get: () => props.diaSelecionado,
+    const selectedDayProxy = computed({
+      get: () => props.selectedDay,
       set: (value) => {
-        context.emit("update:diaSelecionado", value);
+        context.emit("update:selectedDay", value);
       },
     });
 
-    const mesSelecionadoProxy = computed({
-      get: () => props.mesSelecionado,
+    const selectedMonthProxy = computed({
+      get: () => props.selectedMonth,
       set: (value) => {
-        context.emit("update:mesSelecionado", value);
+        context.emit("update:selectedMonth", value);
       },
     });
 
-    const anoSelecionadoProxy = computed({
-      get: () => props.anoSelecionado,
+    const selectedYearProxy = computed({
+      get: () => props.selectedYear,
       set: (value) => {
-        context.emit("update:anoSelecionado", value);
+        context.emit("update:selectedYear", value);
       },
     });
 
-    const opcoesPeriodos = computed(() => Object.values(PERIODOS));
-    const opcoesDias = computed(() => OPCOES_DIAS);
-    const opcoesMeses = computed(() => OPCOES_MESES);
-    const opcoesAnos = computed(() => OPCOES_ANOS);
-    const periodos = computed(() => PERIODOS);
-    const observacoes = computed(() => store.getObservations);
-    const dataInicial = computed(() => store.getStartDate);
-    const dataFinal = computed(() => store.getEndDate);
+    const periodOptions = computed(() => Object.values(PERIODOS));
+    const dayOptions = computed(() => OPCOES_DIAS);
+    const monthOptions = computed(() => OPCOES_MESES);
+    const yearOptions = computed(() => OPCOES_ANOS);
+    const periods = computed(() => PERIODOS);
+    const observations = computed(() => store.getObservations);
+    const startDate = computed(() => store.getStartDate);
+    const endDate = computed(() => store.getEndDate);
 
-    const obterDadosEstacao = () => {
-      context.emit("obterDados");
+    const fetchData = () => {
+      context.emit("fetchData");
     };
 
-    const exportarCsv = () => {
-      context.emit("exportarCsv");
+    const exportCsv = () => {
+      context.emit("exportCsv");
 
-      const nomeCsv = csvUtils.getCsvFileName(
-        periodoSelecionadoProxy.value || "",
-        dataInicial.value,
-        dataFinal.value
+      const csvName = csvUtils.getCsvFileName(
+        selectedPeriodProxy.value || "",
+        startDate.value,
+        endDate.value
       );
-      const csv = csvUtils.getCsvString(observacoes.value);
+      const csv = csvUtils.getCsvString(observations.value);
 
-      csvUtils.downloadCsv(nomeCsv, csv);
+      csvUtils.downloadCsv(csvName, csv);
     };
 
     return {
-      estacaoSelecionadaProxy,
-      periodoSelecionadoProxy,
-      diaSelecionadoProxy,
-      mesSelecionadoProxy,
-      anoSelecionadoProxy,
-      obterDadosEstacao,
-      exportarCsv,
-      opcoesPeriodos,
-      opcoesDias,
-      opcoesMeses,
-      opcoesAnos,
-      periodos,
-      observacoes,
+      selectedStationProxy,
+      selectedPeriodProxy,
+      selectedDayProxy,
+      selectedMonthProxy,
+      selectedYearProxy,
+      fetchData,
+      exportCsv,
+      periodOptions,
+      dayOptions,
+      monthOptions,
+      yearOptions,
+      periods,
+      observations,
     };
   },
 });

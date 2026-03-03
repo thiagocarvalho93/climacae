@@ -7,49 +7,49 @@ export interface IWeatherResponse<T> {
   observations: T[];
 }
 
-async function obterDadosTempoReal(
-  codigoEstacao: string
+async function getRealTimeData(
+  stationId: string
 ): Promise<AxiosResponse<IWeatherResponse<IObservationCurrent>>> {
-  const url = `/pws/observations/current?apiKey=e1f10a1e78da46f5b10a1e78da96f525&stationId=${codigoEstacao}&numericPrecision=decimal&format=json&units=m`;
+  const url = `/pws/observations/current?apiKey=e1f10a1e78da46f5b10a1e78da96f525&stationId=${stationId}&numericPrecision=decimal&format=json&units=m`;
 
   return await api.get<IWeatherResponse<IObservationCurrent>>(url);
 }
 
-async function obterObservacoesDiariasPeriodo(
-  codigoEstacao: string,
-  dataInicial: string,
-  dataFinal: string
+async function getDailyObservationsByPeriod(
+  stationId: string,
+  startDate: string,
+  endDate: string
 ): Promise<IWeatherResponse<IObservation>> {
   //Formato das datas YYYYMMDD
-  const url = `/pws/history/daily?stationId=${codigoEstacao}&format=json&units=m&startDate=${dataInicial}&endDate=${dataFinal}&numericPrecision=decimal&apiKey=e1f10a1e78da46f5b10a1e78da96f525`;
+  const url = `/pws/history/daily?stationId=${stationId}&format=json&units=m&startDate=${startDate}&endDate=${endDate}&numericPrecision=decimal&apiKey=e1f10a1e78da46f5b10a1e78da96f525`;
 
   const { data } = await api.get<IWeatherResponse<IObservation>>(url);
   return data;
 }
 
-async function obterTodasObservacoesDia(
-  codigoEstacao: string,
-  dataFormatada: string
+async function getAllObservationsByDay(
+  stationId: string,
+  formattedDate: string
 ): Promise<IWeatherResponse<IObservation>> {
   //Formato das datas YYYYMMDD
-  const url = `/pws/history/all?stationId=${codigoEstacao}&format=json&units=m&date=${dataFormatada}&numericPrecision=decimal&apiKey=e1f10a1e78da46f5b10a1e78da96f525`;
+  const url = `/pws/history/all?stationId=${stationId}&format=json&units=m&date=${formattedDate}&numericPrecision=decimal&apiKey=e1f10a1e78da46f5b10a1e78da96f525`;
 
   const { data } = await api.get<IWeatherResponse<IObservation>>(url);
   return data;
 }
 
-async function obterObservacoesDiaAtualEstacao(
-  codigoEstacao: string
+async function getStationCurrentDayObservations(
+  stationId: string
 ): Promise<IWeatherResponse<IObservation>> {
-  const url = `/pws/observations/all/1day?apiKey=e1f10a1e78da46f5b10a1e78da96f525&stationId=${codigoEstacao}&numericPrecision=decimal&format=json&units=m`;
+  const url = `/pws/observations/all/1day?apiKey=e1f10a1e78da46f5b10a1e78da96f525&stationId=${stationId}&numericPrecision=decimal&format=json&units=m`;
 
   const { data } = await api.get<IWeatherResponse<IObservation>>(url);
   return data;
 }
 
 export default {
-  obterDadosTempoReal,
-  obterTodasObservacoesDia,
-  obterObservacoesDiariasPeriodo,
-  obterObservacoesDiaAtualEstacao,
+  getRealTimeData,
+  getAllObservationsByDay,
+  getDailyObservationsByPeriod,
+  getStationCurrentDayObservations,
 };

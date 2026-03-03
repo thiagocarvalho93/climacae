@@ -117,7 +117,7 @@ export const useObservationStore = defineStore("observation", {
       }
 
       const promises = stationsArray.map((station) =>
-        weatherApi.obterObservacoesDiaAtualEstacao(station)
+        weatherApi.getStationCurrentDayObservations(station)
       );
 
       const responses = await Promise.all(promises);
@@ -152,7 +152,7 @@ export const useObservationStore = defineStore("observation", {
       const dataFormatada = dataUtils.formatDateForQuery(date);
 
       const promises = stationsArray.map((station) =>
-        weatherApi.obterTodasObservacoesDia(station, dataFormatada)
+        weatherApi.getAllObservationsByDay(station, dataFormatada)
       );
 
       const responses = await Promise.all(promises);
@@ -194,7 +194,7 @@ export const useObservationStore = defineStore("observation", {
       const formatedFinalDate = dataUtils.formatDateForQuery(finalDate);
 
       const promises = stationsArray.map((station) =>
-        weatherApi.obterObservacoesDiariasPeriodo(
+        weatherApi.getDailyObservationsByPeriod(
           station,
           formatedStartDate,
           formatedFinalDate
@@ -218,7 +218,7 @@ export const useObservationStore = defineStore("observation", {
 
     //#region Get by station
     async getStationTodayObservations(idEstacao: string) {
-      const response = await weatherApi.obterObservacoesDiaAtualEstacao(
+      const response = await weatherApi.getStationCurrentDayObservations(
         idEstacao
       );
 
@@ -235,7 +235,7 @@ export const useObservationStore = defineStore("observation", {
       const formatedStartDate = dataUtils.formatDateForQuery(startDate);
       const formatedFinalDate = dataUtils.formatDateForQuery(finalDate);
 
-      const response = await weatherApi.obterObservacoesDiariasPeriodo(
+      const response = await weatherApi.getDailyObservationsByPeriod(
         stationId,
         formatedStartDate,
         formatedFinalDate
@@ -249,7 +249,7 @@ export const useObservationStore = defineStore("observation", {
     async getStationDayObservations(stationId: string, date: Date) {
       const formattedDate = dataUtils.formatDateForQuery(date);
 
-      const response = await weatherApi.obterTodasObservacoesDia(
+      const response = await weatherApi.getAllObservationsByDay(
         stationId,
         formattedDate
       );
@@ -272,7 +272,7 @@ export const useObservationStore = defineStore("observation", {
       }
 
       const promises = stationsArray.map((station) =>
-        weatherApi.obterDadosTempoReal(station)
+        weatherApi.getRealTimeData(station)
       );
 
       const responses = await Promise.all(promises);

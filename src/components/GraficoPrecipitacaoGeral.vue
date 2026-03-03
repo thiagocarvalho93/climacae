@@ -48,7 +48,7 @@ export default defineComponent({
     const chartPrecipitacaoOptions = computed(() => CHART_PRECIPITACAO_OPTIONS);
     const stationsMetrics = computed(() => store.stationsMetrics);
 
-    const atualizar = () => {
+    const update = () => {
       const dadosFiltrados = stationsMetrics.value.filter(
         (x) =>
           x.precipitacaoMaxima !== -Infinity &&
@@ -110,7 +110,7 @@ export default defineComponent({
       graficoPrecipitacao,
       chartSeries,
       chartPrecipitacaoOptions,
-      atualizar,
+      update,
     };
   },
 });

@@ -40,7 +40,7 @@ export default defineComponent({
     const chartTemperaturaOptions = computed(() => CHART_TEMPERATURA_OPTIONS);
     const stationsMetrics = computed(() => store.stationsMetrics);
 
-    const atualizar = () => {
+    const update = () => {
       const dadosFiltrados = stationsMetrics.value.filter(
         (x) => x.maxima !== -Infinity && x.minima !== Infinity
       );
@@ -73,7 +73,7 @@ export default defineComponent({
       graficoColunaTemperatura,
       chartSeries,
       chartTemperaturaOptions,
-      atualizar,
+      update,
     };
   },
 });

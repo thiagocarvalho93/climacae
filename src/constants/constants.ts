@@ -55,7 +55,7 @@ const PERIODOS = {
 // TODO: Essa opção deve ser dinâmica de acordo com o mês selecionado!
 const OPCOES_DIAS: number[] = (arrayUtils as any).arrayRange(
   1,
-  dataUtils.calcularDiaMesAtual(),
+  dataUtils.calculateCurrentMonthDay(),
   1
 );
 

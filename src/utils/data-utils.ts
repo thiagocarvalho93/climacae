@@ -1,27 +1,27 @@
 /**
- * Obtem o dia e o mês atual, com horário zerado.
+ * Gets the current day of the month.
  */
-const calcularDiaMesAtual = (): number =>
+const calculateCurrentMonthDay = (): number =>
   new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
 
 /**
- * Subtrai horas de uma data.
- * @param {Date} data - data a ser subtraida.
- * @param {number} horas - horas a se subtrair.
- * @returns Retorna uma nova data com as horas subtraidas.
+ * Subtracts hours from a date.
+ * @param {Date} date - date to subtract from.
+ * @param {number} hours - hours to subtract.
+ * @returns Returns a new date with the hours subtracted.
  */
-const subtrairHoras = (data: Date, horas: number): Date => {
-  const dateCopy = new Date(data);
+const subtractHours = (date: Date, hours: number): Date => {
+  const dateCopy = new Date(date);
 
-  dateCopy.setHours(dateCopy.getHours() - horas);
+  dateCopy.setHours(dateCopy.getHours() - hours);
 
   return dateCopy;
 };
 
 /**
- * Formata a data para o formato do parâmetro do endpoint da API.
- * @param {Date} data -data a ser formatada.
- * @returns retorna uma string da data no formato YYYYMMDD.
+ * Formats the date for the API endpoint parameter format.
+ * @param {Date} data -date to be formatted.
+ * @returns returns a date string in YYYYMMDD format.
  */
 const formatDateForQuery = (data: Date): string => {
   const year = data.getFullYear();
@@ -31,45 +31,45 @@ const formatDateForQuery = (data: Date): string => {
 };
 
 /**
- * Define as datas inicial e final dado um mês e ano.
- * @param {number} mes - mês do ano.
- * @param {number} ano - ano.
- * @throws caso o mês do ano seja no futuro.
- * @returns retorna um objeto contendo dataInicial e dataFinal.
+ * Defines start and end dates given a month and year.
+ * @param {number} month - month of the year.
+ * @param {number} year - year.
+ * @throws if the month of the year is in the future.
+ * @returns returns an object containing startDate and endDate.
  */
-const definirDataInicialEFinalMes = (
-  mes: number,
-  ano: number
-): { dataInicial: Date; dataFinal: Date } => {
-  const hoje = new Date();
-  const isFuturo = mes > hoje.getMonth() + 1 && ano >= hoje.getFullYear();
+const defineMonthStartAndEndDates = (
+  month: number,
+  year: number
+): { startDate: Date; endDate: Date } => {
+  const today = new Date();
+  const isFuture = month > today.getMonth() + 1 && year >= today.getFullYear();
 
-  if (isFuturo) throw new Error("Não é possivel obter dados do futuro!");
+  if (isFuture) throw new Error("Não é possivel obter dados do futuro!");
 
-  const dataInicial = new Date(ano, mes - 1, 1);
+  const startDate = new Date(year, month - 1, 1);
 
-  const isEsseMes = mes === hoje.getMonth() + 1 && ano === hoje.getFullYear();
+  const isCurrentMonth = month === today.getMonth() + 1 && year === today.getFullYear();
 
-  const dataFinal = isEsseMes ? hoje : new Date(ano, mes, 0);
+  const endDate = isCurrentMonth ? today : new Date(year, month, 0);
 
-  return { dataInicial, dataFinal };
+  return { startDate, endDate };
 };
 
-const formatarDataComUnderline = (data: Date | string | number): string => {
-  const d = new Date(data);
-  const dia = d.getDate();
-  const mes = d.getMonth() + 1;
-  const ano = d.getFullYear();
+const formatDateWithUnderline = (date: Date | string | number): string => {
+  const d = new Date(date);
+  const day = d.getDate();
+  const month = d.getMonth() + 1;
+  const year = d.getFullYear();
 
-  return `${dia}_${mes}_${ano}`;
+  return `${day}_${month}_${year}`;
 };
 
-const subtrairDias = (diasAtras: number): Date => {
-  return new Date(Date.now() - diasAtras * 24 * 60 * 60 * 1000);
+const subtractDays = (daysBack: number): Date => {
+  return new Date(Date.now() - daysBack * 24 * 60 * 60 * 1000);
 };
 
-const somarDias = (diasAFrente: number): Date => {
-  return new Date(Date.now() + diasAFrente * 24 * 60 * 60 * 1000);
+const addDays = (daysForward: number): Date => {
+  return new Date(Date.now() + daysForward * 24 * 60 * 60 * 1000);
 };
 
 function isToday(date: Date): boolean {
@@ -82,12 +82,12 @@ function isToday(date: Date): boolean {
 }
 
 export default {
-  calcularDiaMesAtual,
-  subtrairHoras,
+  calculateCurrentMonthDay,
+  subtractHours,
   formatDateForQuery,
-  definirDataInicialEFinalMes,
-  formatarDataComUnderline,
-  subtrairDias,
-  somarDias,
+  defineMonthStartAndEndDates,
+  formatDateWithUnderline,
+  subtractDays,
+  addDays,
   isToday,
 };

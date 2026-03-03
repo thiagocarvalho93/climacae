@@ -49,17 +49,17 @@ const getCsvFileName = (
   startDate: Date | null,
   endDate: Date | null
 ): string => {
-  const formatedStartDate = startDate
-    ? dataUtils.formatarDataComUnderline(startDate)
-    : "data_inicial";
-  const formatedEndDate = endDate
-    ? dataUtils.formatarDataComUnderline(endDate)
-    : "data_final";
+  const formattedStartDate = startDate
+    ? dataUtils.formatDateWithUnderline(startDate)
+    : "start_date";
+  const formattedEndDate = endDate
+    ? dataUtils.formatDateWithUnderline(endDate)
+    : "end_date";
 
   if (selectedPeriod === PERIODOS.HOJE) {
-    return `${formatedStartDate}.csv`;
+    return `${formattedStartDate}.csv`;
   }
-  return `${formatedStartDate}-${formatedEndDate}.csv`;
+  return `${formattedStartDate}-${formattedEndDate}.csv`;
 };
 
 /**
@@ -76,7 +76,7 @@ const downloadCsv = async (
   csvString: string
 ): Promise<void> => {
   try {
-    const opcoes = {
+    const options = {
       types: [
         {
           description: "CSV",
@@ -87,7 +87,7 @@ const downloadCsv = async (
     };
 
     if ("showSaveFilePicker" in window) {
-      const handle = await (window as any).showSaveFilePicker(opcoes);
+      const handle = await (window as any).showSaveFilePicker(options);
       const writable = await handle.createWritable();
       await writable.write(csvString);
       await writable.close();

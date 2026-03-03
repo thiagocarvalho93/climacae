@@ -1,12 +1,12 @@
 <template>
   <!-- Filtros -->
   <SecaoFiltros
-    v-model:periodo-selecionado="periodoSelecionado"
-    v-model:dia-selecionado="diaSelecionado"
-    v-model:mes-selecionado="mesSelecionado"
-    v-model:ano-selecionado="anoSelecionado"
+    v-model:selected-period="selectedPeriod"
+    v-model:selected-day="selectedDay"
+    v-model:selected-month="selectedMonth"
+    v-model:selected-year="selectedYear"
     :loading="loading"
-    @obterDados="handleFiltrar"
+    @fetchData="handleFilter"
   />
 
   <!-- Cards -->
@@ -14,69 +14,69 @@
     <div class="col-12 col-sm-6 col-md-3">
       <InformacaoCard
         :loading="loading"
-        titulo="MÁXIMA"
-        :descricao="`${maxValues.maxima}°C`"
-        icone="thermostat"
-        cor-icone="red-5"
-        :titulo-verso="formatarTituloCard(maxValues.dadosMaxima)"
-        :descricao-verso="formatarDataCard(maxValues.dadosMaxima)"
+        title="MÁXIMA"
+        :description="`${maxValues.maxima}°C`"
+        icon="thermostat"
+        icon-color="red-5"
+        :back-title="formatCardTitle(maxValues.dadosMaxima)"
+        :back-description="formatCardDate(maxValues.dadosMaxima)"
       />
     </div>
 
     <div class="col-12 col-sm-6 col-md-3">
       <InformacaoCard
         :loading="loading"
-        titulo="MÍNIMA"
-        :descricao="`${maxValues.minima}°C`"
-        icone="thermostat"
-        cor-icone="blue-5"
-        :titulo-verso="formatarTituloCard(maxValues.dadosMinima)"
-        :descricao-verso="formatarDataCard(maxValues.dadosMinima)"
+        title="MÍNIMA"
+        :description="`${maxValues.minima}°C`"
+        icon="thermostat"
+        icon-color="blue-5"
+        :back-title="formatCardTitle(maxValues.dadosMinima)"
+        :back-description="formatCardDate(maxValues.dadosMinima)"
       />
     </div>
 
     <div class="col-12 col-sm-6 col-md-3">
       <InformacaoCard
         :loading="loading"
-        titulo="VENTO MÁXIMO"
-        :descricao="`${maxValues.ventoMaximo} km/h`"
-        icone="wind_power"
-        cor-icone="green-5"
-        :titulo-verso="formatarTituloCard(maxValues.dadosVentoMaximo)"
-        :descricao-verso="formatarDataCard(maxValues.dadosVentoMaximo)"
+        title="VENTO MÁXIMO"
+        :description="`${maxValues.ventoMaximo} km/h`"
+        icon="wind_power"
+        icon-color="green-5"
+        :back-title="formatCardTitle(maxValues.dadosVentoMaximo)"
+        :back-description="formatCardDate(maxValues.dadosVentoMaximo)"
       />
     </div>
 
     <div class="col-12 col-sm-6 col-md-3">
       <InformacaoCard
         :loading="loading"
-        titulo="PRECIPITAÇÃO MÁXIMA"
-        :descricao="`${maxValues.precipitacaoMaxima}mm`"
-        icone="ion-rainy"
-        cor-icone="deep-purple-5"
-        :titulo-verso="formatarTituloCard(maxValues.dadosPrecipitacaoMaxima)"
-        :descricao-verso="formatarDataCard(maxValues.dadosPrecipitacaoMaxima)"
+        title="PRECIPITAÇÃO MÁXIMA"
+        :description="`${maxValues.precipitacaoMaxima}mm`"
+        icon="ion-rainy"
+        icon-color="deep-purple-5"
+        :back-title="formatCardTitle(maxValues.dadosPrecipitacaoMaxima)"
+        :back-description="formatCardDate(maxValues.dadosPrecipitacaoMaxima)"
       />
     </div>
 
     <!-- Carrocel -->
     <div class="col-12 col-md-3 flex">
       <RealTimeObservationsCarousel
-        :estacoes="estacoes"
+        :stations="stations"
         :dark-mode="darkMode"
       />
     </div>
 
     <!-- Gráficos -->
     <div class="col-12 col-md-9 flex">
-      <GraficoTemperaturaGeral :loading="loading" ref="graficoTemperatura" />
+      <GraficoTemperaturaGeral :loading="loading" ref="temperatureChart" />
     </div>
 
     <div class="col-12 col-sm-5 flex">
       <GraficoPrecipitacaoGeral
         :loading="loading"
-        :periodo-selecionado="periodoSelecionado"
-        ref="graficoPrecipitacao"
+        :periodo-selecionado="selectedPeriod"
+        ref="precipitationChart"
       />
     </div>
 
@@ -88,11 +88,11 @@
     <div class="col-12">
       <TabelaObservacoes
         :rows="observations"
-        :columns="colunasTabela"
+        :columns="tableColumns"
         :loading="loading"
-        :data-final="dataFinal"
-        :data-inicial="dataInicial"
-        :periodo-selecionado="periodoSelecionado"
+        :end-date="endDate"
+        :start-date="startDate"
+        :selected-period="selectedPeriod"
       />
     </div>
   </div>
@@ -129,31 +129,31 @@ export default defineComponent({
   setup() {
     const $q = useQuasar();
     const observationStore = useObservationStore();
-    const { mensagemErro } = useNotification();
+    const { showErrorNotification } = useNotification();
 
     const loading = ref(true);
 
     const {
-      dataFinal,
-      dataInicial,
-      periodoSelecionado,
-      anoSelecionado,
-      diaSelecionado,
-      mesSelecionado,
+      endDate,
+      startDate,
+      selectedPeriod,
+      selectedYear,
+      selectedDay,
+      selectedMonth,
       setDatesGivenPeriod,
     } = useDateRangeSetter();
 
-    const graficoTemperatura = ref<any>(null);
-    const graficoPrecipitacao = ref<any>(null);
+    const temperatureChart = ref<any>(null);
+    const precipitationChart = ref<any>(null);
 
     const observations = computed(() => observationStore.observations);
     const maxValues = computed(() => observationStore.maxValues);
     const darkMode = computed(() => $q.dark.isActive);
-    const estacoes = computed(() => STATIONS);
-    const idsEstacoes = computed(() => Object.keys(STATIONS));
-    const colunasTabela = computed(() => COLUNAS_TABELA);
+    const stations = computed(() => STATIONS);
+    const stationIds = computed(() => Object.keys(STATIONS));
+    const tableColumns = computed(() => COLUNAS_TABELA);
 
-    const handleFiltrar = async () => {
+    const handleFilter = async () => {
       loading.value = true;
 
       try {
@@ -161,70 +161,70 @@ export default defineComponent({
         await fetchObservationsData();
         updateGraphs();
       } catch (error: any) {
-        mensagemErro(error?.message || "Erro ao obter os dados.");
+        showErrorNotification(error?.message || "Erro ao obter os dados.");
       } finally {
         loading.value = false;
       }
     };
 
     const fetchObservationsData = async () => {
-      if (!dataFinal.value && dataUtils.isToday(dataInicial.value)) {
-        await observationStore.getTodayObservations(idsEstacoes.value);
-      } else if (!dataFinal.value) {
+      if (!endDate.value && dataUtils.isToday(startDate.value)) {
+        await observationStore.getTodayObservations(stationIds.value);
+      } else if (!endDate.value) {
         await observationStore.getSpecificDayObservations(
-          idsEstacoes.value,
-          dataInicial.value
+          stationIds.value,
+          startDate.value
         );
       } else {
         await observationStore.getPeriodDailyObservations(
-          idsEstacoes.value,
-          dataInicial.value,
-          dataFinal.value
+          stationIds.value,
+          startDate.value,
+          endDate.value
         );
       }
     };
 
     function updateGraphs() {
-      graficoTemperatura.value?.atualizar();
-      graficoPrecipitacao.value?.atualizar();
+      temperatureChart.value?.update();
+      precipitationChart.value?.update();
     }
 
-    const formatarDataCard = (dados: IObservation | null) => {
+    const formatCardDate = (dados: IObservation | null) => {
       if (!dados || !dados.obsTimeLocal) return "N/A";
       return new Date(dados.obsTimeLocal).toLocaleDateString();
     };
 
-    const formatarTituloCard = (dados: IObservation | null) => {
+    const formatCardTitle = (dados: IObservation | null) => {
       if (!dados || !dados.stationID) return "Sem dados";
 
       const idEstacao = dados.stationID;
-      const estacao = (estacoes.value as any)[idEstacao];
+      const estacao = (stations.value as any)[idEstacao];
       return `Em ${estacao?.NOME} (${idEstacao})`;
     };
 
     onMounted(() => {
-      handleFiltrar();
+      handleFilter();
     });
 
     return {
       loading,
-      periodoSelecionado,
-      diaSelecionado,
-      mesSelecionado,
-      anoSelecionado,
-      dataInicial,
-      dataFinal,
+      selectedPeriod,
+      selectedDay,
+      selectedMonth,
+      selectedYear,
+      startDate,
+      endDate,
       observations,
       maxValues,
       darkMode,
-      estacoes,
-      idsEstacoes,
-      colunasTabela,
-      handleFiltrar,
-      formatarTituloCard,
-      formatarDataCard,
-      graficoTemperatura,
-      graficoPrecipitacao,
+      stations,
+      stationIds,
+      tableColumns,
+      handleFilter,
+      formatCardTitle,
+      formatCardDate,
+      temperatureChart,
+      precipitationChart,
     };
   },
 });

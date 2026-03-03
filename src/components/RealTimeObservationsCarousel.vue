@@ -1,7 +1,7 @@
 <template>
   <q-card flat bordered class="full-width">
     <q-card-section class="text-h6">
-      Agora ({{ ultimaAtualizacao }})
+      Agora ({{ lastUpdate }})
     </q-card-section>
     <q-card-section>
       <q-carousel
@@ -22,14 +22,14 @@
         @mouseleave="autoplay = true"
       >
         <q-carousel-slide
-          v-for="dados in realTimeObservations"
-          :key="dados.stationID"
-          :name="estacoes[dados.stationID]?.NOME || ''"
+          v-for="data in realTimeObservations"
+          :key="data.stationID"
+          :name="stations[data.stationID]?.NOME || ''"
           class="column no-wrap flex-center"
         >
           <div class="q-pa-md p-2">
             <div class="q-mt-md text-h6 text-weight-bold">
-              {{ estacoes[dados.stationID]?.NOME }}
+              {{ stations[data.stationID]?.NOME }}
             </div>
 
             <div class="justify-start">
@@ -40,7 +40,7 @@
                   size="md"
                   name="ion-thermometer"
                 />
-                {{ dados.metric.temp }}°C
+                {{ data.metric.temp }}°C
               </div>
               <div class="q-mt-md text-body1">
                 <q-icon
@@ -49,7 +49,7 @@
                   size="md"
                   name="ion-rainy"
                 />
-                {{ dados.metric.precipRate }}mm/h
+                {{ data.metric.precipRate }}mm/h
               </div>
             </div>
             <div class="q-mt-md text-body1">
@@ -59,14 +59,14 @@
                 size="md"
                 name="water_drop"
               />
-              {{ dados.humidity }}%
+              {{ data.humidity }}%
             </div>
           </div>
         </q-carousel-slide>
       </q-carousel>
     </q-card-section>
     <q-inner-loading
-      :showing="carregando"
+      :showing="loading"
       label="Aguarde..."
       label-class="text-teal"
       label-style="font-size: 1.1em"
@@ -82,7 +82,7 @@ import { useObservationStore } from "src/stores/observations";
 export default defineComponent({
   name: "RealTimeObservationsCarousel",
   props: {
-    estacoes: {
+    stations: {
       type: Object as PropType<Stations>,
       required: true
     },
@@ -92,23 +92,23 @@ export default defineComponent({
   setup() {
     const store = useObservationStore();
     const slide = ref(STATIONS[Object.keys(STATIONS)[0]].NOME);
-    const carregando = ref(false);
+    const loading = ref(false);
     const autoplay = ref<boolean | number>(true);
-    const ultimaAtualizacao = ref(new Date().toLocaleTimeString(navigator.language, {
+    const lastUpdate = ref(new Date().toLocaleTimeString(navigator.language, {
       hour: "2-digit",
       minute: "2-digit",
     }));
 
     const realTimeObservations = computed(() => store.realTimeObservations);
-    const idsEstacoes = computed(() => Object.keys(STATIONS));
+    const stationIds = computed(() => Object.keys(STATIONS));
 
     let intervalId: any = null;
 
     const fetchRealTime = async () => {
-      carregando.value = true;
+      loading.value = true;
       try {
-        await store.getRealTimeObservations(idsEstacoes.value);
-        ultimaAtualizacao.value = new Date().toLocaleTimeString(
+        await store.getRealTimeObservations(stationIds.value);
+        lastUpdate.value = new Date().toLocaleTimeString(
           navigator.language,
           {
             hour: "2-digit",
@@ -116,7 +116,7 @@ export default defineComponent({
           }
         );
       } finally {
-        carregando.value = false;
+        loading.value = false;
       }
     };
 
@@ -131,9 +131,9 @@ export default defineComponent({
 
     return {
       slide,
-      carregando,
+      loading,
       autoplay,
-      ultimaAtualizacao,
+      lastUpdate,
       realTimeObservations,
       fetchRealTime
     };
