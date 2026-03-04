@@ -12,11 +12,19 @@
   />
 
   <!-- Gráficos -->
-  <div class="row q-col-gutter-md">
+  <div class="row q-col-gutter-md fade">
+    <!-- Temperatura -->
     <div class="col-12 col-md-6 flex">
-      <q-card flat bordered class="full-width">
-        <q-card-section class="text-h6"> Temperatura (°C) </q-card-section>
-        <q-card-section>
+      <q-card flat bordered class="full-width overflow-hidden">
+        <q-card-section class="q-pa-none">
+          <div class="row no-wrap items-center bg-grey-1 text-grey-8 q-px-md q-py-sm border-bottom dark-header">
+            <q-icon name="thermostat" size="xs" class="q-mr-sm" color="red-5" />
+            <div class="text-subtitle2 text-uppercase text-weight-bold letter-spacing-1">
+              Variação de Temperatura (°C)
+            </div>
+          </div>
+        </q-card-section>
+        <q-card-section class="q-pa-md">
           <apexchart
             height="250"
             :options="chartTimeSerieOptions"
@@ -24,19 +32,24 @@
             ref="temperatureTimeChart"
           ></apexchart>
         </q-card-section>
-        <q-inner-loading
-          :showing="loading"
-          label="Aguarde..."
-          label-class="text-teal"
-          label-style="font-size: 1.1em"
-        />
+        <q-inner-loading :showing="loading">
+          <q-spinner-dots size="40px" color="primary" />
+        </q-inner-loading>
       </q-card>
     </div>
 
+    <!-- Pressão -->
     <div class="col-12 col-md-6 flex">
-      <q-card flat bordered class="full-width">
-        <q-card-section class="text-h6"> Pressão (hPa)</q-card-section>
-        <q-card-section>
+      <q-card flat bordered class="full-width overflow-hidden">
+        <q-card-section class="q-pa-none">
+          <div class="row no-wrap items-center bg-grey-1 text-grey-8 q-px-md q-py-sm border-bottom dark-header">
+            <q-icon name="compress" size="xs" class="q-mr-sm" color="blue-grey-5" />
+            <div class="text-subtitle2 text-uppercase text-weight-bold letter-spacing-1">
+              Pressão Atmosférica (hPa)
+            </div>
+          </div>
+        </q-card-section>
+        <q-card-section class="q-pa-md">
           <apexchart
             height="250"
             :options="chartTimeSerieOptions"
@@ -44,19 +57,24 @@
             ref="pressureTimeChart"
           ></apexchart>
         </q-card-section>
-        <q-inner-loading
-          :showing="loading"
-          label="Aguarde..."
-          label-class="text-teal"
-          label-style="font-size: 1.1em"
-        />
+        <q-inner-loading :showing="loading">
+          <q-spinner-dots size="40px" color="primary" />
+        </q-inner-loading>
       </q-card>
     </div>
 
+    <!-- Precipitação -->
     <div class="col-12 col-md-6 flex">
-      <q-card flat bordered class="full-width">
-        <q-card-section class="text-h6"> Precipitação (mm) </q-card-section>
-        <q-card-section>
+      <q-card flat bordered class="full-width overflow-hidden">
+        <q-card-section class="q-pa-none">
+          <div class="row no-wrap items-center bg-grey-1 text-grey-8 q-px-md q-py-sm border-bottom dark-header">
+            <q-icon name="ion-rainy" size="xs" class="q-mr-sm" color="indigo-5" />
+            <div class="text-subtitle2 text-uppercase text-weight-bold letter-spacing-1">
+              Volume de Precipitação (mm)
+            </div>
+          </div>
+        </q-card-section>
+        <q-card-section class="q-pa-md">
           <apexchart
             height="250"
             :options="chartTimeSerieOptions"
@@ -64,21 +82,24 @@
             ref="precipitationTimeChart"
           ></apexchart>
         </q-card-section>
-        <q-inner-loading
-          :showing="loading"
-          label="Aguarde..."
-          label-class="text-teal"
-          label-style="font-size: 1.1em"
-        />
+        <q-inner-loading :showing="loading">
+          <q-spinner-dots size="40px" color="primary" />
+        </q-inner-loading>
       </q-card>
     </div>
 
+    <!-- Vento -->
     <div class="col-12 col-md-6 flex">
-      <q-card flat bordered class="full-width">
-        <q-card-section class="text-h6">
-          Velocidade do vento (km/h)</q-card-section
-        >
-        <q-card-section>
+      <q-card flat bordered class="full-width overflow-hidden">
+        <q-card-section class="q-pa-none">
+          <div class="row no-wrap items-center bg-grey-1 text-grey-8 q-px-md q-py-sm border-bottom dark-header">
+            <q-icon name="air" size="xs" class="q-mr-sm" color="teal-5" />
+            <div class="text-subtitle2 text-uppercase text-weight-bold letter-spacing-1">
+              Velocidade do Vento (km/h)
+            </div>
+          </div>
+        </q-card-section>
+        <q-card-section class="q-pa-md">
           <apexchart
             height="250"
             :options="chartTimeSerieOptions"
@@ -87,12 +108,9 @@
           >
           </apexchart>
         </q-card-section>
-        <q-inner-loading
-          :showing="loading"
-          label="Aguarde..."
-          label-class="text-teal"
-          label-style="font-size: 1.1em"
-        />
+        <q-inner-loading :showing="loading">
+          <q-spinner-dots size="40px" color="primary" />
+        </q-inner-loading>
       </q-card>
     </div>
   </div>
@@ -295,3 +313,7 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+// Using global styles for dark-header, border-bottom, letter-spacing-1, etc.
+</style>

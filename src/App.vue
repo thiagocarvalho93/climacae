@@ -9,7 +9,3 @@ export default defineComponent({
   name: "App",
 });
 </script>
-
-<style lang="scss">
-// Global animations and styles moved to src/css/app.scss
-</style>
