@@ -1,1 +1,71 @@
 // app global css in SCSS form
+
+// Animations
+.fade {
+  animation: fadeIn 0.8s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+// Layout Utilities
+.border-bottom {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+
+  .body--dark & {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.letter-spacing-1 {
+  letter-spacing: 1px;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+// Section Headers (Used in Cards)
+.dark-header {
+  .body--dark & {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    color: #e0e0e0 !important;
+  }
+}
+
+// Shared Typography
+.section-title-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #757575;
+  letter-spacing: 0.5px;
+
+  .body--dark & {
+    color: #bdbdbd;
+  }
+}
+
+// Scrollbars (Modernized)
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  .body--dark & { background: #1d1d1d; }
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+  &:hover { background: #bbb; }
+  
+  .body--dark & {
+    background: #444;
+    &:hover { background: #555; }
+  }
+}

@@ -1,5 +1,5 @@
 <template>
-  <q-card flat bordered class="q-mb-md filter-section-card fade">
+  <q-card flat bordered class="q-mb-md overflow-hidden fade">
     <q-card-section class="q-pa-none">
       <div class="row no-wrap items-center bg-grey-1 text-grey-8 q-px-md q-py-sm border-bottom dark-header">
         <q-icon name="filter_alt" size="xs" class="q-mr-sm" />
@@ -13,7 +13,7 @@
       <div class="row q-col-gutter-md items-end">
         <!-- Station Selection (Conditional) -->
         <div v-if="stationNames" class="col-12 col-sm-4 col-md-3">
-          <div class="filter-label">Estação</div>
+          <div class="section-title-label q-mb-xs">Estação</div>
           <q-select
             dense
             v-model="selectedStationProxy"
@@ -31,7 +31,7 @@
 
         <!-- Period Selection -->
         <div class="col-12 col-sm-4 col-md-2">
-          <div class="filter-label">Período</div>
+          <div class="section-title-label q-mb-xs">Período</div>
           <q-select
             dense
             outlined
@@ -47,7 +47,7 @@
 
         <!-- Date Specific Controls -->
         <div v-if="selectedPeriodProxy === periods.SPECIFIC_DAY" class="col-4 col-sm-2 col-md-1">
-          <div class="filter-label text-center">Dia</div>
+          <div class="section-title-label text-center q-mb-xs">Dia</div>
           <q-select
             dense
             outlined
@@ -62,7 +62,7 @@
           v-if="selectedPeriodProxy === periods.SPECIFIC_MONTH || selectedPeriodProxy === periods.SPECIFIC_DAY"
           :class="(selectedPeriodProxy === periods.SPECIFIC_DAY ? 'col-4 ' : 'col-6 ') + 'col-sm-2 col-md-1'"
         >
-          <div class="filter-label text-center">Mês</div>
+          <div class="section-title-label text-center q-mb-xs">Mês</div>
           <q-select
             dense
             outlined
@@ -77,7 +77,7 @@
           v-if="selectedPeriodProxy === periods.SPECIFIC_MONTH || selectedPeriodProxy === periods.SPECIFIC_DAY"
           :class="(selectedPeriodProxy === periods.SPECIFIC_DAY ? 'col-4 ' : 'col-6 ') + 'col-sm-2 col-md-1'"
         >
-          <div class="filter-label text-center">Ano</div>
+          <div class="section-title-label text-center q-mb-xs">Ano</div>
           <q-select
             dense
             outlined
@@ -247,27 +247,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.filter-section-card {
-  overflow: hidden;
-}
-
-.filter-label {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: #757575;
-  margin-bottom: 4px;
-  letter-spacing: 0.5px;
-}
-
-.border-bottom {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.letter-spacing-1 {
-  letter-spacing: 1px;
-}
-
 .filter-btn {
   height: 40px;
   min-width: 140px;
@@ -283,19 +262,6 @@ export default defineComponent({
 @media (max-width: 599px) {
   .full-width-xs {
     width: 100%;
-  }
-}
-
-.body--dark {
-  .dark-header {
-    background-color: rgba(255, 255, 255, 0.05) !important;
-    color: #e0e0e0 !important;
-  }
-  .border-bottom {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  .filter-label {
-    color: #bdbdbd;
   }
 }
 </style>

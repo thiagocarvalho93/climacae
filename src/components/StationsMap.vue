@@ -135,31 +135,57 @@ onMounted(async () => {
 </script>
 
 <template>
-  <q-card flat bordered class="full-width">
-    <q-card-section class="row items-center q-pb-none">
-      <div class="text-h6">Mapa em Tempo Real</div>
-      <q-space />
-      <q-select
-        v-model="selectedVariable"
-        :options="variables"
-        label="Variável"
-        outlined
-        dense
-        style="min-width: 150px"
-      />
+  <q-card flat bordered class="full-width overflow-hidden fade">
+    <q-card-section class="q-pa-none">
+      <div class="row no-wrap items-center bg-grey-1 text-grey-8 q-px-md q-py-sm border-bottom dark-header">
+        <q-icon name="map" size="xs" class="q-mr-sm" color="primary" />
+        <div class="text-subtitle2 text-uppercase text-weight-bold letter-spacing-1">
+          Mapa em Tempo Real
+        </div>
+        <q-space />
+        <q-select
+          v-model="selectedVariable"
+          :options="variables"
+          outlined
+          dense
+          square
+          hide-bottom-space
+          class="variable-selector"
+        />
+      </div>
     </q-card-section>
 
-    <q-card-section>
-      <div id="map-container" style="height: 350px; border-radius: 4px;"></div>
+    <q-card-section class="q-pa-none">
+      <div id="map-container" style="height: 380px;"></div>
       <q-inner-loading :showing="loading">
-        <q-spinner-gears size="50px" color="primary" />
+        <q-spinner-dots size="40px" color="primary" />
       </q-inner-loading>
     </q-card-section>
   </q-card>
 </template>
 
-<style>
-.custom-map-marker {
+<style lang="scss" scoped>
+.variable-selector {
+  min-width: 150px;
+  background: white;
+
+  .body--dark & {
+    background: transparent;
+  }
+
+  :deep(.q-field__control) {
+    height: 32px;
+    min-height: 32px;
+    font-size: 12px;
+  }
+  
+  :deep(.q-field__native), :deep(.q-field__append) {
+    min-height: 32px;
+    height: 32px;
+  }
+}
+
+:deep(.custom-map-marker) {
   background: none;
   border: none;
 }

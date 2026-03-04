@@ -1,7 +1,15 @@
 <template>
-  <q-card flat bordered class="full-width">
-    <q-card-section class="text-h6"> Precipitação </q-card-section>
-    <q-card-section>
+  <q-card flat bordered class="full-width overflow-hidden fade">
+    <q-card-section class="q-pa-none">
+      <div class="row no-wrap items-center bg-grey-1 text-grey-8 q-px-md q-py-sm border-bottom dark-header">
+        <q-icon name="ion-rainy" size="xs" class="q-mr-sm" color="indigo-5" />
+        <div class="text-subtitle2 text-uppercase text-weight-bold letter-spacing-1">
+          Precipitação por Estação
+        </div>
+      </div>
+    </q-card-section>
+
+    <q-card-section class="q-pa-md">
       <apexchart
         type="bar"
         height="350"
@@ -10,12 +18,10 @@
         ref="graficoPrecipitacao"
       ></apexchart>
     </q-card-section>
-    <q-inner-loading
-      :showing="loading"
-      label="Aguarde..."
-      label-class="text-teal"
-      label-style="font-size: 1.1em"
-    />
+
+    <q-inner-loading :showing="loading">
+      <q-spinner-dots size="40px" color="primary" />
+    </q-inner-loading>
   </q-card>
 </template>
 
@@ -115,3 +121,7 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+// Using global styles for border-bottom, dark-header, letter-spacing-1, etc.
+</style>
