@@ -91,34 +91,40 @@
         <q-space />
 
         <!-- Actions -->
-        <div class="col-12 col-sm-auto row q-gutter-sm">
-          <q-btn
-            unelevated
-            @click="fetchData"
-            :loading="loading"
-            color="primary"
-            class="filter-btn"
-            icon="search"
-            label="Filtrar"
-          >
-            <template v-slot:loading>
-              <q-spinner-dots />
-            </template>
-          </q-btn>
-          
-          <q-btn
-            outline
-            @click="exportCsv"
-            :loading="loading"
-            color="primary"
-            class="filter-btn"
-            icon="download"
-            label="Exportar CSV"
-          >
-            <template v-slot:loading>
-              <q-spinner-dots />
-            </template>
-          </q-btn>
+        <div class="col-12 col-sm-auto">
+          <div class="row q-col-gutter-sm justify-end">
+            <div class="col-12 col-sm-auto">
+              <q-btn
+                unelevated
+                @click="fetchData"
+                :loading="loading"
+                color="primary"
+                class="filter-btn full-width-xs"
+                icon="search"
+                label="Filtrar"
+              >
+                <template v-slot:loading>
+                  <q-spinner-dots />
+                </template>
+              </q-btn>
+            </div>
+            
+            <div class="col-12 col-sm-auto">
+              <q-btn
+                outline
+                @click="exportCsv"
+                :loading="loading"
+                color="primary"
+                class="filter-btn full-width-xs"
+                icon="download"
+                label="Exportar CSV"
+              >
+                <template v-slot:loading>
+                  <q-spinner-dots />
+                </template>
+              </q-btn>
+            </div>
+          </div>
         </div>
       </div>
     </q-card-section>
@@ -264,13 +270,19 @@ export default defineComponent({
 
 .filter-btn {
   height: 40px;
-  min-width: 120px;
+  min-width: 140px;
 }
 
 .centered-selection {
   :deep(.q-field__native) {
     justify-content: center;
     text-align: center;
+  }
+}
+
+@media (max-width: 599px) {
+  .full-width-xs {
+    width: 100%;
   }
 }
 
