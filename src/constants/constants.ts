@@ -13,7 +13,7 @@ export interface Stations {
 const STATIONS: Stations = {
   IMACA6: { ID: "IMACA6", NAME: "Mirante 1" },
   IMACA7: { ID: "IMACA7", NAME: "Mirante 2" },
-  IMACA13: { ID: "IMACA13", NAME: "Glicério" },
+  IMACA13: { ID: "IMACA13", NAME: "Trapiche" },
   // IMACA15: { ID: "IMACA15", NAME: "Glória" },
   // IMACA23: { ID: "IMACA23", NAME: "Imboassica" },
   // IMACA26: { ID: "IMACA26", NAME: "Granja dos Cavaleiros" },
@@ -22,7 +22,7 @@ const STATIONS: Stations = {
   IMACA30: { ID: "IMACA30", NAME: "Imboassica" },
   IMACA31: { ID: "IMACA31", NAME: "Botafogo" },
   IMACA32: { ID: "IMACA32", NAME: "Visconde" },
-  IMACA36: { ID: "IMACA36", NAME: "Córrego do Ouro" },
+  IMACA36: { ID: "IMACA36", NAME: "Cidade universitária" },
   // IMACA41: { ID: "IMACA41", NAME: "Lagomar" },
   IMACA42: { ID: "IMACA42", NAME: "Virgem Santa" },
   IMACA43: { ID: "IMACA43", NAME: "Aeroporto" },
